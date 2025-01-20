@@ -1,8 +1,8 @@
-import { Switch, Route } from "wouter";
-import { PrivateRouter } from "./components/PrivateRouter";
-import { db } from "@/instantdb";
-import { AuthPage } from "./pages/Auth";
-import { DashboardPage } from "./pages/Dashboard";
+import { Switch, Route } from 'wouter';
+import { PrivateRouter } from './components/PrivateRouter';
+import { db } from '@/instantdb';
+import { AuthPage } from './pages/Auth';
+import { WorkspacePage } from './pages/Workspace';
 
 export default function App() {
   const { isLoading, user, error } = db.useAuth();
@@ -21,7 +21,8 @@ export default function App() {
       <Route path="/404" component={() => <>404</>} />
       <Route path="/auth" component={() => <AuthPage />} />
       <PrivateRouter isAuthorized={!!user}>
-        <Route path="/dashboard" component={() => <DashboardPage />} />
+        {/* <Route path="/workspace" component={() => <DashboardPage />} /> */}
+        <Route path="/workspace" component={() => <WorkspacePage />} />
       </PrivateRouter>
       <Route>
         <>404</>
