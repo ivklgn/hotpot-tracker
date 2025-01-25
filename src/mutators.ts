@@ -82,8 +82,25 @@ export async function acceptInvite({
     result,
   };
 }
+
 export async function declineInvite({ inviteId }: { inviteId: string }) {
   const result = await db.transact([db.tx.invites[inviteId].merge({ status: 'declined' })]);
+
+  return {
+    result,
+  };
+}
+
+export async function renameTeam({ teamId, newName }: { teamId: string; newName: string }) {
+  const result = await db.transact([db.tx.teams[teamId].merge({ name: newName })]);
+
+  return {
+    result,
+  };
+}
+
+export async function deleteTeam({ teamId }: { teamId: string }) {
+  const result = await db.transact([db.tx.teams[teamId].delete()]);
 
   return {
     result,

@@ -1,18 +1,35 @@
-import { Switch, Route } from 'wouter';
-import { PrivateRouter } from './components/PrivateRouter';
-import { db } from '@/instantdb';
-import { AuthPage } from './pages/Auth';
-import { WorkspacePage } from './pages/Workspace';
+import { Switch, Route, Redirect } from 'wouter';
+import { useAtom } from '@reatom/npm-react';
+import { userAtom, userAuthLoadingAtom } from './features/auth/model';
+
+import { AuthPage } from './pages/auth';
+import { WorkspacePage } from './pages/workspace';
+import { BoardsPage } from './pages/Boards';
 
 export default function App() {
-  const { isLoading, user, error } = db.useAuth();
+  const [user] = useAtom(userAtom);
+  const [userAuthLoading] = useAtom(userAuthLoadingAtom);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  console.log({
+    user,
+    userAuthLoading,
+  });
 
-  if (error) {
-    return <div>Uh oh! {error.message}</div>;
+  if (userAuthLoading) return null;
+
+  if (user) {
+    return (
+      <Switch>
+        <Route path="/workspace" component={() => <WorkspacePage />} />
+        <Route path="/boards" component={() => <BoardsPage />} />
+        <Route path="/" component={() => <>hello</>} />
+        <Route path="/404" component={() => <>404</>} />
+        <Route path="/auth" component={() => <Redirect to="/workspace" />} />
+        <Route>
+          <>404</>
+        </Route>
+      </Switch>
+    );
   }
 
   return (
@@ -20,10 +37,7 @@ export default function App() {
       <Route path="/" component={() => <>hello</>} />
       <Route path="/404" component={() => <>404</>} />
       <Route path="/auth" component={() => <AuthPage />} />
-      <PrivateRouter isAuthorized={!!user}>
-        {/* <Route path="/workspace" component={() => <DashboardPage />} /> */}
-        <Route path="/workspace" component={() => <WorkspacePage />} />
-      </PrivateRouter>
+      <Route path="/workspace" component={() => <Redirect to="/auth" />} />
       <Route>
         <>404</>
       </Route>

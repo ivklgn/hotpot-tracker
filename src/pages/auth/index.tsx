@@ -1,29 +1,33 @@
-import { db } from '@/instantdb';
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Heading, Box, Input, Stack } from '@chakra-ui/react';
 import { PinInput } from '@/components/ui/pin-input';
 import { Field } from '@/components/ui/field';
 import { Fieldset } from '@chakra-ui/react';
-import { Redirect } from 'wouter';
+import { useAction, useAtom } from '@reatom/npm-react';
+import {
+  emailAtom,
+  emailSentAtom,
+  fetchSendMagickCodeAtom,
+  fetchSignInWithMagickCodeAtom,
+  otpCodeAtom,
+} from './model';
 
 export function AuthPage() {
-  const { user } = db.useAuth();
+  const [email, setEmail] = useAtom(emailAtom);
+  const [emailSent] = useAtom(emailSentAtom);
+  const [otpCode, setOtpCode] = useAtom(otpCodeAtom);
+  const fetchSendMagickCode = useAction(fetchSendMagickCodeAtom);
+  const fetchSignInWithMagickCode = useAction(fetchSignInWithMagickCodeAtom);
+  const [magickCodeError] = useAtom(fetchSendMagickCodeAtom.errorAtom);
+  const [signInError] = useAtom(fetchSignInWithMagickCodeAtom.errorAtom);
+  const [isLoadingSendCode] = useAtom((ctx) => ctx.spy(fetchSendMagickCodeAtom.pendingAtom) > 0);
+  const [isLoadingSignIn] = useAtom((ctx) => ctx.spy(fetchSignInWithMagickCodeAtom.pendingAtom) > 0);
 
-  const [state, setState] = useState({
-    sentEmail: '',
-    email: '',
-    error: null,
-    code: ['', '', '', '', '', ''],
-  });
-
-  const { sentEmail, email, code, error } = state;
-
-  if (user) {
-    return <Redirect to="/workspace" />;
+  if (isLoadingSignIn) {
+    return null;
   }
 
-  if (!sentEmail) {
+  if (!emailSent) {
     return (
       <Box
         style={{
@@ -53,31 +57,27 @@ export function AuthPage() {
           <form
             onSubmit={async (e) => {
               e.preventDefault();
-
               if (!email) return;
-
-              try {
-                await db.auth.sendMagicCode({ email });
-                setState({ ...state, sentEmail: email, error: null });
-              } catch (error: any) {
-                setState({ ...state, error: error.body?.message });
-              }
+              fetchSendMagickCode(email);
             }}
           >
             <Fieldset.Root size="lg" maxW="md">
               <Fieldset.Content>
-                <Field invalid={!!error} errorText={error ? 'Error sending code' : undefined}>
+                <Field
+                  invalid={!!magickCodeError}
+                  errorText={magickCodeError ? 'Error sending code' : undefined}
+                >
                   <Input
                     autoFocus
                     placeholder="Enter your email"
                     type="email"
-                    value={email}
-                    onChange={(e) => setState({ ...state, email: e.target.value, error: null })}
+                    value={email as string}
+                    onChange={(e) => setEmail(e.target.value)}
                   />
                 </Field>
               </Fieldset.Content>
 
-              <Button className="p-mt-2" type="submit" colorScheme="brand">
+              <Button className="p-mt-2" type="submit" colorScheme="brand" disabled={isLoadingSendCode}>
                 Send code
               </Button>
             </Fieldset.Root>
@@ -114,19 +114,10 @@ export function AuthPage() {
         </Heading>
 
         <form
-          onSubmit={async (e) => {
+          onSubmit={(e) => {
             e.preventDefault();
-
-            if (!code) return;
-
-            try {
-              await db.auth.signInWithMagicCode({
-                email: sentEmail,
-                code: code.join(''),
-              });
-            } catch (error: any) {
-              setState({ ...state, error: error.body?.message });
-            }
+            if (!otpCode) return;
+            fetchSignInWithMagickCode({ email, code: otpCode });
           }}
         >
           <Fieldset.Root size="lg" maxW="md">
@@ -135,22 +126,21 @@ export function AuthPage() {
             </Stack>
 
             <Fieldset.Content>
-              <Field invalid={!!error} errorText={error ? 'Invalid code or unknown error' : undefined}>
+              <Field
+                invalid={!!signInError}
+                errorText={signInError ? 'Invalid code or unknown error' : undefined}
+              >
                 <PinInput
                   count={6}
-                  value={code}
+                  value={otpCode}
                   onValueChange={({ value }) => {
-                    setState({
-                      ...state,
-                      code: value,
-                      error: null,
-                    });
+                    setOtpCode(value);
                   }}
                 />
               </Field>
             </Fieldset.Content>
 
-            <Button className="p-mt-2" type="submit" colorScheme="brand">
+            <Button className="p-mt-2" type="submit" colorScheme="brand" disabled={isLoadingSignIn}>
               Verify code
             </Button>
           </Fieldset.Root>

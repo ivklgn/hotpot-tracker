@@ -14,7 +14,8 @@ import { Field } from '@/components/ui/field';
 import { cloneElement, useRef, useState } from 'react';
 import React from 'react';
 import { createTeamWithMember } from '../../mutators';
-import { db } from '../../instantdb';
+import { useAtom } from '@reatom/npm-react';
+import { userAtom } from '../auth/model';
 
 interface CreateTeamDialogProps {
   opener: React.ReactElement;
@@ -22,7 +23,7 @@ interface CreateTeamDialogProps {
 
 export const CreateTeamDialog: React.FC<CreateTeamDialogProps> = ({ opener }) => {
   const ref = useRef<HTMLInputElement>(null);
-  const { user } = db.useAuth();
+  const [user] = useAtom(userAtom);
   const [isVisible, setVisibility] = useState(false);
   const [teamName, setTeamName] = useState('');
 
@@ -72,7 +73,14 @@ export const CreateTeamDialog: React.FC<CreateTeamDialogProps> = ({ opener }) =>
           </DialogBody>
           <DialogFooter>
             <DialogActionTrigger asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setVisibility(false);
+                }}
+              >
+                Cancel
+              </Button>
             </DialogActionTrigger>
             <Button type="submit">Create</Button>
           </DialogFooter>
