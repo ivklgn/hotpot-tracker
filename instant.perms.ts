@@ -9,9 +9,14 @@ export default {
     },
   },
   invites: {
-    bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')", 'isInvitee', 'auth.email == data.userEmail'],
+    bind: [
+      'isMember',
+      "auth.id in data.ref('teams.memberships.userId')",
+      'isInvitee',
+      'auth.email == data.userEmail',
+    ],
     allow: {
-      view: 'isInvitee',
+      view: 'true', // 'isInvitee',
       create: 'isMember',
       delete: 'isMember',
       update: 'false',

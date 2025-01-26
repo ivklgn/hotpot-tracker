@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "publish:schema": "npx instant-cli@latest push schema"
+    "publish:schema": "npx instant-cli@latest push schema",
+    "publish:perms": "npx instant-cli@latest push perms"
   },
   "dependencies": {
     "@chakra-ui/react": "^3.3.1",

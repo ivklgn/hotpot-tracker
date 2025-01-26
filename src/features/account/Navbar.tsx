@@ -91,7 +91,7 @@ export function AccountNavbar() {
               <Avatar name={user?.email} size="xs" variant="outline" />
             </MenuTrigger>
             <MenuContent>
-              <MenuItemGroup title={user?.email}>
+              <MenuItemGroup title={user?.email as string}>
                 <MenuItem value="logout" onClick={handleSignOutClick}>
                   Logout
                 </MenuItem>

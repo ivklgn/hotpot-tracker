@@ -21,6 +21,7 @@ onConnect(teamsAtom, (ctx) => {
     }
     if (resp.data) {
       teamsAtom(ctx, RD.success(resp.data.teams));
+      currentTeamIdAtom(ctx, resp.data.teams?.[0]?.id ?? null);
     }
   });
 

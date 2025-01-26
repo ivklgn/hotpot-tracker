@@ -10,6 +10,7 @@ import { Settings } from './features/settings/Settings';
 import { HiColorSwatch } from 'react-icons/hi';
 import { EmptyState } from '../../components/ui/empty-state';
 import { CreateTeamDialog } from '../../features/teams/CreateTeamDialog';
+import { Members } from './features/members/Members';
 
 export function WorkspacePage() {
   const [currentTeam] = useAtom(currentTeamAtom);
@@ -46,7 +47,7 @@ export function WorkspacePage() {
     <AccountLayout key={currentTeam?.id}>
       <AccountNavbar />
       <Box flex="1" pt={8} mx={6}>
-        <Tabs.Root defaultValue="towork">
+        <Tabs.Root defaultValue="towork" lazyMount>
           <Tabs.List>
             <Tabs.Trigger value="towork">
               <LuFocus />
@@ -61,8 +62,10 @@ export function WorkspacePage() {
               Settings
             </Tabs.Trigger>
           </Tabs.List>
-          <Tabs.Content value="towork">Manage your team members</Tabs.Content>
-          <Tabs.Content value="members">Manage your projects</Tabs.Content>
+          <Tabs.Content value="towork">Data/notifications</Tabs.Content>
+          <Tabs.Content value="members">
+            <Members />
+          </Tabs.Content>
           <Tabs.Content value="settings">
             <Settings />
           </Tabs.Content>

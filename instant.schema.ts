@@ -9,6 +9,7 @@ const _schema = i.schema({
       teamId: i.string(),
       teamName: i.string(),
       userEmail: i.string(),
+      status: i.string(),
     }),
     memberships: i.entity({
       teamId: i.string(),
