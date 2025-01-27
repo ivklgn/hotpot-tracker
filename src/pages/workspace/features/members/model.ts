@@ -3,6 +3,7 @@ import { atom, onConnect, reatomAsync, withErrorAtom } from '@reatom/framework';
 import { db } from '../../../../instantdb';
 import { currentTeamIdAtom } from '../../../../features/account/model';
 import { id } from '@instantdb/react';
+import { userAtom } from '../../../../features/auth/model';
 
 export const membershipsAtom = atom<RD.RemoteData<Error, any[]>>(RD.notAsked(), 'membershipsAtom');
 export const invitesAtom = atom<RD.RemoteData<Error, any[]>>(RD.notAsked(), 'invitesAtom');
@@ -97,8 +98,12 @@ export const fetchInviteMemberAtom = reatomAsync(
     }
   ) => {
     const inviteId = id();
+    const membershipId = id();
+
     return db.transact([
-      db.tx.invites[inviteId].update({ userEmail, teamId, teamName, status: 'pending' }),
+      db.tx.memberships[membershipId].update({ teamId, userEmail }),
+      db.tx.memberships[membershipId].link({ teams: teamId }),
+      db.tx.invites[inviteId].update({ userEmail, teamId, teamName, status: 'pending', membershipId }),
       db.tx.invites[inviteId].link({ teams: teamId }),
     ]);
   },

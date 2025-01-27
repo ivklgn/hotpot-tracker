@@ -3,22 +3,28 @@ import { LuCheck, LuPencilLine, LuX } from 'react-icons/lu';
 import { useAction, useAtom, useCtx } from '@reatom/npm-react';
 import { currentTeamAtom } from '../../../../features/account/model';
 import { renameTeam } from '../../../../mutators';
-import { fetchDeleteTeam } from './model';
+import { fetchDeleteTeamAtom } from './model';
 import { ConfirmAction } from '../../../../components/ConfirmAction';
 
 export function Settings() {
   const ctx = useCtx();
   const [currentTeam] = useAtom(currentTeamAtom);
-  const fetchDeleteQuestion = useAction(fetchDeleteTeam);
+  const fetchDeleteTeam = useAction(fetchDeleteTeamAtom);
   // TODO: fix cast
   const [name, setName] = useAtom<string>(ctx.get(currentTeamAtom)?.name || '');
 
   const handleDeleteTeamClick = async () => {
-    fetchDeleteQuestion(currentTeam.id);
+    fetchDeleteTeam(currentTeam.id);
   };
 
   return (
     <Table.Root size="md">
+      <Table.Header>
+        <Table.Row>
+          <Table.ColumnHeader>Name</Table.ColumnHeader>
+          <Table.ColumnHeader textAlign="end">Action</Table.ColumnHeader>
+        </Table.Row>
+      </Table.Header>
       <Table.Body>
         <Table.Row key="1">
           <Table.Cell>

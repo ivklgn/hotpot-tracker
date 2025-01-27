@@ -23,10 +23,7 @@ export function Members() {
 
   return (
     <>
-      <Stack direction="row" h="10">
-        <InviteMemberDialog opener={<Button size="xs">Invite</Button>} />
-      </Stack>
-      <Table.Root size="sm">
+      <Table.Root size="md">
         <Table.Header>
           <Table.Row>
             <Table.ColumnHeader>Email</Table.ColumnHeader>
@@ -44,6 +41,12 @@ export function Members() {
           ))}
         </Table.Body>
       </Table.Root>
+
+      <br />
+
+      <Stack direction="row" h="10">
+        <InviteMemberDialog opener={<Button size="xs">Invite</Button>} />
+      </Stack>
     </>
   );
 }

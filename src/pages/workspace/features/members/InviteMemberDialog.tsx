@@ -16,6 +16,7 @@ import React from 'react';
 import { useAction, useAtom } from '@reatom/npm-react';
 import { fetchInviteMemberAtom } from './model';
 import { currentTeamAtom } from '../../../../features/account/model';
+import { userAtom } from '../../../../features/auth/model';
 
 interface CreateTeamDialogProps {
   opener: React.ReactElement;
@@ -80,7 +81,7 @@ export const InviteMemberDialog: React.FC<CreateTeamDialogProps> = ({ opener }) 
                 Cancel
               </Button>
             </DialogActionTrigger>
-            <Button type="submit">Create</Button>
+            <Button type="submit">Send</Button>
           </DialogFooter>
         </form>
       </DialogContent>

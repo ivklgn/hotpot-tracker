@@ -16,10 +16,19 @@ export default {
       'auth.email == data.userEmail',
     ],
     allow: {
-      view: 'true', // 'isInvitee',
+      view: 'isInvitee',
       create: 'isMember',
       delete: 'isMember',
       update: 'false',
+    },
+  },
+  drawings: {
+    bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')"],
+    allow: {
+      view: 'isMember',
+      create: 'isMember',
+      delete: 'isMember',
+      update: 'isMember',
     },
   },
   memberships: {
@@ -30,12 +39,16 @@ export default {
       "size(data.ref('teams.invites.id')) == 0 ? auth.id in data.ref('teams.creatorId') : auth.email in data.ref('teams.invites.userEmail')",
       'isUser',
       'auth.id == data.userId',
+      'isCreator',
+      "auth.id in data.ref('teams.creatorId')",
+      'isInvitee',
+      "auth.email in data.ref('teams.invites.userEmail')",
     ],
     allow: {
       view: 'isMember',
-      create: 'isInviteeOrCreator',
+      create: 'isCreator',
       delete: 'isUser',
-      update: 'false',
+      update: 'isInvitee',
     },
   },
 };

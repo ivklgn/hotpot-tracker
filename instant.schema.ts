@@ -7,6 +7,7 @@ const _schema = i.schema({
     }),
     invites: i.entity({
       teamId: i.string(),
+      membershipId: i.string(),
       teamName: i.string(),
       userEmail: i.string(),
       status: i.string(),

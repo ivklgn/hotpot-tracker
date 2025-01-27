@@ -1,9 +1,9 @@
 import { reatomAsync, withErrorAtom } from '@reatom/async';
 import { db } from '../../../../instantdb';
 
-export const fetchDeleteTeam = reatomAsync(
+export const fetchDeleteTeamAtom = reatomAsync(
   (ctx, teamId: string) => db.transact([db.tx.teams[teamId].delete()]),
-  'fetchDeleteTeam'
+  'fetchDeleteTeamAtom'
 ).pipe(
   withErrorAtom((ctx, error) => {
     console.log(error);

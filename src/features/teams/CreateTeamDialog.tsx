@@ -45,7 +45,7 @@ export const CreateTeamDialog: React.FC<CreateTeamDialogProps> = ({ opener }) =>
 
   return (
     <DialogRoot initialFocusEl={() => ref.current} open={isVisible}>
-      <DialogTrigger>
+      <DialogTrigger asChild>
         {cloneElement(opener, {
           ref,
           onClick: () => {
