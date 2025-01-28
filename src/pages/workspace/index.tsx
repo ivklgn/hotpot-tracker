@@ -7,7 +7,7 @@ import { AccountLayout } from '../../features/account/Layout';
 import { useAtom } from '@reatom/npm-react';
 import { currentTeamAtom, teamsAtom } from '../../features/account/model';
 import { Settings } from './features/settings/Settings';
-import { Members } from './features/members/Members';
+import { Members } from './features/members';
 import { ToWork } from './features/towork/ToWork';
 
 export function WorkspacePage() {

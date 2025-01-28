@@ -7,10 +7,8 @@ import { CreateTeamDialog } from '../../../../features/teams/CreateTeamDialog';
 import { HiColorSwatch } from 'react-icons/hi';
 import { EmptyState } from '../../../../components/ui/empty-state';
 import { myInvitesAtom, fetchAcceptInviteAtom } from './model';
-import { userAtom } from '../../../../features/auth/model';
 
 export function ToWork() {
-  const [user] = useAtom(userAtom);
   const fetchAcceptInvite = useAction(fetchAcceptInviteAtom);
 
   const [toWork] = useAtom(
@@ -34,8 +32,10 @@ export function ToWork() {
                 size="xs"
                 onClick={() => {
                   fetchAcceptInvite({
+                    inviteId: invite.id,
                     membershipId: invite.membershipId,
                   });
+                  window.location.reload();
                 }}
               >
                 Accept

@@ -11,12 +11,11 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Field } from '@/components/ui/field';
-import { cloneElement, useRef, useState } from 'react';
+import { cloneElement, useRef } from 'react';
 import React from 'react';
 import { useAction, useAtom } from '@reatom/npm-react';
-import { fetchInviteMemberAtom } from './model';
-import { currentTeamAtom } from '../../../../features/account/model';
-import { userAtom } from '../../../../features/auth/model';
+import { currentTeamAtom } from '../../../../../features/account/model';
+import { fetchInviteMemberAtom, membersAtom } from './model';
 
 interface CreateTeamDialogProps {
   opener: React.ReactElement;
@@ -25,13 +24,20 @@ interface CreateTeamDialogProps {
 export const InviteMemberDialog: React.FC<CreateTeamDialogProps> = ({ opener }) => {
   const ref = useRef<HTMLInputElement>(null);
   const [currentTeam] = useAtom(currentTeamAtom);
-  const [isVisible, setVisibility] = useState(false);
-  const [email, setEmail] = useState('');
+  const [members] = useAtom(membersAtom);
+  const [isVisible, setVisibility] = useAtom(false);
+  const [email, setEmail] = useAtom('');
+  const [error, setError] = useAtom<string | null>(null);
   const fetchInviteMember = useAction(fetchInviteMemberAtom);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
+
+    if (members.find((m) => m.userEmail === email)) {
+      setError('User already invited');
+      return;
+    }
 
     fetchInviteMember({
       teamId: currentTeam?.id as string,
@@ -41,6 +47,7 @@ export const InviteMemberDialog: React.FC<CreateTeamDialogProps> = ({ opener }) 
 
     setEmail('');
     setVisibility(false);
+    setError(null);
   };
 
   return (
@@ -59,12 +66,15 @@ export const InviteMemberDialog: React.FC<CreateTeamDialogProps> = ({ opener }) 
             <DialogTitle>Invite user by email</DialogTitle>
           </DialogHeader>
           <DialogBody pb="4">
-            <Field label="Last Name">
+            <Field invalid={!!error} errorText={error}>
               <Input
                 ref={ref}
                 placeholder="user@mail.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setError(null);
+                  setEmail(e.target.value);
+                }}
                 required
                 type="email"
               />

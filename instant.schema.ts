@@ -28,6 +28,7 @@ const _schema = i.schema({
         on: 'invites',
         has: 'one',
         label: 'teams',
+        onDelete: 'cascade',
       },
       reverse: {
         on: 'teams',

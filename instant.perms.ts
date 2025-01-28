@@ -16,19 +16,10 @@ export default {
       'auth.email == data.userEmail',
     ],
     allow: {
-      view: 'isInvitee',
+      view: 'isInvitee || isMember',
       create: 'isMember',
       delete: 'isMember',
-      update: 'false',
-    },
-  },
-  drawings: {
-    bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')"],
-    allow: {
-      view: 'isMember',
-      create: 'isMember',
-      delete: 'isMember',
-      update: 'isMember',
+      update: 'isInvitee',
     },
   },
   memberships: {
@@ -47,7 +38,7 @@ export default {
     allow: {
       view: 'isMember',
       create: 'isCreator',
-      delete: 'isUser',
+      delete: 'isCreator',
       update: 'isInvitee',
     },
   },
