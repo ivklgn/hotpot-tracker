@@ -9,8 +9,10 @@ import { currentTeamAtom, teamsAtom } from '../../features/account/model';
 import { Settings } from './features/settings/Settings';
 import { Members } from './features/members';
 import { ToWork } from './features/towork/ToWork';
+import { userAtom } from '../../features/auth/model';
 
 export function WorkspacePage() {
+  const [user] = useAtom(userAtom);
   const [currentTeam] = useAtom(currentTeamAtom);
   const [teams] = useAtom(teamsAtom);
 
@@ -37,6 +39,41 @@ export function WorkspacePage() {
     );
   }
 
+  if (user?.id === currentTeam?.creatorId) {
+    return (
+      <AccountLayout key={currentTeam?.id}>
+        <AccountNavbar />
+        <Box flex="1" pt={8} mx={6}>
+          <Tabs.Root defaultValue="towork" lazyMount>
+            <Tabs.List>
+              <Tabs.Trigger value="towork">
+                <LuFocus />
+                To work
+              </Tabs.Trigger>
+              <Tabs.Trigger value="members">
+                <LuUser />
+                Members
+              </Tabs.Trigger>
+              <Tabs.Trigger value="settings">
+                <LuSettings />
+                Settings
+              </Tabs.Trigger>
+            </Tabs.List>
+            <Tabs.Content value="towork">
+              <ToWork />
+            </Tabs.Content>
+            <Tabs.Content value="members">
+              <Members />
+            </Tabs.Content>
+            <Tabs.Content value="settings">
+              <Settings />
+            </Tabs.Content>
+          </Tabs.Root>
+        </Box>
+      </AccountLayout>
+    );
+  }
+
   return (
     <AccountLayout key={currentTeam?.id}>
       <AccountNavbar />
@@ -51,19 +88,12 @@ export function WorkspacePage() {
               <LuUser />
               Members
             </Tabs.Trigger>
-            <Tabs.Trigger value="settings">
-              <LuSettings />
-              Settings
-            </Tabs.Trigger>
           </Tabs.List>
           <Tabs.Content value="towork">
             <ToWork />
           </Tabs.Content>
           <Tabs.Content value="members">
             <Members />
-          </Tabs.Content>
-          <Tabs.Content value="settings">
-            <Settings />
           </Tabs.Content>
         </Tabs.Root>
       </Box>

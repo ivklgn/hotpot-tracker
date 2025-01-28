@@ -11,11 +11,11 @@ if (import.meta.env.DEV) {
 }
 
 createRoot(document.getElementById('root')!).render(
-  // <StrictMode>
-  <reatomContext.Provider value={ctx}>
-    <Provider>
-      <App />
-    </Provider>
-  </reatomContext.Provider>
-  // </StrictMode>
+  <StrictMode>
+    <reatomContext.Provider value={ctx}>
+      <Provider>
+        <App />
+      </Provider>
+    </reatomContext.Provider>
+  </StrictMode>
 );
