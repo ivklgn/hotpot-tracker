@@ -1,4 +1,3 @@
-import * as RD from '@young-aviator-club/remote-data';
 import {
   Box,
   Button,
@@ -27,7 +26,7 @@ const routes = [
 export function AccountNavbar() {
   const [location] = useLocation();
   const [user] = useAtom(userAtom);
-  const [teams] = useAtom(teamsAtom);
+  const [teams] = useAtom(teamsAtom.dataAtom);
   const [currentTeam] = useAtom(currentTeamAtom);
   const [, setCurrentTeamId] = useAtom(currentTeamIdAtom);
   const signOut = useAction(fetchSignOutAtom);
@@ -56,9 +55,9 @@ export function AccountNavbar() {
               </MenuTrigger>
             )}
             <MenuContent>
-              {RD.successOrElse(teams, () => []).map((team) => (
+              {teams?.data?.teams?.map((team) => (
                 <MenuItem key={team.id} value={team.id} onClick={() => handleChangeTeamClick(team.id)}>
-                  {currentTeam.id === team.id ? <Status value="success">{team.name}</Status> : team.name}
+                  {currentTeam?.id === team.id ? <Status value="success">{team.name}</Status> : team.name}
                 </MenuItem>
               ))}
               <MenuSeparator />

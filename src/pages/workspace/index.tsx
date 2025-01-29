@@ -1,4 +1,3 @@
-import * as RD from '@young-aviator-club/remote-data';
 import { Box } from '@chakra-ui/react';
 import { LuUser, LuFocus, LuSettings } from 'react-icons/lu';
 import { Tabs } from '@chakra-ui/react';
@@ -14,14 +13,11 @@ import { userAtom } from '../../features/auth/model';
 export function WorkspacePage() {
   const [user] = useAtom(userAtom);
   const [currentTeam] = useAtom(currentTeamAtom);
-  const [teams] = useAtom(teamsAtom);
+  const [teams] = useAtom(teamsAtom.dataAtom);
 
-  if (RD.isLoading(teams)) return;
-
-  if (RD.isSuccess(teams) && teams.data.length === 0) {
+  if (teams?.data?.teams?.length === 0) {
     return (
       <AccountLayout key={currentTeam?.id}>
-        <AccountNavbar />
         <Box flex="1" pt={8} mx={6}>
           <Tabs.Root defaultValue="towork" lazyMount>
             <Tabs.List>
@@ -42,7 +38,6 @@ export function WorkspacePage() {
   if (user?.id === currentTeam?.creatorId) {
     return (
       <AccountLayout key={currentTeam?.id}>
-        <AccountNavbar />
         <Box flex="1" pt={8} mx={6}>
           <Tabs.Root defaultValue="towork" lazyMount>
             <Tabs.List>

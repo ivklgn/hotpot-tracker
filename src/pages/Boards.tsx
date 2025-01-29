@@ -1,10 +1,8 @@
 import { Badge, Box, Card, Flex, Heading, Stack } from '@chakra-ui/react';
-import { AccountNavbar } from '../features/account/Navbar';
 
 export function BoardsPage() {
   return (
     <Flex direction="column" minH="100vh">
-      <AccountNavbar />
       <Box flex="1" pt={8} mx={6}>
         <Stack>
           <Card.Root size="sm">

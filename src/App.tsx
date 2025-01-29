@@ -5,6 +5,8 @@ import { userAtom, userAuthLoadingAtom } from './features/auth/model';
 import { AuthPage } from './pages/auth';
 import { WorkspacePage } from './pages/workspace';
 import { BoardsPage } from './pages/Boards';
+import { AccountNavbar } from './features/account/Navbar';
+import { AccountLayout } from './features/account/Layout';
 
 export default function App() {
   const [user] = useAtom(userAtom);
@@ -14,16 +16,19 @@ export default function App() {
 
   if (user) {
     return (
-      <Switch>
-        <Route path="/workspace" component={() => <WorkspacePage />} />
-        <Route path="/boards" component={() => <BoardsPage />} />
-        <Route path="/" component={() => <>hello</>} />
-        <Route path="/404" component={() => <>404</>} />
-        <Route path="/auth" component={() => <Redirect to="/workspace" />} />
-        <Route>
-          <>404</>
-        </Route>
-      </Switch>
+      <AccountLayout>
+        <AccountNavbar />
+        <Switch>
+          <Route path="/workspace" component={() => <WorkspacePage />} />
+          <Route path="/boards" component={() => <BoardsPage />} />
+          <Route path="/" component={() => <>hello</>} />
+          <Route path="/404" component={() => <>404</>} />
+          <Route path="/auth" component={() => <Redirect to="/workspace" />} />
+          <Route>
+            <>404</>
+          </Route>
+        </Switch>
+      </AccountLayout>
     );
   }
 

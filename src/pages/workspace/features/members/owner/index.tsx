@@ -8,6 +8,8 @@ export function OwnerMembers() {
   const [members] = useAtom(membersAtom);
   const fetchDeleteMembership = useAction(fetchDeleteMembershipAtom);
 
+  console.log({ members });
+
   return (
     <>
       <Table.Root size="md">
@@ -23,7 +25,7 @@ export function OwnerMembers() {
             <Table.Row key={member.userEmail}>
               <Table.Cell>{member.userEmail}</Table.Cell>
               <Table.Cell>
-                {member.invite ? <InviteStatus status={member.invite.status} /> : 'owner'}
+                {member.invite ? <InviteStatus status={member?.invite?.status} /> : 'owner'}
               </Table.Cell>
               <Table.Cell textAlign="end">
                 {member.invite && (

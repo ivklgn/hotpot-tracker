@@ -1,10 +1,27 @@
-import * as RD from '@young-aviator-club/remote-data';
 import { useAtom } from '@reatom/npm-react';
-import { teammateMembershipsAtom } from './model';
 import { Table } from '@chakra-ui/react';
+import { currentTeamAtom } from '../../../../../features/account/model';
+import { reatomInstantDBSubscription } from '../../../../../reatom-instantdb';
 
 export function TeammateMembers() {
-  const [members] = useAtom(teammateMembershipsAtom);
+  const [currentTeam] = useAtom(currentTeamAtom);
+  const [memberships] = useAtom(
+    () =>
+      reatomInstantDBSubscription({
+        memberships: {
+          $: {
+            where: {
+              'teams.id': currentTeam?.id as string,
+              userId: {
+                $isNull: false,
+              },
+            },
+          },
+        },
+      }),
+    []
+  );
+  const [members] = useAtom(memberships.dataAtom);
 
   return (
     <>
@@ -15,7 +32,7 @@ export function TeammateMembers() {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {RD.successOrElse(members, () => []).map((member) => (
+          {members?.data?.memberships?.map((member) => (
             <Table.Row key={member.userEmail}>
               <Table.Cell>{member.userEmail}</Table.Cell>
             </Table.Row>

@@ -1,4 +1,3 @@
-import * as RD from '@young-aviator-club/remote-data';
 import { Badge, Box, Button, Table } from '@chakra-ui/react';
 import { useAction, useAtom } from '@reatom/npm-react';
 import { teamsAtom } from '../../../../features/account/model';
@@ -6,21 +5,40 @@ import { LuPlus } from 'react-icons/lu';
 import { CreateTeamDialog } from '../../../../features/teams/CreateTeamDialog';
 import { HiColorSwatch } from 'react-icons/hi';
 import { EmptyState } from '../../../../components/ui/empty-state';
-import { myInvitesAtom, fetchAcceptInviteAtom } from './model';
+import { fetchAcceptInviteAtom } from './model';
+import { reatomInstantDBSubscription } from '../../../../reatom-instantdb';
+import { userAtom } from '../../../../features/auth/model';
 
 export function ToWork() {
+  const [user] = useAtom(userAtom);
+  const [myInvitesAtom] = useAtom(
+    () =>
+      reatomInstantDBSubscription({
+        invites: {
+          $: {
+            where: {
+              userEmail: user?.email as string,
+              status: 'pending',
+            },
+          },
+        },
+      }),
+    []
+  );
+
   const fetchAcceptInvite = useAction(fetchAcceptInviteAtom);
 
   const [toWork] = useAtom(
     (ctx) => {
       let data: any[] = [];
-      const teams = ctx.spy(teamsAtom);
-      const myInvites = ctx.spy(myInvitesAtom);
+      const teams = ctx.spy(teamsAtom.dataAtom);
+      const myInvites = ctx.spy(myInvitesAtom.dataAtom);
 
-      if (RD.isSuccess(myInvites) && myInvites.data.length > 0) {
+      console.log({ myInvites });
+      if (myInvites?.data?.invites?.length && myInvites?.data?.invites?.length > 0) {
         data = [
           ...data,
-          ...myInvites.data.map((invite) => ({
+          ...(myInvites?.data?.invites || []).map((invite) => ({
             message: (
               <>
                 <Badge colorPalette="purple">invite</Badge> You have an invite to join{' '}
@@ -45,7 +63,7 @@ export function ToWork() {
         ];
       }
 
-      if (RD.isSuccess(teams) && teams.data.length === 0) {
+      if (teams?.data?.teams?.length === 0) {
         data.push({
           message: 'You dont have own teams. Create now and start working!',
           action: (

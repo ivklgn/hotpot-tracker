@@ -1,30 +1,30 @@
-import * as RD from '@young-aviator-club/remote-data';
-import { atom, onConnect, reatomAsync, withErrorAtom } from '@reatom/framework';
+import { atom, reatomAsync, withErrorAtom } from '@reatom/framework';
 import { id } from '@instantdb/core';
-import { currentTeamIdAtom } from '../../../../../features/account/model';
 import { db } from '../../../../../instantdb';
+import { reatomInstantDBSubscription } from '../../../../../reatom-instantdb';
 
-const membershipsAtom = atom<RD.RemoteData<Error, any[]>>(RD.notAsked(), 'membershipsAtom');
-const invitesAtom = atom<RD.RemoteData<Error, any[]>>(RD.notAsked(), 'invitesAtom');
+export const membershipsAtom = reatomInstantDBSubscription({
+  memberships: {},
+});
 
-type Member = {
-  membershipId: string;
-  userEmail: string;
-  userId: string;
-  invite?: { inviteId: string; status: 'pending' | 'accepted' | 'declined' };
-};
+export const invitesAtom = reatomInstantDBSubscription({
+  invites: {},
+});
 
-export const membersAtom = atom<Member[]>((ctx) => {
-  const memberships = ctx.spy(membershipsAtom);
-  const invites = ctx.spy(invitesAtom);
+export const membersAtom = atom((ctx) => {
+  const memberships = ctx.spy(membershipsAtom.dataAtom);
+  const invites = ctx.spy(invitesAtom.dataAtom);
 
-  if (RD.isSuccess(memberships) && RD.isSuccess(invites)) {
-    const userEmailAsInviteStatus = invites.data.reduce((acc, invite) => {
-      acc[invite.userEmail] = { inviteId: invite.id, status: invite.status };
+  if (memberships?.data?.memberships && invites?.data?.invites) {
+    const userEmailAsInviteStatus = invites?.data?.invites?.reduce((acc, invite) => {
+      acc[invite.userEmail] = {
+        inviteId: invite.id,
+        status: invite.status as 'pending' | 'accepted' | 'declined',
+      } as const;
       return acc;
-    }, {} as Record<string, 'pending' | 'accepted' | 'rejected'>);
+    }, {} as Record<string, { inviteId: string; status: 'pending' | 'accepted' | 'declined' }>);
 
-    return memberships.data.map((membership) => ({
+    return memberships?.data?.memberships?.map((membership) => ({
       membershipId: membership.id,
       userEmail: membership.userEmail,
       userId: membership.userId,
@@ -33,82 +33,6 @@ export const membersAtom = atom<Member[]>((ctx) => {
   }
 
   return [];
-});
-
-onConnect(membersAtom, async (ctx) => {
-  membershipsAtom(ctx, RD.loading());
-
-  const teamId = ctx.get(currentTeamIdAtom);
-
-  if (!teamId) {
-    // TODO: exception
-    return;
-  }
-
-  const unsubscribe = db.subscribeQuery(
-    {
-      memberships: {
-        $: {
-          where: {
-            // 'teams.id': teamId,
-          },
-        },
-      },
-    },
-    (resp) => {
-      if (resp.error) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        membershipsAtom(ctx, RD.failure(resp.error));
-        return;
-      }
-      if (resp.data) {
-        membershipsAtom(ctx, RD.success(resp.data.memberships));
-      }
-    }
-  );
-
-  return () => {
-    unsubscribe();
-  };
-});
-
-onConnect(membersAtom, async (ctx) => {
-  invitesAtom(ctx, RD.loading());
-
-  const teamId = ctx.get(currentTeamIdAtom);
-
-  if (!teamId) {
-    // TODO: exception?
-    return;
-  }
-
-  const unsubscribe = db.subscribeQuery(
-    {
-      invites: {
-        $: {
-          where: {
-            'teams.id': teamId,
-          },
-        },
-      },
-    },
-    (resp) => {
-      if (resp.error) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        invitesAtom(ctx, RD.failure(resp.error));
-        return;
-      }
-      if (resp.data) {
-        invitesAtom(ctx, RD.success(resp.data.invites));
-      }
-    }
-  );
-
-  return () => {
-    unsubscribe();
-  };
 });
 
 export const fetchInviteMemberAtom = reatomAsync(
