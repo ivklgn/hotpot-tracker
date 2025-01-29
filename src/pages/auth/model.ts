@@ -16,7 +16,6 @@ export const fetchSendMagickCodeAtom = reatomAsync(
   }
 ).pipe(
   withErrorAtom((_ctx, error) => {
-    console.log(error);
     return error;
   })
 );
@@ -36,7 +35,6 @@ export const fetchSignInWithMagickCodeAtom = reatomAsync(
   }
 ).pipe(
   withErrorAtom((_ctx, error) => {
-    console.log(error);
     return error;
   })
 );

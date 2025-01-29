@@ -1,6 +1,6 @@
 import * as RD from '@young-aviator-club/remote-data';
 import { atom, onConnect, reatomAsync, withErrorAtom } from '@reatom/framework';
-import { id } from '@instantdb/react';
+import { id } from '@instantdb/core';
 import { currentTeamIdAtom } from '../../../../../features/account/model';
 import { db } from '../../../../../instantdb';
 
@@ -101,7 +101,6 @@ onConnect(membersAtom, async (ctx) => {
         return;
       }
       if (resp.data) {
-        console.log(resp.data.invites);
         invitesAtom(ctx, RD.success(resp.data.invites));
       }
     }
@@ -140,7 +139,6 @@ export const fetchInviteMemberAtom = reatomAsync(
   }
 ).pipe(
   withErrorAtom((_ctx, error) => {
-    console.log(error);
     return error;
   })
 );
@@ -154,7 +152,6 @@ export const fetchDeleteMembershipAtom = reatomAsync(
   }
 ).pipe(
   withErrorAtom((_ctx, error) => {
-    console.log(error);
     return error;
   })
 );

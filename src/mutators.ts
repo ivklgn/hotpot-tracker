@@ -1,4 +1,4 @@
-import { id, tx } from '@instantdb/react';
+import { id, tx } from '@instantdb/core';
 import { db } from './instantdb';
 
 // export async function createDrawingForTeam({ teamId, drawingName }: { teamId: string; drawingName: string }) {

@@ -65,8 +65,6 @@ export function ToWork() {
     [teamsAtom]
   );
 
-  console.log(toWork);
-
   if (toWork.length === 0) {
     return (
       <Box flex="1" pt={8} mx={6}>

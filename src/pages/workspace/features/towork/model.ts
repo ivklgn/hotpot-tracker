@@ -62,7 +62,6 @@ export const fetchAcceptInviteAtom = reatomAsync(
   }
 ).pipe(
   withErrorAtom((_ctx, error) => {
-    console.log('here', error);
     return error;
   })
 );

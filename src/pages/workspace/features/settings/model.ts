@@ -6,7 +6,6 @@ export const fetchDeleteTeamAtom = reatomAsync(
   'fetchDeleteTeamAtom'
 ).pipe(
   withErrorAtom((ctx, error) => {
-    console.log(error);
     return error;
   })
 );

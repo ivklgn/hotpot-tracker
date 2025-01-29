@@ -10,11 +10,6 @@ export default function App() {
   const [user] = useAtom(userAtom);
   const [userAuthLoading] = useAtom(userAuthLoadingAtom);
 
-  console.log({
-    user,
-    userAuthLoading,
-  });
-
   if (userAuthLoading) return null;
 
   if (user) {

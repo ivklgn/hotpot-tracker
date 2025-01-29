@@ -28,7 +28,6 @@ export const fetchSignOutAtom = reatomAsync(() => db.auth.signOut(), {
   },
 }).pipe(
   withErrorAtom((_ctx, error) => {
-    console.log(error);
     return error;
   })
 );

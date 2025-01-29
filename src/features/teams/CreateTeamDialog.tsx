@@ -37,8 +37,6 @@ export const CreateTeamDialog: React.FC<CreateTeamDialogProps> = ({ opener }) =>
       userId: user?.id as string,
     });
 
-    console.log('response', response);
-
     setTeamName('');
     setVisibility(false);
   };

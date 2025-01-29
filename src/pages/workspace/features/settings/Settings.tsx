@@ -36,12 +36,10 @@ export function Settings() {
               onValueCommit={async ({ value }) => {
                 if (!value) return;
 
-                const response = await renameTeam({
+                await renameTeam({
                   teamId: currentTeam.id,
                   newName: value,
                 });
-
-                console.log({ response });
               }}
             >
               <Editable.Preview />
