@@ -31,7 +31,7 @@ export const CreateTeamDialog: React.FC<CreateTeamDialogProps> = ({ opener }) =>
     e.preventDefault();
     if (!teamName) return;
 
-    const response = await createTeamWithMember({
+    await createTeamWithMember({
       teamName,
       userEmail: user?.email as string,
       userId: user?.id as string,

@@ -1,7 +1,6 @@
 import { Box } from '@chakra-ui/react';
 import { LuUser, LuFocus, LuSettings } from 'react-icons/lu';
 import { Tabs } from '@chakra-ui/react';
-import { AccountNavbar } from '../../features/account/Navbar';
 import { AccountLayout } from '../../features/account/Layout';
 import { useAtom } from '@reatom/npm-react';
 import { currentTeamAtom, teamsAtom } from '../../features/account/model';

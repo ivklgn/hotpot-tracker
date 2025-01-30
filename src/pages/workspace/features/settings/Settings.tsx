@@ -14,7 +14,7 @@ export function Settings() {
   const [name, setName] = useAtom<string>(ctx.get(currentTeamAtom)?.name || '');
 
   const handleDeleteTeamClick = async () => {
-    fetchDeleteTeam(currentTeam.id);
+    fetchDeleteTeam(currentTeam?.id as string);
   };
 
   return (
@@ -37,7 +37,7 @@ export function Settings() {
                 if (!value) return;
 
                 await renameTeam({
-                  teamId: currentTeam.id,
+                  teamId: currentTeam?.id as string,
                   newName: value,
                 });
               }}

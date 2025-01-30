@@ -8,7 +8,7 @@ export function Members() {
   const [user] = useAtom(userAtom);
   const [currentTeam] = useAtom(currentTeamAtom);
 
-  if (user?.id === currentTeam.creatorId) {
+  if (user?.id === currentTeam?.creatorId) {
     return <OwnerMembers />;
   }
 
