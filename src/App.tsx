@@ -1,4 +1,4 @@
-import { Switch, Route, Redirect } from 'wouter';
+import { Switch, Route, Redirect } from 'wouter/';
 import { useAtom } from '@reatom/npm-react';
 import { userAtom, userAuthLoadingAtom } from './features/auth/model';
 
