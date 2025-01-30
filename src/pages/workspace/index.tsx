@@ -71,7 +71,6 @@ export function WorkspacePage() {
 
   return (
     <AccountLayout key={currentTeam?.id}>
-      <AccountNavbar />
       <Box flex="1" pt={8} mx={6}>
         <Tabs.Root defaultValue="towork" lazyMount>
           <Tabs.List>

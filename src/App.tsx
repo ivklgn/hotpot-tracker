@@ -21,7 +21,7 @@ export default function App() {
         <Switch>
           <Route path="/workspace" component={() => <WorkspacePage />} />
           <Route path="/boards" component={() => <BoardsPage />} />
-          <Route path="/" component={() => <>hello</>} />
+          <Route path="/" component={() => <Redirect to="/workspace" />} />
           <Route path="/404" component={() => <>404</>} />
           <Route path="/auth" component={() => <Redirect to="/workspace" />} />
           <Route>
@@ -34,7 +34,7 @@ export default function App() {
 
   return (
     <Switch>
-      <Route path="/" component={() => <>hello</>} />
+      <Route path="/" component={() => <Redirect to="/auth" />} />
       <Route path="/404" component={() => <>404</>} />
       <Route path="/auth" component={() => <AuthPage />} />
       <Route path="/workspace" component={() => <Redirect to="/auth" />} />
