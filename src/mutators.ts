@@ -1,14 +1,6 @@
 import { id } from '@instantdb/core';
 import { db } from './instantdb';
 
-export async function renameTeam({ teamId, newName }: { teamId: string; newName: string }) {
-  const result = await db.transact([db.tx.teams[teamId].merge({ name: newName })]);
-
-  return {
-    result,
-  };
-}
-
 export async function createTeamWithMember({
   teamName,
   userEmail,

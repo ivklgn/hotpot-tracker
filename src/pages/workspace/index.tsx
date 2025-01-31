@@ -3,7 +3,7 @@ import { LuUser, LuFocus, LuSettings } from 'react-icons/lu';
 import { Tabs } from '@chakra-ui/react';
 import { AccountLayout } from '../../features/account/Layout';
 import { useAtom } from '@reatom/npm-react';
-import { currentTeamAtom, teamsAtom } from '../../features/account/model';
+import { currentTeamAtom, teamsSubscription } from '../../features/account/model';
 import { Settings } from './features/settings/Settings';
 import { Members } from './features/members';
 import { ToWork } from './features/towork/ToWork';
@@ -12,7 +12,7 @@ import { userAtom } from '../../features/auth/model';
 export function WorkspacePage() {
   const [user] = useAtom(userAtom);
   const [currentTeam] = useAtom(currentTeamAtom);
-  const [teams] = useAtom(teamsAtom.dataAtom);
+  const [teams] = useAtom(teamsSubscription.dataAtom);
 
   if (teams?.data?.teams?.length === 0) {
     return (

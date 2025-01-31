@@ -1,40 +1,21 @@
 import { Badge, Box, Button, Table } from '@chakra-ui/react';
 import { useAction, useAtom } from '@reatom/npm-react';
-import { teamsAtom } from '../../../../features/account/model';
+import { teamsSubscription } from '../../../../features/account/model';
 import { LuPlus } from 'react-icons/lu';
 import { CreateTeamDialog } from '../../../../features/teams/CreateTeamDialog';
 import { HiColorSwatch } from 'react-icons/hi';
 import { EmptyState } from '../../../../components/ui/empty-state';
-import { fetchAcceptInviteAtom } from './model';
-import { reatomInstantDBSubscription } from '../../../../reatom-instantdb';
-import { userAtom } from '../../../../features/auth/model';
+import { fetchAcceptInviteAtom, myInvitesSubscription } from './model';
 
 export function ToWork() {
-  const [user] = useAtom(userAtom);
-  const [myInvitesAtom] = useAtom(
-    () =>
-      reatomInstantDBSubscription({
-        invites: {
-          $: {
-            where: {
-              userEmail: user?.email as string,
-              status: 'pending',
-            },
-          },
-        },
-      }),
-    []
-  );
-
   const fetchAcceptInvite = useAction(fetchAcceptInviteAtom);
 
   const [toWork] = useAtom(
     (ctx) => {
       let data: any[] = [];
-      const teams = ctx.spy(teamsAtom.dataAtom);
-      const myInvites = ctx.spy(myInvitesAtom.dataAtom);
+      const teams = ctx.spy(teamsSubscription.dataAtom);
+      const myInvites = ctx.spy(myInvitesSubscription.dataAtom);
 
-      console.log({ myInvites });
       if (myInvites?.data?.invites?.length && myInvites?.data?.invites?.length > 0) {
         data = [
           ...data,
@@ -80,7 +61,7 @@ export function ToWork() {
 
       return data;
     },
-    [teamsAtom]
+    [teamsSubscription]
   );
 
   if (toWork.length === 0) {

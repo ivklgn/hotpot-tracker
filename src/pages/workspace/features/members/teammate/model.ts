@@ -1,17 +1,19 @@
-// import { currentTeamIdAtom } from '../../../../../features/account/model';
-// import { reatomInstantDBSubscription } from '../../../../../reatom-instantdb';
+import { reatomInstantSubscription } from '../../../../../reatom-instantdb';
+import { currentTeamAtom } from '../../../../../features/account/model';
 
-// TODO: нужен (ctx) => ...
+export const membershipsSubscription = reatomInstantSubscription(null, 'membershipsSubscription');
 
-// export const membershipsAtom = reatomInstantDBSubscription({
-//   memberships: {
-//     $: {
-//       where: {
-//         'teams.id': teamId,
-//         userId: {
-//           $isNull: false,
-//         },
-//       },
-//     },
-//   },
-// });
+currentTeamAtom.onChange((ctx, currentTeam) => {
+  membershipsSubscription.queryAtom(ctx, {
+    memberships: {
+      $: {
+        where: {
+          'teams.id': currentTeam?.id as string,
+          userId: {
+            $isNull: false,
+          },
+        },
+      },
+    },
+  });
+});

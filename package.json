@@ -12,9 +12,9 @@
     "publish:perms": "npx instant-cli@latest push perms"
   },
   "dependencies": {
-    "@chakra-ui/react": "^3.3.1",
+    "@chakra-ui/react": "^3.5.1",
     "@emotion/react": "^11.14.0",
-    "@instantdb/core": "^0.17.9",
+    "@instantdb/core": "^0.17.12",
     "@reatom/async": "^3.16.5",
     "@reatom/framework": "^3.4.58",
     "@reatom/npm-react": "^3.10.5",
@@ -23,7 +23,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-icons": "^5.4.0",
-    "wouter": "^3.3.5"
+    "wouter": "^3.5.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

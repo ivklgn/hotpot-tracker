@@ -1,52 +1,60 @@
-import {
-  coerceQuery,
-  type InstaQLParams,
-  InstantCoreDatabase,
-  InstaQLLifecycleState,
-  InstantSchemaDef,
-} from '@instantdb/core';
-import { atom, AtomMut, onConnect } from '@reatom/framework';
+import { type InstaQLParams, InstaQLLifecycleState } from '@instantdb/core';
+import { Action, atom, AtomMut, Ctx, onConnect } from '@reatom/framework';
 import { db } from './instantdb';
+import { AppSchema } from '../instant.schema';
 
-export const initReatomInstantDBSubscription =
-  <Q extends InstaQLParams<Schema>, Schema extends InstantSchemaDef<any, any, any>>(
-    _core: InstantCoreDatabase<Schema>
-  ) =>
-  (
-    _query: null | Q
-  ): {
-    dataAtom: AtomMut<InstaQLLifecycleState<Schema, Q> | undefined>;
-    loadingAtom: AtomMut<boolean>;
-    errorAtom: AtomMut<{ message: string } | null>;
-  } => {
-    const query = _query ? coerceQuery(_query) : null;
+export interface InstantSubscriptionQueryAtom<Q> extends AtomMut<Q> {
+  set: Action<[InstaQLParams<AppSchema>], Q>;
+  reset: Action<[], Q>;
+}
 
-    const loadingAtom = atom(false, 'loadingAtom');
-    const errorAtom = atom<{ message: string } | null>(null, 'errorAtom');
-    const dataAtom = atom<InstaQLLifecycleState<Schema, Q> | undefined>(undefined, 'dataAtom');
+export const reatomInstantSubscription = <Q extends InstaQLParams<AppSchema>>(
+  initQuery: Q | null,
+  name?: string
+): {
+  dataAtom: AtomMut<InstaQLLifecycleState<AppSchema, Q> | undefined>;
+  loadingAtom: AtomMut<boolean>;
+  errorAtom: AtomMut<{ message: string } | null>;
+  queryAtom: AtomMut<InstaQLParams<AppSchema> | undefined>;
+} => {
+  const loadingAtom = atom(false, `${name}loadingAtom`);
+  const errorAtom = atom<{ message: string } | null>(null, `${name}errorAtom`);
+  const dataAtom = atom<InstaQLLifecycleState<AppSchema, Q> | undefined>(undefined, `${name}dataAtom`);
+  const queryAtom = atom<InstaQLParams<AppSchema> | null>(initQuery, `${name}queryAtom`);
 
-    onConnect(dataAtom, (ctx) => {
-      const unsubscribe = db.subscribeQuery(query, (resp) => {
-        loadingAtom(ctx, true);
-        if (resp.error) {
-          loadingAtom(ctx, false);
-          errorAtom(ctx, resp.error);
-          return;
-        }
-        if (resp.data) {
-          loadingAtom(ctx, false);
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          dataAtom(ctx, resp);
-        }
-      });
+  const sub = (
+    ctx: Ctx & {
+      controller: AbortController;
+      isConnected(): boolean;
+    }
+  ) => {
+    const q = ctx.get(queryAtom);
 
-      return () => {
-        unsubscribe();
-      };
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const unsubscribe = db.subscribeQuery(q, (resp) => {
+      loadingAtom(ctx, true);
+      if (resp.error) {
+        loadingAtom(ctx, false);
+        errorAtom(ctx, resp.error);
+        return;
+      }
+      if (resp.data) {
+        loadingAtom(ctx, false);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        dataAtom(ctx, resp);
+      }
     });
 
-    return { dataAtom, errorAtom, loadingAtom };
+    return () => {
+      unsubscribe();
+    };
   };
 
-export const reatomInstantDBSubscription = initReatomInstantDBSubscription(db);
+  onConnect(dataAtom, sub);
+
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  return { dataAtom, errorAtom, loadingAtom, queryAtom };
+};

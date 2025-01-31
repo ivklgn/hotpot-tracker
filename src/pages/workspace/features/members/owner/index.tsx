@@ -8,8 +8,6 @@ export function OwnerMembers() {
   const [members] = useAtom(membersAtom);
   const fetchDeleteMembership = useAction(fetchDeleteMembershipAtom);
 
-  console.log({ members });
-
   return (
     <>
       <Table.Root size="md">

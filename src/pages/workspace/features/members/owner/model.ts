@@ -1,19 +1,25 @@
 import { atom, reatomAsync, withErrorAtom } from '@reatom/framework';
 import { id } from '@instantdb/core';
 import { db } from '../../../../../instantdb';
-import { reatomInstantDBSubscription } from '../../../../../reatom-instantdb';
+import { reatomInstantSubscription } from '../../../../../reatom-instantdb';
 
-export const membershipsAtom = reatomInstantDBSubscription({
-  memberships: {},
-});
+export const membershipsSubscription = reatomInstantSubscription(
+  {
+    memberships: {},
+  },
+  'ownerMembershipsSubscription'
+);
 
-export const invitesAtom = reatomInstantDBSubscription({
-  invites: {},
-});
+export const invitesSubscription = reatomInstantSubscription(
+  {
+    invites: {},
+  },
+  'ownerInvitesSubscription'
+);
 
 export const membersAtom = atom((ctx) => {
-  const memberships = ctx.spy(membershipsAtom.dataAtom);
-  const invites = ctx.spy(invitesAtom.dataAtom);
+  const memberships = ctx.spy(membershipsSubscription.dataAtom);
+  const invites = ctx.spy(invitesSubscription.dataAtom);
 
   if (memberships?.data?.memberships && invites?.data?.invites) {
     const userEmailAsInviteStatus = invites?.data?.invites?.reduce((acc, invite) => {

@@ -15,7 +15,7 @@ import { Status } from '../../components/ui/status';
 import { CreateTeamDialog } from '../teams/CreateTeamDialog';
 import { Link, useLocation } from 'wouter';
 import { useAction, useAtom } from '@reatom/npm-react';
-import { currentTeamAtom, currentTeamIdAtom, teamsAtom } from './model';
+import { currentTeamAtom, currentTeamIdAtom, teamsSubscription } from './model';
 import { fetchSignOutAtom, userAtom } from '../auth/model';
 
 const routes = [
@@ -26,7 +26,7 @@ const routes = [
 export function AccountNavbar() {
   const [location] = useLocation();
   const [user] = useAtom(userAtom);
-  const [teams] = useAtom(teamsAtom.dataAtom);
+  const [teams] = useAtom(teamsSubscription.dataAtom);
   const [currentTeam] = useAtom(currentTeamAtom);
   const [, setCurrentTeamId] = useAtom(currentTeamIdAtom);
   const signOut = useAction(fetchSignOutAtom);

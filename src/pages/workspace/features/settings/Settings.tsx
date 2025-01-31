@@ -2,18 +2,22 @@ import { Button, Editable, IconButton, Table } from '@chakra-ui/react';
 import { LuCheck, LuPencilLine, LuX } from 'react-icons/lu';
 import { useAction, useAtom, useCtx } from '@reatom/npm-react';
 import { currentTeamAtom } from '../../../../features/account/model';
-import { renameTeam } from '../../../../mutators';
-import { fetchDeleteTeamAtom } from './model';
+import { fetchDeleteTeamAtom, fetchRenameTeamAtom } from './model';
 import { ConfirmAction } from '../../../../components/ConfirmAction';
 
 export function Settings() {
   const ctx = useCtx();
   const [currentTeam] = useAtom(currentTeamAtom);
+  const fetchRenameTeam = useAction(fetchRenameTeamAtom);
   const fetchDeleteTeam = useAction(fetchDeleteTeamAtom);
-  // TODO: fix cast
   const [name, setName] = useAtom<string>(ctx.get(currentTeamAtom)?.name || '');
 
-  const handleDeleteTeamClick = async () => {
+  const handleRenameTeam = ({ value: newName }: { value: string }) => {
+    if (!newName) return;
+    fetchRenameTeam(currentTeam?.id as string, newName);
+  };
+
+  const handleDeleteTeamClick = () => {
     fetchDeleteTeam(currentTeam?.id as string);
   };
 
@@ -33,14 +37,7 @@ export function Settings() {
               value={name}
               onValueChange={(e) => setName(e.value)}
               placeholder="Click to edit"
-              onValueCommit={async ({ value }) => {
-                if (!value) return;
-
-                await renameTeam({
-                  teamId: currentTeam?.id as string,
-                  newName: value,
-                });
-              }}
+              onValueCommit={handleRenameTeam}
             >
               <Editable.Preview />
               <Editable.Input />

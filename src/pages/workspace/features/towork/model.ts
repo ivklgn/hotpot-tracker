@@ -1,19 +1,22 @@
 import { reatomAsync, withErrorAtom } from '@reatom/framework';
 import { db } from '../../../../instantdb';
 import { userAtom } from '../../../../features/auth/model';
+import { reatomInstantSubscription } from '../../../../reatom-instantdb';
 
-// TODO: нужен (ctx) => ...
+export const myInvitesSubscription = reatomInstantSubscription(null, 'myInvitesSubscription');
 
-// export const myInvitesAtom = reatomInstantDBSubscription({
-// invites: {
-//   $: {
-//     where: {
-//       userEmail: user?.email as string,
-//       status: 'pending',
-//     },
-//   },
-//   },
-// });
+userAtom.onChange((ctx, user) => {
+  myInvitesSubscription.queryAtom(ctx, {
+    invites: {
+      $: {
+        where: {
+          userEmail: user?.email as string,
+          status: 'pending',
+        },
+      },
+    },
+  });
+});
 
 export const fetchAcceptInviteAtom = reatomAsync(
   (
