@@ -1,12 +1,11 @@
 import { reatomAsync, withErrorAtom } from '@reatom/framework';
 import { db } from '../../../../instantdb';
 import { userAtom } from '../../../../features/auth/model';
-import { reatomInstantSubscription } from '../../../../reatom-instantdb';
+import { reatomInstantQueryAtom, reatomInstantSubscription } from '../../../../reatom-instantdb';
 
-export const myInvitesSubscription = reatomInstantSubscription(null, 'myInvitesSubscription');
-
-userAtom.onChange((ctx, user) => {
-  myInvitesSubscription.queryAtom(ctx, {
+const myInvitesQueryAtom = reatomInstantQueryAtom((ctx) => {
+  const user = ctx.get(userAtom);
+  return {
     invites: {
       $: {
         where: {
@@ -15,8 +14,10 @@ userAtom.onChange((ctx, user) => {
         },
       },
     },
-  });
-});
+  };
+}, 'myInvitesQueryAtom');
+
+export const myInvitesSubscription = reatomInstantSubscription(myInvitesQueryAtom, 'myInvitesSubscription');
 
 export const fetchAcceptInviteAtom = reatomAsync(
   (

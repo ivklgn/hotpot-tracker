@@ -15,11 +15,12 @@ export function ToWork() {
       let data: any[] = [];
       const teams = ctx.spy(teamsSubscription.dataAtom);
       const myInvites = ctx.spy(myInvitesSubscription.dataAtom);
+      console.log(myInvites);
 
-      if (myInvites?.data?.invites?.length && myInvites?.data?.invites?.length > 0) {
+      if (myInvites?.invites?.length && myInvites?.invites?.length > 0) {
         data = [
           ...data,
-          ...(myInvites?.data?.invites || []).map((invite) => ({
+          ...(myInvites?.invites || []).map((invite) => ({
             message: (
               <>
                 <Badge colorPalette="purple">invite</Badge> You have an invite to join{' '}
@@ -44,7 +45,7 @@ export function ToWork() {
         ];
       }
 
-      if (teams?.data?.teams?.length === 0) {
+      if (teams?.teams?.length === 0) {
         data.push({
           message: 'You dont have own teams. Create now and start working!',
           action: (

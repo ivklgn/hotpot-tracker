@@ -1,35 +1,34 @@
 import { type InstaQLParams, InstaQLLifecycleState } from '@instantdb/core';
-import { Action, atom, AtomMut, Ctx, onConnect } from '@reatom/framework';
+import { Atom, atom, AtomMut, Ctx, onConnect } from '@reatom/framework';
 import { db } from './instantdb';
 import { AppSchema } from '../instant.schema';
 
-export interface InstantSubscriptionQueryAtom<Q> extends AtomMut<Q> {
-  set: Action<[InstaQLParams<AppSchema>], Q>;
-  reset: Action<[], Q>;
-}
+export const reatomInstantQueryAtom = <Q extends InstaQLParams<AppSchema>>(
+  atomCb: (ctx: Ctx) => Q | null,
+  name?: string
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+): Atom<InstaQLParams<AppSchema>> => atom(atomCb, name);
 
 export const reatomInstantSubscription = <Q extends InstaQLParams<AppSchema>>(
-  initQuery: Q | null,
+  queryAtom: Atom<Q | null>,
   name?: string
 ): {
-  dataAtom: AtomMut<InstaQLLifecycleState<AppSchema, Q> | undefined>;
+  dataAtom: AtomMut<InstaQLLifecycleState<AppSchema, Q>['data'] | undefined>;
   loadingAtom: AtomMut<boolean>;
   errorAtom: AtomMut<{ message: string } | null>;
-  queryAtom: AtomMut<InstaQLParams<AppSchema> | undefined>;
 } => {
   const loadingAtom = atom(false, `${name}loadingAtom`);
   const errorAtom = atom<{ message: string } | null>(null, `${name}errorAtom`);
-  const dataAtom = atom<InstaQLLifecycleState<AppSchema, Q> | undefined>(undefined, `${name}dataAtom`);
-  const queryAtom = atom<InstaQLParams<AppSchema> | null>(initQuery, `${name}queryAtom`);
+  const dataAtom = atom<InstaQLLifecycleState<AppSchema, Q>['data'] | undefined>(
+    undefined,
+    `${name}dataAtom`
+  );
 
-  const sub = (
-    ctx: Ctx & {
-      controller: AbortController;
-      isConnected(): boolean;
-    }
-  ) => {
+  const sub = (ctx: Ctx) => {
     const q = ctx.get(queryAtom);
-
+    if (!q) return;
+    console.log('sub', q, name);
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const unsubscribe = db.subscribeQuery(q, (resp) => {
@@ -43,18 +42,17 @@ export const reatomInstantSubscription = <Q extends InstaQLParams<AppSchema>>(
         loadingAtom(ctx, false);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        dataAtom(ctx, resp);
+        dataAtom(ctx, resp.data);
       }
     });
 
     return () => {
+      console.log('unsub', q, name);
       unsubscribe();
     };
   };
 
   onConnect(dataAtom, sub);
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  return { dataAtom, errorAtom, loadingAtom, queryAtom };
+  return { dataAtom, errorAtom, loadingAtom };
 };

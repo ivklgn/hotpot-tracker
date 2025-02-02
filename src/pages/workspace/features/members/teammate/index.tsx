@@ -1,9 +1,9 @@
 import { useAtom } from '@reatom/npm-react';
 import { Table } from '@chakra-ui/react';
-import { membershipsSubscription } from './model';
+import { teammateMembershipsSubscription } from './model';
 
 export function TeammateMembers() {
-  const [memberships] = useAtom(membershipsSubscription.dataAtom);
+  const [memberships] = useAtom(teammateMembershipsSubscription.dataAtom);
 
   return (
     <>
@@ -14,7 +14,7 @@ export function TeammateMembers() {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {memberships?.data?.memberships?.map((member) => (
+          {memberships?.memberships?.map((member) => (
             <Table.Row key={member.userEmail}>
               <Table.Cell>{member.userEmail}</Table.Cell>
             </Table.Row>

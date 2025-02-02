@@ -1,10 +1,12 @@
-import { reatomInstantSubscription } from '../../../../../reatom-instantdb';
+import { reatomInstantQueryAtom, reatomInstantSubscription } from '../../../../../reatom-instantdb';
 import { currentTeamAtom } from '../../../../../features/account/model';
 
-export const membershipsSubscription = reatomInstantSubscription(null, 'membershipsSubscription');
+const teammateMembershipsQueryAtom = reatomInstantQueryAtom((ctx) => {
+  const currentTeam = ctx.get(currentTeamAtom);
+  if (!currentTeam) return null;
+  console.log({ currentTeam });
 
-currentTeamAtom.onChange((ctx, currentTeam) => {
-  membershipsSubscription.queryAtom(ctx, {
+  return {
     memberships: {
       $: {
         where: {
@@ -15,5 +17,10 @@ currentTeamAtom.onChange((ctx, currentTeam) => {
         },
       },
     },
-  });
-});
+  };
+}, 'teamsQueryAtom');
+
+export const teammateMembershipsSubscription = reatomInstantSubscription(
+  teammateMembershipsQueryAtom,
+  'membershipsSubscription'
+);

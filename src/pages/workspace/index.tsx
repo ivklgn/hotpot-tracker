@@ -14,7 +14,7 @@ export function WorkspacePage() {
   const [currentTeam] = useAtom(currentTeamAtom);
   const [teams] = useAtom(teamsSubscription.dataAtom);
 
-  if (teams?.data?.teams?.length === 0) {
+  if (teams?.teams?.length === 0) {
     return (
       <AccountLayout key={currentTeam?.id}>
         <Box flex="1" pt={8} mx={6}>

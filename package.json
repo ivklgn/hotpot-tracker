@@ -15,7 +15,6 @@
     "@chakra-ui/react": "^3.5.1",
     "@emotion/react": "^11.14.0",
     "@instantdb/core": "^0.17.12",
-    "@reatom/async": "^3.16.5",
     "@reatom/framework": "^3.4.58",
     "@reatom/npm-react": "^3.10.5",
     "@reatom/persist-web-storage": "^3.4.4",

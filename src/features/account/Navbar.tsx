@@ -55,7 +55,7 @@ export function AccountNavbar() {
               </MenuTrigger>
             )}
             <MenuContent>
-              {teams?.data?.teams?.map((team) => (
+              {teams?.teams?.map((team) => (
                 <MenuItem key={team.id} value={team.id} onClick={() => handleChangeTeamClick(team.id)}>
                   {currentTeam?.id === team.id ? <Status value="success">{team.name}</Status> : team.name}
                 </MenuItem>

@@ -1,28 +1,33 @@
 import { atom, reatomAsync, withErrorAtom } from '@reatom/framework';
 import { id } from '@instantdb/core';
 import { db } from '../../../../../instantdb';
-import { reatomInstantSubscription } from '../../../../../reatom-instantdb';
+import { reatomInstantQueryAtom, reatomInstantSubscription } from '../../../../../reatom-instantdb';
+import { currentTeamAtom } from '../../../../../features/account/model';
 
-export const membershipsSubscription = reatomInstantSubscription(
-  {
-    memberships: {},
-  },
-  'ownerMembershipsSubscription'
-);
-
-export const invitesSubscription = reatomInstantSubscription(
-  {
+const ownerMembersQueryAtom = reatomInstantQueryAtom((ctx) => {
+  const currentTeam = ctx.get(currentTeamAtom);
+  return {
     invites: {},
-  },
-  'ownerInvitesSubscription'
-);
+    memberships: {
+      $: {
+        where: {
+          'teams.id': currentTeam?.id as string,
+        },
+      },
+    },
+  };
+}, 'ownerMembersQueryAtom');
+
+export const subscription = reatomInstantSubscription(ownerMembersQueryAtom, 'ownerMembershipsSubscription');
 
 export const membersAtom = atom((ctx) => {
-  const memberships = ctx.spy(membershipsSubscription.dataAtom);
-  const invites = ctx.spy(invitesSubscription.dataAtom);
+  const resp = ctx.spy(subscription.dataAtom);
+  if (!resp) return [];
 
-  if (memberships?.data?.memberships && invites?.data?.invites) {
-    const userEmailAsInviteStatus = invites?.data?.invites?.reduce((acc, invite) => {
+  const { memberships, invites } = resp;
+
+  if (memberships && invites) {
+    const userEmailAsInviteStatus = invites.reduce((acc, invite) => {
       acc[invite.userEmail] = {
         inviteId: invite.id,
         status: invite.status as 'pending' | 'accepted' | 'declined',
@@ -30,7 +35,7 @@ export const membersAtom = atom((ctx) => {
       return acc;
     }, {} as Record<string, { inviteId: string; status: 'pending' | 'accepted' | 'declined' }>);
 
-    return memberships?.data?.memberships?.map((membership) => ({
+    return memberships.map((membership) => ({
       membershipId: membership.id,
       userEmail: membership.userEmail,
       userId: membership.userId,
