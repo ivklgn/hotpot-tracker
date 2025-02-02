@@ -28,7 +28,5 @@ teamsSubscription.dataAtom.onChange((ctx, teams) => {
 export const currentTeamAtom = atom((ctx) => {
   const currentTeamId = ctx.spy(currentTeamIdAtom);
   const teams = ctx.spy(teamsSubscription.dataAtom);
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  return currentTeamId ? (teams?.teams || []).find((team) => team.id === currentTeamId) : teams.teams?.[0];
+  return currentTeamId ? (teams?.teams || []).find((team) => team.id === currentTeamId) : teams?.teams?.[0];
 }, 'currentTeamAtom');
