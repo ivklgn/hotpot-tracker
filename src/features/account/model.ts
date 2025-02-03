@@ -16,9 +16,10 @@ export const currentTeamIdAtom = atom<string | null>(null, 'currentTeamIdAtom').
 );
 
 teamsSubscription.dataAtom.onChange((ctx, teams) => {
+  const currentTeamId = ctx.get(currentTeamIdAtom);
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore
-  if (teams && teams?.teams?.length > 0) {
+  if (!currentTeamId && teams && teams?.teams?.length > 0) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     currentTeamIdAtom(ctx, teams?.teams?.[0].id);

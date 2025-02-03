@@ -25,7 +25,7 @@ export const reatomInstantSubscription = <Q extends InstaQLParams<AppSchema>>(
     `${name}dataAtom`
   );
 
-  const sub = (ctx: Ctx) => {
+  onConnect(dataAtom, (ctx: Ctx) => {
     const q = ctx.get(queryAtom);
     if (!q) return;
     console.log('sub', q, name);
@@ -50,9 +50,7 @@ export const reatomInstantSubscription = <Q extends InstaQLParams<AppSchema>>(
       console.log('unsub', q, name);
       unsubscribe();
     };
-  };
-
-  onConnect(dataAtom, sub);
+  });
 
   return { dataAtom, errorAtom, loadingAtom };
 };
