@@ -1,10 +1,10 @@
 import { type InstaQLParams, InstaQLLifecycleState } from '@instantdb/core';
-import { Atom, atom, AtomMut, Ctx, onConnect } from '@reatom/framework';
+import { Atom, atom, AtomMut, Ctx, CtxSpy, onConnect } from '@reatom/framework';
 import { db } from './instantdb';
 import { AppSchema } from '../instant.schema';
 
 export const reatomInstantQueryAtom = <Q extends InstaQLParams<AppSchema>>(
-  atomCb: (ctx: Ctx) => Q | null,
+  atomCb: (ctx: CtxSpy) => Q | null,
   name?: string
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore

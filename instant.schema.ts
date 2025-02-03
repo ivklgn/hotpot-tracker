@@ -21,8 +21,25 @@ const _schema = i.schema({
       creatorId: i.string(),
       name: i.string(),
     }),
+    boards: i.entity({
+      name: i.string(),
+      teamId: i.string(),
+    }),
   },
   links: {
+    boardsTeams: {
+      forward: {
+        on: 'boards',
+        has: 'one',
+        label: 'teams',
+        onDelete: 'cascade',
+      },
+      reverse: {
+        on: 'teams',
+        has: 'many',
+        label: 'boards',
+      },
+    },
     invitesTeams: {
       forward: {
         on: 'invites',

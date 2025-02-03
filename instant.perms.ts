@@ -22,6 +22,15 @@ export default {
       update: 'isInvitee',
     },
   },
+  drawings: {
+    bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')"],
+    allow: {
+      view: 'isMember',
+      create: 'isMember',
+      delete: 'isMember',
+      update: 'isMember',
+    },
+  },
   memberships: {
     bind: [
       'isMember',
