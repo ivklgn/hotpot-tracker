@@ -12,11 +12,11 @@ import { Avatar } from '@/components/ui/avatar';
 import { MenuContent, MenuItem, MenuRoot, MenuTrigger } from '@/components/ui/menu';
 import { LuChartBarBig, LuPlus, LuAppWindow } from 'react-icons/lu';
 import { Status } from '../../components/ui/status';
-import { CreateTeamDialog } from '../teams/CreateTeamDialog';
+import { CreateTeamDialog } from '../team/CreateTeamDialog';
 import { Link, useLocation } from 'wouter';
-import { useAction, useAtom } from '@reatom/npm-react';
-import { currentTeamAtom, currentTeamIdAtom, teamsSubscription } from './model';
-import { fetchSignOutAtom, userAtom } from '../auth/model';
+import { db } from '../../instantdb';
+import { useAccount } from './AccountContext';
+import { useEffect, useMemo } from 'react';
 
 const routes = [
   { route: '/workspace', title: 'Workspace', icon: <LuAppWindow /> },
@@ -25,18 +25,28 @@ const routes = [
 
 export function AccountNavbar() {
   const [location] = useLocation();
-  const [user] = useAtom(userAtom);
-  const [teams] = useAtom(teamsSubscription.dataAtom);
-  const [currentTeam] = useAtom(currentTeamAtom);
-  const [, setCurrentTeamId] = useAtom(currentTeamIdAtom);
-  const signOut = useAction(fetchSignOutAtom);
+  const { user } = db.useAuth();
+  const { currentTeamId, setCurrentTeamId } = useAccount();
+  const { data: teams } = db.useQuery({ teams: {} });
+  const currentSelectedTeam = useMemo(() => {
+    if (teams?.teams && teams.teams.length) {
+      return currentTeamId ? teams.teams.find((team) => team.id === currentTeamId) : teams.teams?.[0];
+    }
+    return undefined;
+  }, [currentTeamId, teams?.teams]);
+
+  useEffect(() => {
+    if (teams?.teams && teams.teams.length && !currentTeamId) {
+      setCurrentTeamId(teams.teams[0].id);
+    }
+  }, [currentTeamId, setCurrentTeamId, teams?.teams]);
 
   const handleChangeTeamClick = (teamId: string) => {
     setCurrentTeamId(teamId);
   };
 
   const handleSignOutClick = () => {
-    signOut();
+    db.auth.signOut();
   };
 
   return (
@@ -46,31 +56,35 @@ export function AccountNavbar() {
           <Link to="/">Hotpot</Link>
         </ChakraLink>
         <Flex>
-          <MenuRoot size="md">
-            {currentTeam && (
+          {currentSelectedTeam && (
+            <MenuRoot size="md">
               <MenuTrigger>
                 <Button variant="outline" size="xs" asChild>
-                  <Status value="success">{currentTeam.name}</Status>
+                  <Status value="success">{currentSelectedTeam.name}</Status>
                 </Button>
               </MenuTrigger>
-            )}
-            <MenuContent>
-              {teams?.teams?.map((team) => (
-                <MenuItem key={team.id} value={team.id} onClick={() => handleChangeTeamClick(team.id)}>
-                  {currentTeam?.id === team.id ? <Status value="success">{team.name}</Status> : team.name}
-                </MenuItem>
-              ))}
-              <MenuSeparator />
-              <CreateTeamDialog
-                opener={
-                  <MenuItem value="create">
-                    <LuPlus />
-                    create team
+              <MenuContent>
+                {teams?.teams?.map((team) => (
+                  <MenuItem key={team.id} value={team.id} onClick={() => handleChangeTeamClick(team.id)}>
+                    {currentSelectedTeam?.id === team.id ? (
+                      <Status value="success">{team.name}</Status>
+                    ) : (
+                      team.name
+                    )}
                   </MenuItem>
-                }
-              />
-            </MenuContent>
-          </MenuRoot>
+                ))}
+                <MenuSeparator />
+                <CreateTeamDialog
+                  opener={
+                    <MenuItem value="create">
+                      <LuPlus />
+                      create team
+                    </MenuItem>
+                  }
+                />
+              </MenuContent>
+            </MenuRoot>
+          )}
 
           {routes.map((route) => (
             <ChakraLink

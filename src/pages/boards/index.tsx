@@ -11,22 +11,28 @@ import {
   Text,
   VStack,
 } from '@chakra-ui/react';
-import { AccountLayout } from '../../features/account/Layout';
 import { HiColorSwatch } from 'react-icons/hi';
 import { CreateBoardDialog } from './features/CreateBoardDialog';
-import { boardsSubscription } from './features/model';
-import { useAtom } from '@reatom/npm-react';
-import { currentTeamAtom } from '../../features/account/model';
+import { db } from '../../instantdb';
+import { useAccount } from '../../features/account/AccountContext';
 
 export function BoardsPage() {
-  const [currentTeam] = useAtom(currentTeamAtom);
-  const [boards] = useAtom(boardsSubscription.dataAtom);
+  const { currentTeamId } = useAccount();
+  const { data: boards } = db.useQuery({
+    boards: {
+      $: {
+        where: {
+          teamId: currentTeamId as string,
+        },
+      },
+    },
+  });
 
   if (!boards) return null;
 
   if (boards?.boards?.length === 0) {
     return (
-      <Box flex="1" pt={8} mx={6} key={currentTeam?.id}>
+      <Box flex="1" pt={8} mx={6}>
         <EmptyState.Root>
           <EmptyState.Content>
             <EmptyState.Indicator>
@@ -46,7 +52,7 @@ export function BoardsPage() {
   }
 
   return (
-    <AccountLayout key={currentTeam?.id}>
+    <>
       {boards?.boards?.map((board) => (
         <Box my="2" minHeight="320px" mt="4" key={board.id}>
           <Link href="#" ml="4" colorPalette="teal" fontWeight="medium" fontSize="xl">
@@ -129,6 +135,6 @@ export function BoardsPage() {
       <Stack direction="row" h="10" mx={4}>
         <CreateBoardDialog opener={<Button size="xs">Create board</Button>} />
       </Stack>
-    </AccountLayout>
+    </>
   );
 }

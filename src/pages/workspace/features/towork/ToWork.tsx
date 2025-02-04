@@ -1,69 +1,76 @@
 import { Badge, Box, Button, Table } from '@chakra-ui/react';
-import { useAction, useAtom } from '@reatom/npm-react';
-import { teamsSubscription } from '../../../../features/account/model';
 import { LuPlus } from 'react-icons/lu';
-import { CreateTeamDialog } from '../../../../features/teams/CreateTeamDialog';
+import { CreateTeamDialog } from '../../../../features/team/CreateTeamDialog';
 import { HiColorSwatch } from 'react-icons/hi';
 import { EmptyState } from '../../../../components/ui/empty-state';
-import { fetchAcceptInviteAtom, myInvitesSubscription } from './model';
+import { db } from '../../../../instantdb';
+import { useMemo } from 'react';
 
 export function ToWork() {
-  const fetchAcceptInvite = useAction(fetchAcceptInviteAtom);
-
-  const [toWork] = useAtom(
-    (ctx) => {
-      let data: any[] = [];
-      const teams = ctx.spy(teamsSubscription.dataAtom);
-      const myInvites = ctx.spy(myInvitesSubscription.dataAtom);
-      console.log(myInvites);
-
-      if (myInvites?.invites?.length && myInvites?.invites?.length > 0) {
-        data = [
-          ...data,
-          ...(myInvites?.invites || []).map((invite) => ({
-            message: (
-              <>
-                <Badge colorPalette="purple">invite</Badge> You have an invite to join{' '}
-                <strong>{invite.teamName}</strong> team!
-              </>
-            ),
-            action: (
-              <Button
-                size="xs"
-                onClick={() => {
-                  fetchAcceptInvite({
-                    inviteId: invite.id,
-                    membershipId: invite.membershipId,
-                  });
-                  window.location.reload();
-                }}
-              >
-                Accept
-              </Button>
-            ),
-          })),
-        ];
-      }
-
-      if (teams?.teams?.length === 0) {
-        data.push({
-          message: 'You dont have own teams. Create now and start working!',
-          action: (
-            <CreateTeamDialog
-              opener={
-                <Button size="xs">
-                  <LuPlus /> Create team
-                </Button>
-              }
-            />
-          ),
-        });
-      }
-
-      return data;
+  const { user } = db.useAuth();
+  const { data: teams } = db.useQuery({ teams: {} });
+  const { data: invites } = db.useQuery({
+    invites: {
+      $: {
+        where: {
+          userEmail: user?.email as string,
+          status: 'pending',
+        },
+      },
     },
-    [teamsSubscription]
-  );
+  });
+
+  const toWork = useMemo(() => {
+    // TODO:
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let data: any[] = [];
+
+    if (invites?.invites?.length && invites?.invites?.length > 0) {
+      data = [
+        ...data,
+        ...(invites?.invites || []).map((invite) => ({
+          message: (
+            <>
+              <Badge colorPalette="purple">invite</Badge> You have an invite to join{' '}
+              <strong>{invite.teamName}</strong> team!
+            </>
+          ),
+          action: (
+            <Button
+              size="xs"
+              onClick={() => {
+                acceptInvite({
+                  inviteId: invite.id,
+                  membershipId: invite.membershipId,
+                  userId: user?.id as string,
+                });
+                window.location.reload();
+              }}
+            >
+              Accept
+            </Button>
+          ),
+        })),
+      ];
+    }
+
+    if (teams?.teams?.length === 0) {
+      data.push({
+        message: 'You dont have own teams. Create now and start working!',
+        action: (
+          <CreateTeamDialog
+            opener={
+              <Button size="xs">
+                <LuPlus /> Create team
+              </Button>
+            }
+          />
+        ),
+      });
+    }
+
+    return data;
+  }, [invites?.invites, teams?.teams?.length, user?.id]);
 
   if (toWork.length === 0) {
     return (
@@ -95,4 +102,19 @@ export function ToWork() {
       </Table.Body>
     </Table.Root>
   );
+}
+
+async function acceptInvite({
+  inviteId,
+  membershipId,
+  userId,
+}: {
+  inviteId: string;
+  membershipId: string;
+  userId: string;
+}) {
+  return db.transact([
+    db.tx.invites[inviteId].update({ status: 'accepted' }),
+    db.tx.memberships[membershipId].update({ userId }),
+  ]);
 }

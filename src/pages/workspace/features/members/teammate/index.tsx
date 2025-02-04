@@ -1,9 +1,21 @@
-import { useAtom } from '@reatom/npm-react';
 import { Table } from '@chakra-ui/react';
-import { teammateMembershipsSubscription } from './model';
+import { db } from '../../../../../instantdb';
+import { useAccount } from '../../../../../features/account/AccountContext';
 
 export function TeammateMembers() {
-  const [memberships] = useAtom(teammateMembershipsSubscription.dataAtom);
+  const { currentTeamId } = useAccount();
+  const { data: memberships } = db.useQuery({
+    memberships: {
+      $: {
+        where: {
+          'teams.id': currentTeamId as string,
+          userId: {
+            $isNull: false,
+          },
+        },
+      },
+    },
+  });
 
   return (
     <>

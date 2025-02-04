@@ -1,14 +1,14 @@
-import { useAtom } from '@reatom/npm-react';
-import { userAtom } from '../../../../features/auth/model';
-import { currentTeamAtom } from '../../../../features/account/model';
 import { TeammateMembers } from './teammate';
 import { OwnerMembers } from './owner';
+import { db } from '../../../../instantdb';
+import { useAccount } from '../../../../features/account/AccountContext';
 
 export function Members() {
-  const [user] = useAtom(userAtom);
-  const [currentTeam] = useAtom(currentTeamAtom);
+  const { user } = db.useAuth();
+  const { currentTeamId } = useAccount();
+  const { data: currentTeam } = db.useQuery({ teams: { $: { where: { id: currentTeamId as string } } } });
 
-  if (user?.id === currentTeam?.creatorId) {
+  if (user?.id === currentTeam?.teams?.[0]?.creatorId) {
     return <OwnerMembers />;
   }
 

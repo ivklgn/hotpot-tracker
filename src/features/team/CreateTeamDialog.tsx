@@ -13,9 +13,8 @@ import {
 import { Field } from '@/components/ui/field';
 import { cloneElement, useRef, useState } from 'react';
 import React from 'react';
-import { createTeamWithMember } from '../../mutators';
-import { useAtom } from '@reatom/npm-react';
-import { userAtom } from '../auth/model';
+import { db } from '../../instantdb';
+import { id } from '@instantdb/react';
 
 interface CreateTeamDialogProps {
   opener: React.ReactElement;
@@ -23,7 +22,7 @@ interface CreateTeamDialogProps {
 
 export const CreateTeamDialog: React.FC<CreateTeamDialogProps> = ({ opener }) => {
   const ref = useRef<HTMLInputElement>(null);
-  const [user] = useAtom(userAtom);
+  const { user } = db.useAuth();
   const [isVisible, setVisibility] = useState(false);
   const [teamName, setTeamName] = useState('');
 
@@ -87,3 +86,30 @@ export const CreateTeamDialog: React.FC<CreateTeamDialogProps> = ({ opener }) =>
     </DialogRoot>
   );
 };
+
+async function createTeamWithMember({
+  teamName,
+  userEmail,
+  userId,
+}: {
+  teamName: string;
+  userEmail: string;
+  userId: string;
+}) {
+  const teamId = id();
+  const membershipId = id();
+
+  const result = await db.transact([
+    db.tx.teams[teamId].update({ name: teamName, creatorId: userId }),
+    db.tx.memberships[membershipId].update({ teamId, userId, userEmail }),
+    db.tx.memberships[membershipId].link({ teams: teamId }),
+  ]);
+
+  return {
+    result,
+    vars: {
+      teamId,
+      membershipId,
+    },
+  };
+}

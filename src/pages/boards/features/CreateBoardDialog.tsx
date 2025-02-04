@@ -11,10 +11,11 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Field } from '@/components/ui/field';
-import { cloneElement, useRef } from 'react';
+import { cloneElement, useRef, useState } from 'react';
 import React from 'react';
-import { useAction, useAtom } from '@reatom/npm-react';
-import { fetchCreateBoardAtom } from './model';
+import { db } from '../../../instantdb';
+import { id } from '@instantdb/react';
+import { useAccount } from '../../../features/account/AccountContext';
 
 interface CreateTeamDialogProps {
   opener: React.ReactElement;
@@ -22,20 +23,17 @@ interface CreateTeamDialogProps {
 
 export const CreateBoardDialog: React.FC<CreateTeamDialogProps> = ({ opener }) => {
   const ref = useRef<HTMLInputElement>(null);
-  // const [currentTeam] = useAtom(currentTeamAtom);
-  // const [members] = useAtom(membersAtom);
-  const [isVisible, setVisibility] = useAtom(false);
-  const [name, setName] = useAtom('');
-  const [error, setError] = useAtom<string | null>(null);
-  const fetchCreateBoard = useAction(fetchCreateBoardAtom);
+  const [isVisible, setVisibility] = useState(false);
+  const [name, setName] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const { currentTeamId } = useAccount();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name) return;
+    // TODO: check current team id ??
 
-    fetchCreateBoard({
-      name,
-    });
+    createBoard({ name, teamId: currentTeamId as string });
 
     setName('');
     setVisibility(false);
@@ -91,3 +89,14 @@ export const CreateBoardDialog: React.FC<CreateTeamDialogProps> = ({ opener }) =
     </DialogRoot>
   );
 };
+
+async function createBoard({ name, teamId }: { name: string; teamId: string }) {
+  const result = db.transact([db.tx.boards[id()].update({ name, teamId }).link({ teams: teamId })]);
+
+  return {
+    result,
+    vars: {
+      name,
+    },
+  };
+}

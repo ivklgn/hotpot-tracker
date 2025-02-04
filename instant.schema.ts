@@ -1,4 +1,4 @@
-import { i } from '@instantdb/core';
+import { i } from '@instantdb/react';
 
 const _schema = i.schema({
   entities: {

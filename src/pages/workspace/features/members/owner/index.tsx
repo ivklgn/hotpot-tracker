@@ -1,12 +1,45 @@
-import { useAction, useAtom } from '@reatom/npm-react';
-import { fetchDeleteMembershipAtom, membersAtom } from './model';
 import { Badge, Button, Stack, Table } from '@chakra-ui/react';
 import { InviteMemberDialog } from './InviteMemberDialog';
 import { ConfirmAction } from '../../../../../components/ConfirmAction';
+import { db } from '../../../../../instantdb';
+import { useAccount } from '../../../../../features/account/AccountContext';
+import { useMemo } from 'react';
 
 export function OwnerMembers() {
-  const [members] = useAtom(membersAtom);
-  const fetchDeleteMembership = useAction(fetchDeleteMembershipAtom);
+  const { currentTeamId } = useAccount();
+  const { data: memberships } = db.useQuery({
+    memberships: {
+      $: {
+        where: {
+          'teams.id': currentTeamId as string,
+        },
+      },
+    },
+  });
+  const { data: invites } = db.useQuery({
+    invites: {},
+  });
+
+  const members = useMemo(() => {
+    if (memberships && invites) {
+      const userEmailAsInviteStatus = invites.invites.reduce((acc, invite) => {
+        acc[invite.userEmail] = {
+          inviteId: invite.id,
+          status: invite.status as 'pending' | 'accepted' | 'declined',
+        } as const;
+        return acc;
+      }, {} as Record<string, { inviteId: string; status: 'pending' | 'accepted' | 'declined' }>);
+
+      return memberships.memberships.map((membership) => ({
+        membershipId: membership.id,
+        userEmail: membership.userEmail,
+        userId: membership.userId,
+        invite: userEmailAsInviteStatus[membership.userEmail],
+      }));
+    }
+
+    return [];
+  }, [invites, memberships]);
 
   return (
     <>
@@ -35,7 +68,10 @@ export function OwnerMembers() {
                     }
                     text="Are you sure you want to delete this user?"
                     onOk={() => {
-                      fetchDeleteMembership(member.membershipId, member?.invite?.inviteId as string);
+                      deleteMembership({
+                        membershipId: member.membershipId,
+                        inviteId: member?.invite?.inviteId as string,
+                      });
                     }}
                   />
                 )}
@@ -64,4 +100,8 @@ function InviteStatus({ status }: { status: 'pending' | 'accepted' | 'declined' 
   }
 
   return <Badge colorPalette="red">declined</Badge>;
+}
+
+async function deleteMembership({ membershipId, inviteId }: { membershipId: string; inviteId: string }) {
+  return await db.transact([db.tx.invites[inviteId].delete(), db.tx.memberships[membershipId].delete()]);
 }

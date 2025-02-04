@@ -1,24 +1,22 @@
 import { Button, Editable, IconButton, Table } from '@chakra-ui/react';
 import { LuCheck, LuPencilLine, LuX } from 'react-icons/lu';
-import { useAction, useAtom, useCtx } from '@reatom/npm-react';
-import { currentTeamAtom } from '../../../../features/account/model';
-import { fetchDeleteTeamAtom, fetchRenameTeamAtom } from './model';
 import { ConfirmAction } from '../../../../components/ConfirmAction';
+import { useAccount } from '../../../../features/account/AccountContext';
+import { db } from '../../../../instantdb';
+import { useState } from 'react';
 
 export function Settings() {
-  const ctx = useCtx();
-  const [currentTeam] = useAtom(currentTeamAtom);
-  const fetchRenameTeam = useAction(fetchRenameTeamAtom);
-  const fetchDeleteTeam = useAction(fetchDeleteTeamAtom);
-  const [name, setName] = useAtom<string>(ctx.get(currentTeamAtom)?.name || '');
+  const { currentTeamId } = useAccount();
+  const { data: currentTeam } = db.useQuery({ teams: { $: { where: { id: currentTeamId as string } } } });
+  const [name, setName] = useState<string>(currentTeam?.teams?.[0]?.name || '');
 
   const handleRenameTeam = ({ value: newName }: { value: string }) => {
     if (!newName) return;
-    fetchRenameTeam(currentTeam?.id as string, newName);
+    renameTeam({ teamId: currentTeam?.teams?.[0]?.id as string, newName });
   };
 
   const handleDeleteTeamClick = () => {
-    fetchDeleteTeam(currentTeam?.id as string);
+    deleteTeam({ teamId: currentTeam?.teams?.[0]?.id as string });
   };
 
   return (
@@ -79,4 +77,12 @@ export function Settings() {
       </Table.Body>
     </Table.Root>
   );
+}
+
+async function renameTeam({ newName, teamId }: { teamId: string; newName: string }) {
+  return await db.transact([db.tx.teams[teamId].merge({ name: newName })]);
+}
+
+async function deleteTeam({ teamId }: { teamId: string }) {
+  return await db.transact([db.tx.teams[teamId].delete()]);
 }
