@@ -1,0 +1,223 @@
+import { i } from '@instantdb/react';
+
+const _schema = i.schema({
+  entities: {
+    $users: i.entity({
+      email: i.string().unique().indexed(),
+    }),
+    invites: i.entity({
+      teamId: i.string(),
+      membershipId: i.string(),
+      teamName: i.string(),
+      userEmail: i.string(),
+      status: i.string(),
+    }),
+    memberships: i.entity({
+      teamId: i.string(),
+      userEmail: i.string(),
+      userId: i.string(),
+    }),
+    teams: i.entity({
+      creatorId: i.string(),
+      name: i.string(),
+    }),
+    boards: i.entity({
+      name: i.string(),
+      teamId: i.string(),
+    }),
+    columns: i.entity({
+      boardId: i.string(),
+      createdAt: i.date(),
+      // additionalProperties: Property[];
+      approveRule: i.string(),
+      teamId: i.string(),
+      statusId: i.string(),
+      position: i.number().indexed(),
+    }),
+    statuses: i.entity({
+      name: i.string(),
+      createdAt: i.date(),
+      teamId: i.string(),
+    }),
+    contributors: i.entity({
+      columnId: i.string(),
+      membershipId: i.string(),
+      teamId: i.string(),
+    }),
+    tasks: i.entity({
+      title: i.string(),
+      content: i.string(),
+      createdAt: i.date(),
+      teamId: i.string(),
+      columnId: i.string(),
+      executorUserId: i.string(),
+      // updatedAt: Date;
+      // additionalProperties: Property[];
+      // approvedUserIds: string[];
+    }),
+  },
+  links: {
+    tasksColumns: {
+      forward: {
+        on: 'tasks',
+        has: 'one',
+        label: 'columns',
+        onDelete: 'cascade',
+      },
+      reverse: {
+        on: 'columns',
+        has: 'many',
+        label: 'tasks',
+      },
+    },
+    tasksTeams: {
+      forward: {
+        on: 'tasks',
+        has: 'one',
+        label: 'teams',
+        onDelete: 'cascade',
+      },
+      reverse: {
+        on: 'teams',
+        has: 'many',
+        label: 'tasks',
+      },
+    },
+    contributorsMemberships: {
+      forward: {
+        on: 'contributors',
+        has: 'one',
+        label: 'memberships',
+        onDelete: 'cascade',
+      },
+      reverse: {
+        on: 'memberships',
+        has: 'many',
+        label: 'contributors',
+      },
+    },
+    columnContributors: {
+      forward: {
+        on: 'columns',
+        has: 'many',
+        label: 'contributors',
+      },
+      reverse: {
+        on: 'contributors',
+        has: 'many',
+        label: 'columns',
+      },
+    },
+    contributorsTeams: {
+      forward: {
+        on: 'contributors',
+        has: 'one',
+        label: 'teams',
+        onDelete: 'cascade',
+      },
+      reverse: {
+        on: 'teams',
+        has: 'many',
+        label: 'contributors',
+      },
+    },
+    columnsStatuses: {
+      forward: {
+        on: 'columns',
+        has: 'one',
+        label: 'statuses',
+      },
+      reverse: {
+        on: 'statuses',
+        has: 'many',
+        label: 'columns',
+      },
+    },
+    columnsBoards: {
+      forward: {
+        on: 'columns',
+        has: 'one',
+        label: 'boards',
+        onDelete: 'cascade',
+      },
+      reverse: {
+        on: 'boards',
+        has: 'many',
+        label: 'columns',
+      },
+    },
+    columnsTeams: {
+      forward: {
+        on: 'columns',
+        has: 'one',
+        label: 'teams',
+        onDelete: 'cascade',
+      },
+      reverse: {
+        on: 'teams',
+        has: 'many',
+        label: 'columns',
+      },
+    },
+    statusesTeams: {
+      forward: {
+        on: 'statuses',
+        has: 'one',
+        label: 'teams',
+        onDelete: 'cascade',
+      },
+      reverse: {
+        on: 'teams',
+        has: 'many',
+        label: 'statuses',
+      },
+    },
+    boardsTeams: {
+      forward: {
+        on: 'boards',
+        has: 'one',
+        label: 'teams',
+        onDelete: 'cascade',
+      },
+      reverse: {
+        on: 'teams',
+        has: 'many',
+        label: 'boards',
+      },
+    },
+    invitesTeams: {
+      forward: {
+        on: 'invites',
+        has: 'one',
+        label: 'teams',
+        onDelete: 'cascade',
+      },
+      reverse: {
+        on: 'teams',
+        has: 'many',
+        label: 'invites',
+      },
+    },
+    membershipsTeams: {
+      forward: {
+        on: 'memberships',
+        has: 'one',
+        label: 'teams',
+        onDelete: 'cascade',
+      },
+      reverse: {
+        on: 'teams',
+        has: 'many',
+        label: 'memberships',
+      },
+    },
+  },
+});
+
+// This helps Typescript display better intellisense
+type _AppSchema = typeof _schema;
+type AppSchema = _AppSchema;
+const schema: AppSchema = _schema;
+
+export type { AppSchema };
+export default schema;
