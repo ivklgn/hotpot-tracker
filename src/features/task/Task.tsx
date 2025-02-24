@@ -6,6 +6,7 @@ import { HiColorSwatch } from 'react-icons/hi';
 import { AppSchema } from '../../../instant.schema';
 import { InstaQLEntity } from '@instantdb/react';
 import { useLocation } from 'wouter';
+import { Editor } from '@/components/Editor/Editor';
 
 interface TaskProps {
   task?: InstaQLEntity<AppSchema, 'tasks'>;
@@ -49,9 +50,10 @@ export function Task({ task }: TaskProps) {
         onValueChange={(e) => setName(e.value)}
         placeholder="Click to edit"
         onValueCommit={handleRenameBoard}
+        mb={8}
       >
-        <Editable.Preview />
-        <Editable.Input />
+        <Editable.Preview fontSize="3xl" fontWeight="bold" />
+        <Editable.Input fontSize="3xl" fontWeight="bold" />
         <Editable.Control>
           <Editable.EditTrigger asChild>
             <IconButton variant="ghost" size="xs">
@@ -70,7 +72,8 @@ export function Task({ task }: TaskProps) {
           </Editable.SubmitTrigger>
         </Editable.Control>
       </Editable.Root>
-      <div>(Content)</div>
+
+      <Editor initialContent="Task body" />
     </Box>
   );
 }
