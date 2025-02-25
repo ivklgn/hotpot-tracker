@@ -59,7 +59,7 @@ export function SmartParams({ type, smartParams, ...props }: SmartParamsProps) {
       {type === 'task' && (
         <SmartParamsDialog
           isOpen={isDialogOpen}
-          type={type}
+          type="task"
           // @ts-ignore
           taskId={props.taskId}
           opener={

@@ -6,9 +6,10 @@ import { HiColorSwatch } from 'react-icons/hi';
 import { AppSchema } from '../../../instant.schema';
 import { InstaQLEntity } from '@instantdb/react';
 import { useLocation } from 'wouter';
+import { SmartParams } from '../smart-params';
 
 interface TaskProps {
-  task?: InstaQLEntity<AppSchema, 'tasks'>;
+  task?: InstaQLEntity<AppSchema, 'tasks', { smartParams: {} }>;
 }
 
 export function Task({ task }: TaskProps) {
@@ -70,6 +71,7 @@ export function Task({ task }: TaskProps) {
           </Editable.SubmitTrigger>
         </Editable.Control>
       </Editable.Root>
+      <SmartParams type="task" smartParams={task.smartParams || []} taskId={task.id} />
       <div>(Content)</div>
     </Box>
   );

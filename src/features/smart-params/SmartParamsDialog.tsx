@@ -335,7 +335,7 @@ async function createSmartParams({
           .link({ teams: teamId }),
         type === 'board'
           ? db.tx.smartParams[newSmartParam].link({ boards: rest.boardId })
-          : db.tx.smartParams[newSmartParam].link({ teams: rest.taskId }),
+          : db.tx.smartParams[newSmartParam].link({ tasks: rest.taskId }),
       ])
       .then(() => {
         ids.push(newSmartParam);

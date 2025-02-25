@@ -76,6 +76,19 @@ const _schema = i.schema({
         label: 'smartParams',
       },
     },
+    smartParamsTasks: {
+      forward: {
+        on: 'smartParams',
+        has: 'one',
+        label: 'tasks',
+        onDelete: 'cascade',
+      },
+      reverse: {
+        on: 'tasks',
+        has: 'many',
+        label: 'smartParams',
+      },
+    },
     smartParamsTeams: {
       forward: {
         on: 'smartParams',
