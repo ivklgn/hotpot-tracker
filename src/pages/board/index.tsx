@@ -8,6 +8,7 @@ export function BoardPage() {
   const params = useParams();
   const { data: board } = db.useQuery({
     boards: {
+      smartParams: {},
       $: {
         where: {
           id: params?.boardId as string,
@@ -19,6 +20,8 @@ export function BoardPage() {
   if (!params?.boardId) return <Redirect to="/404" />;
 
   if (!board) return null;
+
+  console.log(board);
 
   return (
     <DndProvider backend={HTML5Backend}>

@@ -8,8 +8,6 @@ import {
   VStack,
   Editable,
   IconButton,
-  HStack,
-  Tag,
 } from '@chakra-ui/react';
 import { Link, useLocation } from 'wouter';
 import { db } from '../../instantdb';
@@ -17,25 +15,18 @@ import { HiColorSwatch } from 'react-icons/hi';
 import { id, InstaQLEntity } from '@instantdb/react';
 import { useAccount } from '../account/AccountContext';
 import { ConfirmAction } from '../../components/ConfirmAction';
-import { LuPencilLine, LuX, LuCheck, LuActivity, LuCalendar, LuTimer, LuCalendar1 } from 'react-icons/lu';
+import { LuPencilLine, LuX, LuCheck } from 'react-icons/lu';
 import { useState } from 'react';
-import { Column } from './columns/Column';
+import { Column } from './Column';
 import { CreateBoardDialog } from './CreateBoardDialog';
 import { AppSchema } from '../../../instant.schema';
-import { UserAvatar } from '../../components/Avatars';
 import { SmartParams } from '../smart-params';
-
-interface Board {
-  id: string;
-  teamId: string;
-  name: string;
-}
 
 type BoardViewMode = 'view' | 'edit';
 
 interface BoardProps {
   mode: BoardViewMode;
-  board?: InstaQLEntity<AppSchema, 'boards'>;
+  board?: InstaQLEntity<AppSchema, 'boards', { smartParams: {} }>;
 }
 
 export function Board({ board, mode = 'view' }: BoardProps) {
@@ -169,18 +160,18 @@ async function deleteBoard({ boardId }: { boardId: string }) {
 }
 
 interface BoardHeaderProps {
-  board: Board;
+  board?: InstaQLEntity<AppSchema, 'boards', { smartParams: {} }>;
   mode: BoardViewMode;
 }
 
 function BoardHeader({ board, mode }: BoardHeaderProps) {
   const [, navigate] = useLocation();
   const { currentTeamId } = useAccount();
-  const [name, setName] = useState<string>(board.name);
+  const [name, setName] = useState<string>(board?.name || '');
 
   const handleRenameBoard = ({ value: newName }: { value: string }) => {
     if (!newName) return;
-    renameBoard({ boardId: board.id, newName });
+    renameBoard({ boardId: board?.id as string, newName });
   };
 
   if (!board) return null;
@@ -248,7 +239,7 @@ function BoardHeader({ board, mode }: BoardHeaderProps) {
           )}
         </ButtonGroup>
       </Flex>
-      <SmartParams />
+      <SmartParams type="board" smartParams={board.smartParams || []} boardId={board.id} />
     </Flex>
   );
 }

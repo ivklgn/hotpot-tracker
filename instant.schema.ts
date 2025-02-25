@@ -39,6 +39,15 @@ const _schema = i.schema({
       createdAt: i.date(),
       teamId: i.string(),
     }),
+    smartParams: i.entity({
+      name: i.string(),
+      type: i.string(),
+      value: i.string(),
+      boardId: i.string(),
+      taskId: i.string(),
+      createdAt: i.date(),
+      teamId: i.string(),
+    }),
     contributors: i.entity({
       columnId: i.string(),
       membershipId: i.string(),
@@ -51,12 +60,35 @@ const _schema = i.schema({
       teamId: i.string(),
       columnId: i.string(),
       executorUserId: i.string(),
-      // updatedAt: Date;
-      // additionalProperties: Property[];
-      // approvedUserIds: string[];
     }),
   },
   links: {
+    smartParamsBoards: {
+      forward: {
+        on: 'smartParams',
+        has: 'one',
+        label: 'boards',
+        onDelete: 'cascade',
+      },
+      reverse: {
+        on: 'boards',
+        has: 'many',
+        label: 'smartParams',
+      },
+    },
+    smartParamsTeams: {
+      forward: {
+        on: 'smartParams',
+        has: 'one',
+        label: 'teams',
+        onDelete: 'cascade',
+      },
+      reverse: {
+        on: 'teams',
+        has: 'many',
+        label: 'smartParams',
+      },
+    },
     tasksColumns: {
       forward: {
         on: 'tasks',

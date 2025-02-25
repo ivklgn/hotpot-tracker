@@ -12,14 +12,14 @@ import { Field } from '@/components/ui/field';
 import { CreatableSelect, Select } from 'chakra-react-select';
 import { useRef, useState } from 'react';
 import { LuX, LuPencil, LuPlus } from 'react-icons/lu';
-import { db } from '../../../instantdb';
+import { db } from '../../instantdb';
 import { id, InstaQLResult } from '@instantdb/react';
-import { useAccount } from '../../account/AccountContext';
-import { ConfirmAction } from '../../../components/ConfirmAction';
-import { UserAvatars } from '../../../components/Avatars';
+import { useAccount } from '../account/AccountContext';
+import { ConfirmAction } from '../../components/ConfirmAction';
+import { UserAvatars } from '../../components/Avatars';
 import { Link } from 'wouter';
 import { useDrag, useDrop } from 'react-dnd';
-import { AppSchema } from '../../../../instant.schema';
+import { AppSchema } from '../../../instant.schema';
 
 type ColumnType = InstaQLResult<
   AppSchema,

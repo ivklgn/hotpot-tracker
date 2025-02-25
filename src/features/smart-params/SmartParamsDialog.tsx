@@ -12,10 +12,13 @@ import {
   DialogCloseTrigger,
 } from '@/components/ui/dialog';
 import { Select } from 'chakra-react-select';
-import { cloneElement, useRef, useState } from 'react';
+import { cloneElement, useEffect, useMemo, useRef, useState } from 'react';
 import React from 'react';
 import { LuPlus, LuX } from 'react-icons/lu';
-import { id } from '@instantdb/react';
+import { id, InstaQLEntity, InstaQLResult } from '@instantdb/react';
+import { db } from '../../instantdb';
+import { useAccount } from '../account/AccountContext';
+import { AppSchema } from '../../../instant.schema';
 
 const SMART_PARAMS_TYPES = [
   {
@@ -34,51 +37,105 @@ const SMART_PARAMS_TYPES = [
     value: 'date',
     label: 'Date',
   },
-  // {
-  //   value: 'date-range',
-  //   label: 'Date range',
-  // },
 ];
 
-interface SmartParam {
-  id: string;
-  name: string;
-  type: string;
-  value?: string;
-}
-interface SmartParamsDialogProps {
-  opener: React.ReactElement;
+type SmartParam = InstaQLEntity<AppSchema, 'smartParams'>;
+
+interface EditableSmartParam extends Pick<SmartParam, 'id' | 'name' | 'type' | 'value'> {
+  isNew: boolean;
 }
 
-export const SmartParamsDialog: React.FC<SmartParamsDialogProps> = ({ opener }) => {
-  const [smartParams, setSmartParams] = useState<SmartParam[]>([]);
+interface BaseProps {
+  opener: React.ReactElement;
+  smartParams: InstaQLResult<AppSchema, { smartParams: {} }>['smartParams'];
+  boardId?: string;
+  taskId?: string;
+}
+
+interface SmartParamsBoardProps extends BaseProps {
+  type: 'board';
+  boardId: string;
+}
+
+interface SmartParamsTaskProps extends BaseProps {
+  type: 'task';
+  taskId: string;
+}
+
+export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTaskProps> = ({
+  opener,
+  smartParams,
+  type,
+  ...props
+}) => {
+  const [editedParams, setEditedParams] = useState<EditableSmartParam[]>([]);
   const ref = useRef<HTMLInputElement>(null);
   const [isVisible, setVisibility] = useState(false);
-  // const { currentTeamId } = useAccount();
+  const { currentTeamId } = useAccount();
   const contentRef = useRef<HTMLDivElement>(null);
+
+  const _smartParams = useMemo(() => [...smartParams, ...editedParams], [editedParams, smartParams]);
+  console.log({ _smartParams, editedParams });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const idsForCreate = editedParams.filter((param) => param.isNew);
+    if (idsForCreate.length > 0) {
+      createSmartParams(
+        // @ts-ignore
+        type === 'board'
+          ? {
+              type: 'board',
+              smartParams: idsForCreate,
+              teamId: currentTeamId as string,
+              boardId: props.boardId,
+            }
+          : {
+              type: 'task',
+              smartParams: idsForCreate,
+              teamId: currentTeamId as string,
+              taskId: props.taskId,
+            }
+      );
+    }
+
+    const idsForUpdate = editedParams.filter((param) => !param.isNew);
+    if (idsForUpdate) {
+      updateSmartParams({
+        smartParams: idsForUpdate,
+      });
+    }
+
+    setVisibility(false);
   };
 
   const handleAddParamClick = () => {
-    setSmartParams((prev) => [...prev, { id: id(), name: '', type: 'string', value: '' }]);
+    setEditedParams((prev) => [...prev, { id: id(), name: '', type: 'string', value: '', isNew: true }]);
   };
 
   const handleDeleteParamClick = (id: string) => {
-    setSmartParams((prev) => prev.filter((param) => param.id !== id));
+    deleteSmartParam({ smartParamId: id }).then(() => {
+      setEditedParams((prev) => prev.filter((param) => param.id !== id));
+    });
   };
 
   const handleChangeParam = (id: string, fieldName: keyof SmartParam, fieldValue?: string) => {
-    setSmartParams((prev) => {
-      return prev.map((param) => {
+    setEditedParams((prev) =>
+      prev.map((param) => {
         if (param.id === id) {
           return { ...param, [fieldName]: fieldValue };
         }
         return param;
-      });
-    });
+      })
+    );
   };
+
+  useEffect(() => {
+    if (!opener) {
+      setEditedParams([]);
+    }
+  }, [opener]);
 
   return (
     <DialogRoot initialFocusEl={() => ref.current} open={isVisible} size="lg">
@@ -99,11 +156,11 @@ export const SmartParamsDialog: React.FC<SmartParamsDialogProps> = ({ opener }) 
           <DialogBody pb="4">
             <Fieldset.Root size="sm">
               <Fieldset.Content>
-                {smartParams.length === 0 && <Text>No params, click to add params</Text>}
-                {smartParams.length > 0 &&
-                  Object.entries(smartParams).map(([name, param]) => (
+                {_smartParams.length === 0 && <Text>No params, click to add params</Text>}
+                {_smartParams.length > 0 &&
+                  _smartParams.map((param) => (
                     <ParamField
-                      key={name}
+                      key={param.name}
                       param={param}
                       onDelete={handleDeleteParamClick}
                       onChange={handleChangeParam}
@@ -227,4 +284,72 @@ function ParamField({
       </HStack>
     </div>
   );
+}
+
+async function deleteSmartParam({ smartParamId }: { smartParamId: string }) {
+  return await db.transact([db.tx.smartParams[smartParamId].delete()]);
+}
+
+interface CreateSmartParams {
+  smartParams: EditableSmartParam[];
+  teamId: string;
+  boardId?: string;
+  taskId?: string;
+}
+
+interface CreateBoardSmartParams extends CreateSmartParams {
+  type: 'board';
+  boardId: string;
+}
+
+interface CreateTaskSmartParams extends CreateSmartParams {
+  type: 'task';
+  taskId: string;
+}
+
+async function createSmartParams({
+  type,
+  smartParams,
+  teamId,
+  ...rest
+}: CreateBoardSmartParams | CreateTaskSmartParams) {
+  const ids: string[] = [];
+  for (const sp of smartParams) {
+    const newSmartParam = id();
+    await db
+      .transact([
+        db.tx.smartParams[newSmartParam]
+          .update({
+            name: sp.name,
+            type: sp.type,
+            value: sp.value,
+            boardId: rest.boardId ? rest.boardId : undefined,
+            taskId: rest.taskId ? rest.taskId : undefined,
+            teamId,
+          })
+          .link({ teams: teamId }),
+        type === 'board'
+          ? db.tx.smartParams[newSmartParam].link({ boards: rest.boardId })
+          : db.tx.smartParams[newSmartParam].link({ teams: rest.taskId }),
+      ])
+      .then(() => {
+        ids.push(newSmartParam);
+      });
+  }
+
+  return ids;
+}
+
+async function updateSmartParams({ smartParams }: { smartParams: EditableSmartParam[] }) {
+  const ids: string[] = [];
+  for (const sp of smartParams) {
+    const newSmartParam = id();
+    await db
+      .transact([db.tx.smartParams[sp.id].merge({ name: sp.name, type: sp.type, value: sp.value })])
+      .then(() => {
+        ids.push(newSmartParam);
+      });
+  }
+
+  return ids;
 }
