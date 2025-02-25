@@ -50,6 +50,8 @@ interface BaseProps {
   smartParams: InstaQLResult<AppSchema, { smartParams: {} }>['smartParams'];
   boardId?: string;
   taskId?: string;
+  isOpen: boolean;
+  onClose?: () => void;
 }
 
 interface SmartParamsBoardProps extends BaseProps {
@@ -63,19 +65,17 @@ interface SmartParamsTaskProps extends BaseProps {
 }
 
 export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTaskProps> = ({
+  isOpen,
   opener,
   smartParams,
   type,
+  onClose,
   ...props
 }) => {
   const [editedParams, setEditedParams] = useState<EditableSmartParam[]>([]);
   const ref = useRef<HTMLInputElement>(null);
-  const [isVisible, setVisibility] = useState(false);
   const { currentTeamId } = useAccount();
   const contentRef = useRef<HTMLDivElement>(null);
-
-  const _smartParams = useMemo(() => [...smartParams, ...editedParams], [editedParams, smartParams]);
-  console.log({ _smartParams, editedParams });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,7 +107,7 @@ export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTask
       });
     }
 
-    setVisibility(false);
+    onClose?.();
   };
 
   const handleAddParamClick = () => {
@@ -132,23 +132,28 @@ export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTask
   };
 
   useEffect(() => {
-    if (!opener) {
-      setEditedParams([]);
+    if (smartParams) {
+      setEditedParams(() =>
+        smartParams.map((param) => ({
+          id: param.id,
+          name: param.name,
+          type: param.type,
+          value: param.value,
+          isNew: false,
+        }))
+      );
     }
-  }, [opener]);
+  }, [smartParams]);
 
   return (
-    <DialogRoot initialFocusEl={() => ref.current} open={isVisible} size="lg">
+    <DialogRoot initialFocusEl={() => ref.current} open={isOpen} size="lg">
       <DialogTrigger asChild>
         {cloneElement(opener, {
           ref,
-          onClick: () => {
-            setVisibility(true);
-          },
         })}
       </DialogTrigger>
       <DialogContent ref={contentRef}>
-        <DialogCloseTrigger onClick={() => setVisibility(false)} />
+        <DialogCloseTrigger onClick={() => onClose?.()} />
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Add or edit smart params</DialogTitle>
@@ -156,11 +161,11 @@ export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTask
           <DialogBody pb="4">
             <Fieldset.Root size="sm">
               <Fieldset.Content>
-                {_smartParams.length === 0 && <Text>No params, click to add params</Text>}
-                {_smartParams.length > 0 &&
-                  _smartParams.map((param) => (
+                {editedParams.length === 0 && <Text>No params, click to add params</Text>}
+                {editedParams.length > 0 &&
+                  editedParams.map((param) => (
                     <ParamField
-                      key={param.name}
+                      key={param.id}
                       param={param}
                       onDelete={handleDeleteParamClick}
                       onChange={handleChangeParam}
@@ -178,7 +183,7 @@ export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTask
                 <Button
                   variant="outline"
                   onClick={() => {
-                    setVisibility(false);
+                    onClose?.();
                   }}
                   size="xs"
                 >
@@ -201,9 +206,9 @@ function ParamField({
   onDelete,
   onChange,
 }: {
-  param: SmartParam;
+  param: EditableSmartParam;
   onDelete?: (id: string) => void;
-  onChange?: (id: string, fieldName: keyof SmartParam, fieldValue?: string) => void;
+  onChange?: (id: string, fieldName: keyof EditableSmartParam, fieldValue?: string) => void;
 }) {
   return (
     <div key={param.id}>

@@ -3,6 +3,7 @@ import { LuCalendar, LuTimer, LuPencilLine, LuCaseLower } from 'react-icons/lu';
 import { SmartParamsDialog } from './SmartParamsDialog';
 import { InstaQLResult } from '@instantdb/react';
 import { AppSchema } from '../../../instant.schema';
+import { useState } from 'react';
 
 interface BaseProps {
   smartParams: InstaQLResult<AppSchema, { smartParams: {} }>['smartParams'];
@@ -21,6 +22,8 @@ interface TaskProps extends BaseProps {
 type SmartParamsProps = BoardProps | TaskProps;
 
 export function SmartParams({ type, smartParams, ...props }: SmartParamsProps) {
+  const [isDialogOpen, setDialogOpen] = useState(false);
+
   return (
     <HStack>
       {smartParams.map((sp) => (
@@ -40,28 +43,32 @@ export function SmartParams({ type, smartParams, ...props }: SmartParamsProps) {
       {smartParams.length === 0 && <Text>Click to add smart params</Text>}
       {type === 'board' && (
         <SmartParamsDialog
+          isOpen={isDialogOpen}
           type="board"
           // @ts-ignore
           boardId={props.boardId}
           opener={
-            <IconButton variant="ghost" size="xs">
+            <IconButton variant="ghost" size="xs" onClick={() => setDialogOpen(true)}>
               <LuPencilLine />
             </IconButton>
           }
           smartParams={smartParams}
+          onClose={() => setDialogOpen(false)}
         />
       )}
       {type === 'task' && (
         <SmartParamsDialog
+          isOpen={isDialogOpen}
           type={type}
           // @ts-ignore
           taskId={props.taskId}
           opener={
-            <IconButton variant="ghost" size="xs">
+            <IconButton variant="ghost" size="xs" onClick={() => setDialogOpen(true)}>
               <LuPencilLine />
             </IconButton>
           }
           smartParams={smartParams}
+          onClose={() => setDialogOpen(false)}
         />
       )}
     </HStack>

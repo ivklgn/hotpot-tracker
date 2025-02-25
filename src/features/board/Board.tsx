@@ -177,7 +177,7 @@ function BoardHeader({ board, mode }: BoardHeaderProps) {
   if (!board) return null;
 
   return (
-    <Flex direction="column" mx={4} gap="2" mb={4}>
+    <Flex direction="column" mx={4} gap="2">
       <Flex direction="row" justifyContent="space-between">
         {mode === 'view' && (
           <ChakraLink asChild colorPalette="teal" fontWeight="medium" fontSize="xl">
