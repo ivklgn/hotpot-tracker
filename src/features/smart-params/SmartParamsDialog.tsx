@@ -12,7 +12,7 @@ import {
   DialogCloseTrigger,
 } from '@/components/ui/dialog';
 import { Select } from 'chakra-react-select';
-import { cloneElement, useEffect, useMemo, useRef, useState } from 'react';
+import { cloneElement, useEffect, useRef, useState } from 'react';
 import React from 'react';
 import { LuPlus, LuX } from 'react-icons/lu';
 import { id, InstaQLEntity, InstaQLResult } from '@instantdb/react';
@@ -120,7 +120,7 @@ export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTask
     });
   };
 
-  const handleChangeParam = (id: string, fieldName: keyof SmartParam, fieldValue?: string) => {
+  const handleChangeParam = (id: string, fieldName: keyof EditableSmartParam, fieldValue?: string) => {
     setEditedParams((prev) =>
       prev.map((param) => {
         if (param.id === id) {
