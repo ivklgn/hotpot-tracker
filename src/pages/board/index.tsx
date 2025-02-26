@@ -21,8 +21,6 @@ export function BoardPage() {
 
   if (!board) return null;
 
-  console.log(board);
-
   return (
     <DndProvider backend={HTML5Backend}>
       <Board board={board.boards?.[0]} mode="edit" />

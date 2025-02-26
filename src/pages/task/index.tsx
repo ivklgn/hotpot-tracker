@@ -20,7 +20,5 @@ export function TaskPage() {
 
   if (!task) return null;
 
-  console.log({ task });
-
   return <Task task={task.tasks?.[0]} />;
 }

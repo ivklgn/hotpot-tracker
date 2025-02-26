@@ -83,19 +83,18 @@ export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTask
     const idsForCreate = editedParams.filter((param) => param.isNew);
     if (idsForCreate.length > 0) {
       createSmartParams(
-        // @ts-ignore
         type === 'board'
           ? {
               type: 'board',
               smartParams: idsForCreate,
               teamId: currentTeamId as string,
-              boardId: props.boardId,
+              boardId: props.boardId as string,
             }
           : {
               type: 'task',
               smartParams: idsForCreate,
               teamId: currentTeamId as string,
-              taskId: props.taskId,
+              taskId: props.taskId as string,
             }
       );
     }
@@ -298,8 +297,6 @@ async function deleteSmartParam({ smartParamId }: { smartParamId: string }) {
 interface CreateSmartParams {
   smartParams: EditableSmartParam[];
   teamId: string;
-  boardId?: string;
-  taskId?: string;
 }
 
 interface CreateBoardSmartParams extends CreateSmartParams {
@@ -312,14 +309,21 @@ interface CreateTaskSmartParams extends CreateSmartParams {
   taskId: string;
 }
 
-async function createSmartParams({
-  type,
-  smartParams,
-  teamId,
-  ...rest
-}: CreateBoardSmartParams | CreateTaskSmartParams) {
+function isBoardSmartParams(
+  smartParams: CreateBoardSmartParams | CreateTaskSmartParams
+): smartParams is CreateBoardSmartParams {
+  return (smartParams as CreateBoardSmartParams).type === 'board';
+}
+
+function isTaskSmartParams(
+  smartParams: CreateBoardSmartParams | CreateTaskSmartParams
+): smartParams is CreateTaskSmartParams {
+  return (smartParams as CreateTaskSmartParams).type === 'task';
+}
+
+async function createSmartParams(params: CreateBoardSmartParams | CreateTaskSmartParams) {
   const ids: string[] = [];
-  for (const sp of smartParams) {
+  for (const sp of params.smartParams) {
     const newSmartParam = id();
     await db
       .transact([
@@ -328,14 +332,14 @@ async function createSmartParams({
             name: sp.name,
             type: sp.type,
             value: sp.value,
-            boardId: rest.boardId ? rest.boardId : undefined,
-            taskId: rest.taskId ? rest.taskId : undefined,
-            teamId,
+            boardId: isBoardSmartParams(params) ? params.boardId : undefined,
+            taskId: isTaskSmartParams(params) ? params.taskId : undefined,
+            teamId: params.teamId,
           })
-          .link({ teams: teamId }),
-        type === 'board'
-          ? db.tx.smartParams[newSmartParam].link({ boards: rest.boardId })
-          : db.tx.smartParams[newSmartParam].link({ tasks: rest.taskId }),
+          .link({ teams: params.teamId }),
+        params.type === 'board'
+          ? db.tx.smartParams[newSmartParam].link({ boards: params.boardId })
+          : db.tx.smartParams[newSmartParam].link({ tasks: params.taskId }),
       ])
       .then(() => {
         ids.push(newSmartParam);

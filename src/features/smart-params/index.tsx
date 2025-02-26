@@ -23,17 +23,18 @@ interface TaskProps extends BaseProps {
 
 type SmartParamsProps = BoardProps | TaskProps;
 
-export function SmartParams({ type, smartParams, ...props }: SmartParamsProps) {
-  console.log({ props });
+function isTaskProps(props: SmartParamsProps): props is TaskProps {
+  return (props as TaskProps).type === 'task';
+}
+
+export function SmartParams(props: SmartParamsProps) {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const { data: boardParams } = db.useQuery(
-    // @ts-ignore
-    type === 'task' && props.taskBoardId
+    isTaskProps(props) && props?.taskBoardId
       ? {
           smartParams: {
             $: {
               where: {
-                // @ts-ignore
                 boardId: props.taskBoardId,
               },
             },
@@ -41,8 +42,6 @@ export function SmartParams({ type, smartParams, ...props }: SmartParamsProps) {
         }
       : null
   );
-
-  console.log({ boardParams });
 
   return (
     <HStack>
@@ -60,7 +59,7 @@ export function SmartParams({ type, smartParams, ...props }: SmartParamsProps) {
           </Tag.Label>
         </Tag.Root>
       ))}
-      {smartParams.map((sp) => (
+      {props.smartParams.map((sp) => (
         <Tag.Root key={sp.id} variant="outline">
           {sp.type !== 'number' && (
             <Tag.StartElement>
@@ -74,34 +73,32 @@ export function SmartParams({ type, smartParams, ...props }: SmartParamsProps) {
           </Tag.Label>
         </Tag.Root>
       ))}
-      {smartParams.length === 0 && <Text>Click to add smart params</Text>}
-      {type === 'board' && (
+      {props.smartParams.length === 0 && <Text>Click to add smart params</Text>}
+      {props.type === 'board' && (
         <SmartParamsDialog
           isOpen={isDialogOpen}
           type="board"
-          // @ts-ignore
           boardId={props.boardId}
           opener={
             <IconButton variant="ghost" size="xs" onClick={() => setDialogOpen(true)}>
               <LuPencilLine />
             </IconButton>
           }
-          smartParams={smartParams}
+          smartParams={props.smartParams}
           onClose={() => setDialogOpen(false)}
         />
       )}
-      {type === 'task' && (
+      {props.type === 'task' && (
         <SmartParamsDialog
           isOpen={isDialogOpen}
           type="task"
-          // @ts-ignore
           taskId={props.taskId}
           opener={
             <IconButton variant="ghost" size="xs" onClick={() => setDialogOpen(true)}>
               <LuPencilLine />
             </IconButton>
           }
-          smartParams={smartParams}
+          smartParams={props.smartParams}
           onClose={() => setDialogOpen(false)}
         />
       )}
