@@ -7,6 +7,7 @@ export function TaskPage() {
   const { data: task } = db.useQuery({
     tasks: {
       smartParams: {},
+      columns: {},
       $: {
         where: {
           id: params?.taskId as string,
@@ -18,6 +19,8 @@ export function TaskPage() {
   if (!params?.taskId) return <Redirect to="/404" />;
 
   if (!task) return null;
+
+  console.log({ task });
 
   return <Task task={task.tasks?.[0]} />;
 }

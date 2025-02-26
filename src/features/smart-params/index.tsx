@@ -4,6 +4,7 @@ import { SmartParamsDialog } from './SmartParamsDialog';
 import { InstaQLResult } from '@instantdb/react';
 import { AppSchema } from '../../../instant.schema';
 import { useState } from 'react';
+import { db } from '../../instantdb';
 
 interface BaseProps {
   smartParams: InstaQLResult<AppSchema, { smartParams: {} }>['smartParams'];
@@ -17,17 +18,50 @@ interface BoardProps extends BaseProps {
 interface TaskProps extends BaseProps {
   type: 'task';
   taskId: string;
+  taskBoardId?: string;
 }
 
 type SmartParamsProps = BoardProps | TaskProps;
 
 export function SmartParams({ type, smartParams, ...props }: SmartParamsProps) {
+  console.log({ props });
   const [isDialogOpen, setDialogOpen] = useState(false);
+  const { data: boardParams } = db.useQuery(
+    // @ts-ignore
+    type === 'task' && props.taskBoardId
+      ? {
+          smartParams: {
+            $: {
+              where: {
+                // @ts-ignore
+                boardId: props.taskBoardId,
+              },
+            },
+          },
+        }
+      : null
+  );
+
+  console.log({ boardParams });
 
   return (
     <HStack>
+      {boardParams?.smartParams.map((sp) => (
+        <Tag.Root key={sp.id} variant="surface">
+          {sp.type !== 'number' && (
+            <Tag.StartElement>
+              {sp.type === 'string' && <LuCaseLower />}
+              {sp.type === 'date' && <LuCalendar />}
+              {sp.type === 'time' && <LuTimer />}
+            </Tag.StartElement>
+          )}
+          <Tag.Label>
+            {sp.name}: <strong>{sp.value}</strong>
+          </Tag.Label>
+        </Tag.Root>
+      ))}
       {smartParams.map((sp) => (
-        <Tag.Root key={sp.id}>
+        <Tag.Root key={sp.id} variant="outline">
           {sp.type !== 'number' && (
             <Tag.StartElement>
               {sp.type === 'string' && <LuCaseLower />}

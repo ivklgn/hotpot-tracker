@@ -9,7 +9,7 @@ import { useLocation } from 'wouter';
 import { SmartParams } from '../smart-params';
 
 interface TaskProps {
-  task?: InstaQLEntity<AppSchema, 'tasks', { smartParams: {} }>;
+  task?: InstaQLEntity<AppSchema, 'tasks', { smartParams: {}; columns: {} }>;
 }
 
 export function Task({ task }: TaskProps) {
@@ -71,7 +71,12 @@ export function Task({ task }: TaskProps) {
           </Editable.SubmitTrigger>
         </Editable.Control>
       </Editable.Root>
-      <SmartParams type="task" smartParams={task.smartParams || []} taskId={task.id} />
+      <SmartParams
+        type="task"
+        smartParams={task.smartParams || []}
+        taskId={task.id}
+        taskBoardId={task.columns?.boardId}
+      />
       <div>(Content)</div>
     </Box>
   );
