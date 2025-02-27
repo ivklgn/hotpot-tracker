@@ -21,7 +21,10 @@
     "noUncheckedSideEffectImports": true,
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "typeRoots": [
+      "./src/@types"
+    ]
   },
   "include": ["src", "instant.schema.ts"]
 }

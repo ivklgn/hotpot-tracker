@@ -55,7 +55,7 @@ const _schema = i.schema({
     }),
     tasks: i.entity({
       title: i.string(),
-      content: i.string(),
+      content: i.json(),
       createdAt: i.date(),
       teamId: i.string(),
       columnId: i.string(),
