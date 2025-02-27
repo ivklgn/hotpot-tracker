@@ -1,4 +1,4 @@
-import { Switch, Route, Redirect } from 'wouter';
+import { Switch, Route, Redirect, useRoute } from 'wouter';
 import { AuthPage } from './pages/auth';
 import { WorkspacePage } from './pages/workspace';
 import { AccountNavbar } from './features/account/Navbar';
@@ -8,26 +8,26 @@ import { db } from './instantdb';
 import { BoardPage } from './pages/board';
 import { TaskPage } from './pages/task';
 import { NotFoundPage } from './pages/404';
-import Landing from './pages';
+import { Landing } from './pages/landing';
 
 export default function App() {
   const { user, isLoading } = db.useAuth();
+  const [isMainPage] = useRoute('/');
 
   if (isLoading) return null;
 
   if (user) {
     return (
       <AccountLayout>
-        <AccountNavbar />
+        {!isMainPage && <AccountNavbar />}
         <Switch>
           <Route path="/workspace" component={() => <WorkspacePage />} />
           <Route path="/boards" component={() => <BoardsPage />} />
           <Route path="/board/:boardId" component={() => <BoardPage />} />
           <Route path="/task/:taskId" component={() => <TaskPage />} />
-          <Route path="/" component={() => <Redirect to="/workspace" />} />
+          <Route path="/" component={() => <Landing />} />
           <Route path="/404" component={() => <NotFoundPage />} />
           <Route path="/auth" component={() => <Redirect to="/workspace" />} />
-          <Route path="/landing" component={() => <Landing />} />
           <Route>
             <NotFoundPage />
           </Route>
@@ -38,7 +38,7 @@ export default function App() {
 
   return (
     <Switch>
-      <Route path="/" component={() => <Redirect to="/auth" />} />
+      <Route path="/" component={() => <Landing />} />
       <Route path="/404" component={() => <NotFoundPage />} />
       <Route path="/auth" component={() => <AuthPage />} />
       <Route path="/workspace" component={() => <Redirect to="/auth" />} />

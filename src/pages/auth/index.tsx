@@ -1,19 +1,34 @@
-import { useState } from 'react';
-import { OTPEmailForm } from './features/OTPEmailForm';
-import { OTPCodeForm } from './features/OTPCodeForm';
+import { Box, Heading } from '@chakra-ui/react';
+import { Auth } from '../../features/auth';
 
 export function AuthPage() {
-  const [email, setEmail] = useState('');
-
-  if (!email) {
-    return (
-      <OTPEmailForm
-        onCodeSendComplete={(email) => {
-          setEmail(email);
+  return (
+    <Box
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundSize: 'cover',
+        minHeight: '100dvh',
+        padding: '16px',
+      }}
+    >
+      <Box
+        bg="chakra-body-bg"
+        borderWidth="1px"
+        style={{
+          width: '100%',
+          maxWidth: '400px',
+          borderRadius: '12px',
+          padding: '32px',
         }}
-      />
-    );
-  }
-
-  return <OTPCodeForm email={email} />;
+      >
+        <Heading mb="8" fontSize="2xl">
+          Auth with OTP
+        </Heading>
+        <Auth />
+      </Box>
+    </Box>
+  );
 }
