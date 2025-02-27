@@ -8,6 +8,7 @@ import { InstaQLEntity } from '@instantdb/react';
 import { useLocation } from 'wouter';
 import { SmartParams } from '../smart-params';
 import { Editor } from '@/components/Editor/Editor';
+import { JSONContent } from '@tiptap/react';
 
 interface TaskProps {
   task?: InstaQLEntity<AppSchema, 'tasks', { smartParams: {}; columns: {} }>;
@@ -20,6 +21,12 @@ export function Task({ task }: TaskProps) {
   const handleRenameBoard = ({ value: newTitle }: { value: string }) => {
     if (!newTitle || !task) return;
     renameTask({ taskId: task.id, newTitle });
+  };
+
+  const handleUpdateContent = (newContent: JSONContent) => {
+    if (!newContent || !task) return;
+
+    updateTaskContent({ taskId: task.id, newContent: JSON.stringify(newContent) });
   };
 
   if (!task) {
@@ -81,11 +88,15 @@ export function Task({ task }: TaskProps) {
         taskBoardId={task.columns?.boardId}
       />
 
-      <Editor initialContent="Task body" />
+      <Editor originalContent={task.content} onSaveClick={handleUpdateContent} />
     </Box>
   );
 }
 
 async function renameTask({ newTitle, taskId }: { taskId: string; newTitle: string }) {
   return await db.transact([db.tx.tasks[taskId].merge({ title: newTitle })]);
+}
+
+async function updateTaskContent({ newContent, taskId }: { taskId: string; newContent: string }) {
+  return await db.transact([db.tx.tasks[taskId].merge({ content: newContent })]);
 }

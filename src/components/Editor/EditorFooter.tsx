@@ -1,18 +1,37 @@
 import { Flex } from '@chakra-ui/react';
 import { Button } from '@/components/ui/button.tsx';
-import { useCurrentEditor } from '@tiptap/react';
+import { JSONContent, useCurrentEditor } from '@tiptap/react';
 
-export function EditorFooter() {
+export interface IProps {
+  originalContent: JSONString;
+  onSaveClick(value: JSONContent): void;
+}
+
+export function EditorFooter({ originalContent, onSaveClick }: IProps) {
   const { editor } = useCurrentEditor();
 
-  if (!editor || !editor?.getText().length) {
+  const handleSaveSubmit = () => {
+    if (!editor) return;
+
+    onSaveClick(editor.getJSON());
+  };
+
+  const handleCancelClick = () => {
+    editor?.commands.setContent(JSON.parse(originalContent));
+  };
+
+  if (!editor || originalContent === JSON.stringify(editor.getJSON())) {
     return null;
   }
 
   return (
     <Flex mt={4} justify="flex-end">
-      <Button variant="plain">Cancel</Button>
-      <Button colorPalette="teal">Save</Button>
+      <Button variant="plain" onClick={handleCancelClick}>
+        Cancel
+      </Button>
+      <Button colorPalette="teal" onClick={handleSaveSubmit}>
+        Save
+      </Button>
     </Flex>
   );
 }

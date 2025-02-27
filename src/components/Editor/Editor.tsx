@@ -3,7 +3,7 @@ import { Color } from '@tiptap/extension-color';
 import TextStyle from '@tiptap/extension-text-style';
 import ListItem from '@tiptap/extension-list-item';
 import StarterKit from '@tiptap/starter-kit';
-import { EditorProvider } from '@tiptap/react';
+import { EditorProvider, JSONContent } from '@tiptap/react';
 import { EditorMenu } from '@/components/Editor/EditorMenu.tsx';
 import { EditorFooter } from '@/components/Editor/EditorFooter.tsx';
 
@@ -25,10 +25,13 @@ const extensions = [
 ];
 
 export interface IProps {
-  initialContent: string;
+  originalContent: JSONString;
+  onSaveClick(value: JSONContent): void;
 }
 
-export function Editor({ initialContent }: IProps) {
+export function Editor({ originalContent, onSaveClick }: IProps) {
+  const editorContent = originalContent ? JSON.parse(originalContent) : '';
+
   return (
     <Box
       p="4"
@@ -39,9 +42,9 @@ export function Editor({ initialContent }: IProps) {
       borderRadius="md"
     >
       <EditorProvider
-        content={initialContent}
+        content={editorContent}
         slotBefore={<EditorMenu />}
-        slotAfter={<EditorFooter />}
+        slotAfter={<EditorFooter originalContent={originalContent} onSaveClick={onSaveClick} />}
         extensions={extensions}
       />
     </Box>
