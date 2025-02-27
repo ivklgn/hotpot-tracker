@@ -8,6 +8,7 @@ export function BoardPage() {
   const params = useParams();
   const { data: board } = db.useQuery({
     boards: {
+      smartParams: {},
       $: {
         where: {
           id: params?.boardId as string,

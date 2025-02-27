@@ -6,6 +6,8 @@ export function TaskPage() {
   const params = useParams();
   const { data: task } = db.useQuery({
     tasks: {
+      smartParams: {},
+      columns: {},
       $: {
         where: {
           id: params?.taskId as string,
