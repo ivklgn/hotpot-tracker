@@ -21,7 +21,13 @@ interface TaskProps extends BaseProps {
   taskBoardId?: string;
 }
 
-type SmartParamsProps = BoardProps | TaskProps;
+// only for task on board
+interface BoardTaskProps extends BaseProps {
+  type: 'board-task';
+  taskId: string;
+}
+
+type SmartParamsProps = BoardProps | TaskProps | BoardTaskProps;
 
 function isTaskProps(props: SmartParamsProps): props is TaskProps {
   return (props as TaskProps).type === 'task';
@@ -44,7 +50,7 @@ export function SmartParams(props: SmartParamsProps) {
   );
 
   return (
-    <HStack>
+    <HStack wrap="wrap">
       {boardParams?.smartParams.map((sp) => (
         <Tag.Root key={sp.id} variant="surface">
           {sp.type !== 'number' && (
