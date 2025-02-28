@@ -1,4 +1,4 @@
-import { Box, Button, ButtonGroup, EmptyState, Stack, VStack, Text } from '@chakra-ui/react';
+import { Box, Button, ButtonGroup, EmptyState, Stack, VStack } from '@chakra-ui/react';
 import { HiColorSwatch } from 'react-icons/hi';
 import { CreateBoardDialog } from '../../features/board/CreateBoardDialog';
 import { db } from '../../instantdb';
