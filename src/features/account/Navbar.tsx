@@ -28,6 +28,7 @@ export function AccountNavbar() {
   const { user } = db.useAuth();
   const { currentTeamId, setCurrentTeamId } = useAccount();
   const { data: teams } = db.useQuery({ teams: {} });
+
   const currentSelectedTeam = useMemo(() => {
     if (teams?.teams && teams.teams.length) {
       return currentTeamId ? teams.teams.find((team) => team.id === currentTeamId) : teams.teams?.[0];
@@ -36,10 +37,14 @@ export function AccountNavbar() {
   }, [currentTeamId, teams?.teams]);
 
   useEffect(() => {
-    if (teams?.teams && teams.teams.length && !currentTeamId) {
-      setCurrentTeamId(teams.teams[0].id);
+    if (teams?.teams && teams.teams.length) {
+      if (currentTeamId && !teams.teams.find((team) => team.id === currentTeamId)) {
+        setCurrentTeamId(undefined);
+      } else {
+        setCurrentTeamId(teams.teams[0].id);
+      }
     }
-  }, [currentTeamId, setCurrentTeamId, teams?.teams]);
+  }, [currentTeamId, teams?.teams]);
 
   const handleChangeTeamClick = (teamId: string) => {
     setCurrentTeamId(teamId);
