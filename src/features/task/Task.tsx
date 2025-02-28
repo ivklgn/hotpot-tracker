@@ -1,4 +1,4 @@
-import { Box, Button, ButtonGroup, Editable, EmptyState, IconButton, VStack } from '@chakra-ui/react';
+import { Box, Button, ButtonGroup, Editable, EmptyState, Flex, IconButton, VStack } from '@chakra-ui/react';
 import { useState } from 'react';
 import { LuPencilLine, LuX, LuCheck } from 'react-icons/lu';
 import { db } from '../../instantdb';
@@ -9,6 +9,7 @@ import { useLocation } from 'wouter';
 import { SmartParams } from '../smart-params';
 import { Editor } from '@/components/Editor/Editor';
 import { JSONContent } from '@tiptap/react';
+import { ConfirmAction } from '../../components/ConfirmAction';
 
 interface TaskProps {
   task?: InstaQLEntity<AppSchema, 'tasks', { smartParams: {}; columns: {} }>;
@@ -52,34 +53,51 @@ export function Task({ task }: TaskProps) {
 
   return (
     <Box flex="1" pt={8} mx={6}>
-      <Editable.Root
-        maxW={480}
-        value={name}
-        onValueChange={(e) => setName(e.value)}
-        placeholder="Click to edit"
-        onValueCommit={handleRenameBoard}
-        mb={8}
-      >
-        <Editable.Preview fontSize="3xl" fontWeight="bold" />
-        <Editable.Input fontSize="3xl" fontWeight="bold" />
-        <Editable.Control>
-          <Editable.EditTrigger asChild>
-            <IconButton variant="ghost" size="xs">
-              <LuPencilLine />
-            </IconButton>
-          </Editable.EditTrigger>
-          <Editable.CancelTrigger asChild>
-            <IconButton variant="outline" size="xs">
-              <LuX />
-            </IconButton>
-          </Editable.CancelTrigger>
-          <Editable.SubmitTrigger asChild>
-            <IconButton variant="outline" size="xs">
-              <LuCheck />
-            </IconButton>
-          </Editable.SubmitTrigger>
-        </Editable.Control>
-      </Editable.Root>
+      <Flex direction="row" justifyContent="space-between">
+        <Editable.Root
+          maxW={480}
+          value={name}
+          onValueChange={(e) => setName(e.value)}
+          placeholder="Click to edit"
+          onValueCommit={handleRenameBoard}
+          mb={8}
+        >
+          <Editable.Preview fontSize="3xl" fontWeight="bold" />
+          <Editable.Input fontSize="3xl" fontWeight="bold" />
+          <Editable.Control>
+            <Editable.EditTrigger asChild>
+              <IconButton variant="ghost" size="xs">
+                <LuPencilLine />
+              </IconButton>
+            </Editable.EditTrigger>
+            <Editable.CancelTrigger asChild>
+              <IconButton variant="outline" size="xs">
+                <LuX />
+              </IconButton>
+            </Editable.CancelTrigger>
+            <Editable.SubmitTrigger asChild>
+              <IconButton variant="outline" size="xs">
+                <LuCheck />
+              </IconButton>
+            </Editable.SubmitTrigger>
+          </Editable.Control>
+        </Editable.Root>
+        <ButtonGroup size="xs" variant="outline">
+          <ConfirmAction
+            opener={
+              <Button variant="outline" colorPalette="red">
+                Delete
+              </Button>
+            }
+            text="Are you sure you want to delete task? All content will be removed."
+            onOk={() => {
+              deleteTask({ taskId: task.id }).then(() => {
+                navigate('/boards');
+              });
+            }}
+          />
+        </ButtonGroup>
+      </Flex>
 
       <SmartParams
         type="task"
@@ -91,6 +109,10 @@ export function Task({ task }: TaskProps) {
       <Editor originalContent={task.content} onSaveClick={handleUpdateContent} />
     </Box>
   );
+}
+
+async function deleteTask({ taskId }: { taskId: string }) {
+  return await db.transact([db.tx.tasks[taskId].delete()]);
 }
 
 async function renameTask({ newTitle, taskId }: { taskId: string; newTitle: string }) {
