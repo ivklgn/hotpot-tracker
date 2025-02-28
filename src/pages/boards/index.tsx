@@ -1,4 +1,4 @@
-import { Box, Button, ButtonGroup, EmptyState, VStack } from '@chakra-ui/react';
+import { Box, Button, ButtonGroup, EmptyState, Stack, VStack, Text } from '@chakra-ui/react';
 import { HiColorSwatch } from 'react-icons/hi';
 import { CreateBoardDialog } from '../../features/board/CreateBoardDialog';
 import { db } from '../../instantdb';
@@ -6,6 +6,7 @@ import { useAccount } from '../../features/account/AccountContext';
 import { Board } from '../../features/board/Board';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { SegmentedControl } from '../../components/ui/segmented-control';
 
 export function BoardsPage() {
   const { currentTeamId } = useAccount();
@@ -45,9 +46,13 @@ export function BoardsPage() {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      {/* <Stack direction="row" m={4} mt={4}>
-        <CreateBoardDialog opener={<Button size="md">Create board</Button>} />
-      </Stack> */}
+      <Stack direction="row" m={4} mt={4}>
+        <VStack align="flex-start">
+          <SegmentedControl size="sm" defaultValue="All" items={['All', 'My', 'Favorites']} />
+          {/* <Text>size = </Text> */}
+        </VStack>
+        <CreateBoardDialog opener={<Button size="xs">Create board</Button>} />
+      </Stack>
       {boards?.boards?.map((board) => <Board board={board} key={board.id} mode="view" />)}
     </DndProvider>
   );
