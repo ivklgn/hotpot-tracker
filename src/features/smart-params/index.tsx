@@ -5,6 +5,7 @@ import { InstaQLResult } from '@instantdb/react';
 import { AppSchema } from '../../../instant.schema';
 import { useState } from 'react';
 import { db } from '../../instantdb';
+import { isJSON } from '../../utils/json';
 
 interface BaseProps {
   smartParams: InstaQLResult<AppSchema, { smartParams: {} }>['smartParams'];
@@ -62,7 +63,10 @@ export function SmartParams(props: SmartParamsProps) {
             </Tag.StartElement>
           )}
           <Tag.Label>
-            {sp.name}: <strong>{sp.type === 'user' ? JSON.parse(sp.value).userEmail : sp.value}</strong>
+            {sp.name}:{' '}
+            <strong>
+              {sp.type === 'user' && isJSON(sp.value) ? JSON.parse(sp.value).userEmail : sp.value}
+            </strong>
           </Tag.Label>
         </Tag.Root>
       ))}
@@ -77,7 +81,10 @@ export function SmartParams(props: SmartParamsProps) {
             </Tag.StartElement>
           )}
           <Tag.Label>
-            {sp.name}: <strong>{sp.type === 'user' ? JSON.parse(sp.value).userEmail : sp.value}</strong>
+            {sp.name}:{' '}
+            <strong>
+              {sp.type === 'user' && isJSON(sp.value) ? JSON.parse(sp.value).userEmail : sp.value}
+            </strong>
           </Tag.Label>
         </Tag.Root>
       ))}
