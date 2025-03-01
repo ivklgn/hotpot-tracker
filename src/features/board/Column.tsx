@@ -20,12 +20,13 @@ import { UserAvatars } from '../../components/Avatars';
 import { Link } from 'wouter';
 import { useDrag, useDrop } from 'react-dnd';
 import { AppSchema } from '../../../instant.schema';
+import { SmartParams } from '../smart-params';
 
 type ColumnType = InstaQLResult<
   AppSchema,
   {
     columns: {
-      tasks: object;
+      tasks: { smartParams: object };
       statuses: object;
       contributors: {
         memberships: object;
@@ -118,9 +119,14 @@ function ColumnTask({ task }: ColumnTaskProps) {
 
   return (
     <Box bg="bg" shadow="md" borderRadius="md" mb="2" p="2" key={task.id} ref={drag}>
-      <ChakraLink asChild colorPalette="teal" fontWeight="medium" fontSize="sm">
+      <ChakraLink asChild colorPalette="teal" fontWeight="medium" fontSize="md">
         <Link to={`/task/${task.id}`}>{task.title}</Link>
       </ChakraLink>
+      {task?.smartParams && (
+        <Box mt="2">
+          <SmartParams type="board-task" smartParams={task.smartParams} taskId={task.id} />
+        </Box>
+      )}
     </Box>
   );
 }

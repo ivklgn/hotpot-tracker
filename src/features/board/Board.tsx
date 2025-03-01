@@ -35,7 +35,9 @@ export function Board({ board, mode = 'view' }: BoardProps) {
     board
       ? {
           columns: {
-            tasks: {},
+            tasks: {
+              smartParams: {},
+            },
             statuses: {},
             contributors: {
               memberships: {},
