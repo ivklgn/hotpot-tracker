@@ -12,13 +12,14 @@ import {
   DialogCloseTrigger,
 } from '@/components/ui/dialog';
 import { Select } from 'chakra-react-select';
-import { cloneElement, useEffect, useRef, useState } from 'react';
+import { cloneElement, useEffect, useMemo, useRef, useState } from 'react';
 import React from 'react';
 import { LuPlus, LuX } from 'react-icons/lu';
 import { id, InstaQLEntity, InstaQLResult } from '@instantdb/react';
 import { db } from '../../instantdb';
 import { useAccount } from '../account/AccountContext';
 import { AppSchema } from '../../../instant.schema';
+import { isJSON } from '../../utils/json';
 
 const SMART_PARAMS_TYPES = [
   {
@@ -36,6 +37,10 @@ const SMART_PARAMS_TYPES = [
   {
     value: 'date',
     label: 'Date',
+  },
+  {
+    value: 'user',
+    label: 'User',
   },
 ];
 
@@ -76,6 +81,18 @@ export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTask
   const ref = useRef<HTMLInputElement>(null);
   const { currentTeamId } = useAccount();
   const contentRef = useRef<HTMLDivElement>(null);
+  const { data: memberships } = db.useQuery({
+    memberships: {
+      $: {
+        where: {
+          teamId: currentTeamId as string,
+          userId: {
+            $isNull: false,
+          },
+        },
+      },
+    },
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -163,9 +180,10 @@ export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTask
                 {editedParams.length === 0 && <Text>No params, click to add params</Text>}
                 {editedParams.length > 0 &&
                   editedParams.map((param) => (
-                    <ParamField
+                    <SmartParamField
                       key={param.id}
                       param={param}
+                      memberships={memberships?.memberships}
                       onDelete={handleDeleteParamClick}
                       onChange={handleChangeParam}
                     />
@@ -200,15 +218,21 @@ export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTask
   );
 };
 
-function ParamField({
+function SmartParamField({
   param,
+  memberships,
   onDelete,
   onChange,
 }: {
   param: EditableSmartParam;
+  memberships?: InstaQLResult<AppSchema, { memberships: {} }>['memberships'];
   onDelete?: (id: string) => void;
   onChange?: (id: string, fieldName: keyof EditableSmartParam, fieldValue?: string) => void;
 }) {
+  const paramValue = useMemo(() => {
+    return isJSON(param.value) ? JSON.parse(param.value) : param.value;
+  }, [param.value]);
+
   return (
     <div key={param.id}>
       <HStack>
@@ -242,7 +266,7 @@ function ParamField({
             placeholder="value"
             size="sm"
             onChange={(e) => onChange?.(param.id, 'value', e.target.value)}
-            value={param.value}
+            value={paramValue}
             type="text"
           />
         )}
@@ -252,7 +276,7 @@ function ParamField({
             placeholder="10"
             size="sm"
             onChange={(e) => onChange?.(param.id, 'value', e.target.value)}
-            value={param.value}
+            value={paramValue}
             type="number"
           />
         )}
@@ -261,7 +285,7 @@ function ParamField({
             placeholder="1w 2d"
             size="sm"
             onChange={(e) => onChange?.(param.id, 'value', e.target.value)}
-            value={param.value}
+            value={paramValue}
             type="text"
           />
         )}
@@ -271,8 +295,26 @@ function ParamField({
             placeholder="19.02.2028"
             size="sm"
             onChange={(e) => onChange?.(param.id, 'value', e.target.value)}
-            value={param.value}
+            value={paramValue}
             type="date"
+          />
+        )}
+        {param.type === 'user' && (
+          <Select
+            size="sm"
+            onChange={(selectedOption) =>
+              onChange?.(
+                param.id,
+                'value',
+                JSON.stringify({ userId: selectedOption?.value, userEmail: selectedOption?.label })
+              )
+            }
+            options={memberships?.map((member) => ({
+              value: member.userId,
+              label: member.userEmail,
+            }))}
+            placeholder="Select user"
+            value={{ value: paramValue?.userId, label: paramValue?.userEmail }}
           />
         )}
         <IconButton

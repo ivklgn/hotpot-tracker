@@ -1,5 +1,5 @@
 import { HStack, Tag, IconButton, Text } from '@chakra-ui/react';
-import { LuCalendar, LuTimer, LuPencilLine, LuCaseLower } from 'react-icons/lu';
+import { LuCalendar, LuTimer, LuPencilLine, LuCaseLower, LuUser } from 'react-icons/lu';
 import { SmartParamsDialog } from './SmartParamsDialog';
 import { InstaQLResult } from '@instantdb/react';
 import { AppSchema } from '../../../instant.schema';
@@ -52,10 +52,11 @@ export function SmartParams(props: SmartParamsProps) {
               {sp.type === 'string' && <LuCaseLower />}
               {sp.type === 'date' && <LuCalendar />}
               {sp.type === 'time' && <LuTimer />}
+              {sp.type === 'user' && <LuUser />}
             </Tag.StartElement>
           )}
           <Tag.Label>
-            {sp.name}: <strong>{sp.value}</strong>
+            {sp.name}: <strong>{sp.type === 'user' ? JSON.parse(sp.value).userEmail : sp.value}</strong>
           </Tag.Label>
         </Tag.Root>
       ))}
@@ -66,10 +67,11 @@ export function SmartParams(props: SmartParamsProps) {
               {sp.type === 'string' && <LuCaseLower />}
               {sp.type === 'date' && <LuCalendar />}
               {sp.type === 'time' && <LuTimer />}
+              {sp.type === 'user' && <LuUser />}
             </Tag.StartElement>
           )}
           <Tag.Label>
-            {sp.name}: <strong>{sp.value}</strong>
+            {sp.name}: <strong>{sp.type === 'user' ? JSON.parse(sp.value).userEmail : sp.value}</strong>
           </Tag.Label>
         </Tag.Root>
       ))}
