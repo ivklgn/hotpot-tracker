@@ -313,6 +313,7 @@ function SmartParamField({
               value: member.userId,
               label: member.userEmail,
             }))}
+            noOptionsMessage={() => 'No members for select'}
             placeholder="Select user"
             value={{ value: paramValue?.userId, label: paramValue?.userEmail }}
           />
