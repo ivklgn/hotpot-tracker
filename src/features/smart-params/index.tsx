@@ -65,7 +65,7 @@ export function SmartParams(props: SmartParamsProps) {
           <Tag.Label>
             {sp.name}:{' '}
             <strong>
-              {sp.type === 'user' && isJSON(sp.value) ? JSON.parse(sp.value).userEmail : sp.value}
+              {sp.type === 'user' && isJSON(sp.value) ? JSON.parse(sp.value)?.userEmail : sp.value}
             </strong>
           </Tag.Label>
         </Tag.Root>
@@ -83,7 +83,7 @@ export function SmartParams(props: SmartParamsProps) {
           <Tag.Label>
             {sp.name}:{' '}
             <strong>
-              {sp.type === 'user' && isJSON(sp.value) ? JSON.parse(sp.value).userEmail : sp.value}
+              {sp.type === 'user' && isJSON(sp.value) ? JSON.parse(sp.value)?.userEmail : sp.value}
             </strong>
           </Tag.Label>
         </Tag.Root>
