@@ -28,7 +28,6 @@ const _schema = i.schema({
     columns: i.entity({
       boardId: i.string(),
       createdAt: i.date(),
-      // additionalProperties: Property[];
       approveRule: i.string(),
       teamId: i.string(),
       statusId: i.string(),
@@ -59,7 +58,6 @@ const _schema = i.schema({
       createdAt: i.date(),
       teamId: i.string(),
       columnId: i.string(),
-      executorUserId: i.string(),
     }),
   },
   links: {
