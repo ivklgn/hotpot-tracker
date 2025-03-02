@@ -97,7 +97,7 @@ export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTask
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const idsForCreate = editedParams.filter((param) => param.isNew);
+    const idsForCreate = editedParams.filter((param) => param.isNew && !!param.name && !!param.value);
     if (idsForCreate.length > 0) {
       createSmartParams(
         type === 'board'
@@ -116,7 +116,7 @@ export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTask
       );
     }
 
-    const idsForUpdate = editedParams.filter((param) => !param.isNew);
+    const idsForUpdate = editedParams.filter((param) => !param.isNew && !!param.name && !!param.value);
     if (idsForUpdate) {
       updateSmartParams({
         smartParams: idsForUpdate,
@@ -130,7 +130,12 @@ export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTask
     setEditedParams((prev) => [...prev, { id: id(), name: '', type: 'string', value: '', isNew: true }]);
   };
 
-  const handleDeleteParamClick = (id: string) => {
+  const handleDeleteParamClick = (id: string, isNew: boolean) => {
+    if (isNew) {
+      setEditedParams((prev) => prev.filter((param) => param.id !== id));
+      return;
+    }
+
     deleteSmartParam({ smartParamId: id }).then(() => {
       setEditedParams((prev) => prev.filter((param) => param.id !== id));
     });
@@ -160,6 +165,12 @@ export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTask
       );
     }
   }, [smartParams]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setEditedParams((prev) => prev.filter((param) => !param.isNew));
+    }
+  }, [isOpen]);
 
   return (
     <DialogRoot initialFocusEl={() => ref.current} open={isOpen} size="lg">
@@ -226,7 +237,7 @@ function SmartParamField({
 }: {
   param: EditableSmartParam;
   memberships?: InstaQLResult<AppSchema, { memberships: {} }>['memberships'];
-  onDelete?: (id: string) => void;
+  onDelete?: (id: string, isNew: boolean) => void;
   onChange?: (id: string, fieldName: keyof EditableSmartParam, fieldValue?: string) => void;
 }) {
   const paramValue = useMemo(() => {
@@ -323,7 +334,7 @@ function SmartParamField({
           variant="plain"
           size="xs"
           onClick={() => {
-            onDelete?.(param.id);
+            onDelete?.(param.id, param.isNew);
           }}
         >
           <LuX />
