@@ -18,7 +18,7 @@ import { id } from '@instantdb/react';
 
 interface CreateTeamDialogProps {
   opener?: React.ReactElement;
-  isOpen: boolean;
+  isOpen?: boolean;
   onClose?: () => void;
 }
 
