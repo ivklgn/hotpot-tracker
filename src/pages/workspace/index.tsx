@@ -15,7 +15,7 @@ export function WorkspacePage() {
 
   if (teams?.teams?.length === 0) {
     return (
-      <Box flex="1" pt={8} mx={6}>
+      <Box flex="1" pt={8} mx={6} key={currentTeamId}>
         <Tabs.Root defaultValue="towork" lazyMount>
           <Tabs.List>
             <Tabs.Trigger value="towork">
@@ -33,7 +33,7 @@ export function WorkspacePage() {
 
   if (user?.id === currentTeam?.teams?.[0]?.creatorId) {
     return (
-      <Box flex="1" pt={8} mx={6}>
+      <Box flex="1" pt={8} mx={6} key={currentTeamId}>
         <Tabs.Root defaultValue="towork" lazyMount>
           <Tabs.List>
             <Tabs.Trigger value="towork">
@@ -64,7 +64,7 @@ export function WorkspacePage() {
   }
 
   return (
-    <Box flex="1" pt={8} mx={6}>
+    <Box flex="1" pt={8} mx={6} key={currentTeamId}>
       <Tabs.Root defaultValue="towork" lazyMount>
         <Tabs.List>
           <Tabs.Trigger value="towork">

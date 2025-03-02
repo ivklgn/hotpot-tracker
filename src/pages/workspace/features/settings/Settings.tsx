@@ -4,11 +4,13 @@ import { ConfirmAction } from '../../../../components/ConfirmAction';
 import { useAccount } from '../../../../features/account/AccountContext';
 import { db } from '../../../../instantdb';
 import { useState } from 'react';
+import { useLocation } from 'wouter';
 
 export function Settings() {
-  const { currentTeamId } = useAccount();
+  const { currentTeamId, setCurrentTeamId } = useAccount();
   const { data: currentTeam } = db.useQuery({ teams: { $: { where: { id: currentTeamId as string } } } });
   const [name, setName] = useState<string>(currentTeam?.teams?.[0]?.name || '');
+  const [, navigate] = useLocation();
 
   const handleRenameTeam = ({ value: newName }: { value: string }) => {
     if (!newName) return;
@@ -16,7 +18,10 @@ export function Settings() {
   };
 
   const handleDeleteTeamClick = () => {
-    deleteTeam({ teamId: currentTeam?.teams?.[0]?.id as string });
+    deleteTeam({ teamId: currentTeam?.teams?.[0]?.id as string }).then(() => {
+      setCurrentTeamId(undefined);
+      navigate('/workspace', { replace: true });
+    });
   };
 
   return (
