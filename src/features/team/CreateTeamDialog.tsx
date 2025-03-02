@@ -1,4 +1,4 @@
-import { Input } from '@chakra-ui/react';
+import { DialogCloseTrigger, Input } from '@chakra-ui/react';
 import { Button } from '@/components/ui/button';
 import {
   DialogActionTrigger,
@@ -17,13 +17,14 @@ import { db } from '../../instantdb';
 import { id } from '@instantdb/react';
 
 interface CreateTeamDialogProps {
-  opener: React.ReactElement;
+  opener?: React.ReactElement;
+  isOpen: boolean;
+  onClose?: () => void;
 }
 
-export const CreateTeamDialog: React.FC<CreateTeamDialogProps> = ({ opener }) => {
+export const CreateTeamDialog: React.FC<CreateTeamDialogProps> = ({ opener, isOpen, onClose }) => {
   const ref = useRef<HTMLInputElement>(null);
   const { user } = db.useAuth();
-  const [isVisible, setVisibility] = useState(false);
   const [teamName, setTeamName] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,20 +38,20 @@ export const CreateTeamDialog: React.FC<CreateTeamDialogProps> = ({ opener }) =>
     });
 
     setTeamName('');
-    setVisibility(false);
+    onClose?.();
   };
 
   return (
-    <DialogRoot initialFocusEl={() => ref.current} open={isVisible}>
-      <DialogTrigger asChild>
-        {cloneElement(opener, {
-          ref,
-          onClick: () => {
-            setVisibility(true);
-          },
-        })}
-      </DialogTrigger>
+    <DialogRoot initialFocusEl={() => ref.current} open={isOpen}>
+      {opener && (
+        <DialogTrigger asChild>
+          {cloneElement(opener, {
+            ref,
+          })}
+        </DialogTrigger>
+      )}
       <DialogContent>
+        <DialogCloseTrigger onClick={() => onClose?.()} />
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Create new Team</DialogTitle>
@@ -73,7 +74,7 @@ export const CreateTeamDialog: React.FC<CreateTeamDialogProps> = ({ opener }) =>
               <Button
                 variant="outline"
                 onClick={() => {
-                  setVisibility(false);
+                  onClose?.();
                 }}
               >
                 Cancel

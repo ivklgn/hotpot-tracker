@@ -15,10 +15,10 @@ import { CreateTeamDialog } from '../team/CreateTeamDialog';
 import { Link, useLocation } from 'wouter';
 import { db } from '../../instantdb';
 import { useAccount } from './AccountContext';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { UserAvatar } from '../../components/Avatars';
 
-const routes = [
+const ROUTES = [
   { route: '/workspace', title: 'Workspace', icon: <LuAppWindow /> },
   { route: '/boards', title: 'Boards', icon: <LuChartBarBig /> },
 ] as const;
@@ -28,49 +28,64 @@ export function AccountNavbar() {
   const { user } = db.useAuth();
   const { currentTeamId, setCurrentTeamId } = useAccount();
   const { data: teams } = db.useQuery({ teams: {} });
+  const [isCreateTeamDialogVisible, setCreateTeamDialogVisibility] = useState(false);
+
+  const routes = useMemo(() => {
+    if (!teams?.teams || (teams?.teams && teams.teams.length === 0)) {
+      return ROUTES.filter((route) => route.route === '/workspace');
+    }
+    return ROUTES;
+  }, [teams?.teams]);
 
   const currentSelectedTeam = useMemo(() => {
-    if (teams?.teams && teams.teams.length) {
+    if (teams?.teams && teams.teams.length > 0) {
       return currentTeamId ? teams.teams.find((team) => team.id === currentTeamId) : teams.teams?.[0];
     }
     return undefined;
   }, [currentTeamId, teams?.teams]);
 
   useEffect(() => {
-    if (teams?.teams && teams.teams.length) {
+    if (!teams?.teams) return;
+    if (teams.teams.length > 0) {
       if (currentTeamId && !teams.teams.find((team) => team.id === currentTeamId)) {
         setCurrentTeamId(undefined);
-      } else {
+      } else if (!currentTeamId && teams.teams.length > 0) {
         setCurrentTeamId(teams.teams[0].id);
       }
     }
   }, [currentTeamId, teams?.teams]);
-
-  const handleChangeTeamClick = (teamId: string) => {
-    setCurrentTeamId(teamId);
-  };
 
   const handleSignOutClick = () => {
     db.auth.signOut();
   };
 
   return (
-    <Box px={4} py={3} shadow="md">
+    <Box px={4} py={3} shadow="md" key={currentTeamId}>
       <Flex alignItems="center">
         <ChakraLink fontWeight="bold" mx={4} asChild>
           <Link to="/">Hotpot</Link>
         </ChakraLink>
+
         <Flex>
           {currentSelectedTeam && (
-            <MenuRoot size="md">
+            <MenuRoot
+              size="md"
+              onSelect={(details) => {
+                if (details.value === 'create') {
+                  setCreateTeamDialogVisibility(true);
+                } else {
+                  setCurrentTeamId(details.value as string);
+                }
+              }}
+            >
               <MenuTrigger>
                 <Button variant="outline" size="xs" asChild>
-                  <Status value="success">{currentSelectedTeam.name}</Status>
+                  <Status value="success">{currentSelectedTeam?.name}</Status>
                 </Button>
               </MenuTrigger>
               <MenuContent>
                 {teams?.teams?.map((team) => (
-                  <MenuItem key={team.id} value={team.id} onClick={() => handleChangeTeamClick(team.id)}>
+                  <MenuItem key={team.id} value={team.id}>
                     {currentSelectedTeam?.id === team.id ? (
                       <Status value="success">{team.name}</Status>
                     ) : (
@@ -79,17 +94,20 @@ export function AccountNavbar() {
                   </MenuItem>
                 ))}
                 <MenuSeparator />
-                <CreateTeamDialog
-                  opener={
-                    <MenuItem value="create">
-                      <LuPlus />
-                      create team
-                    </MenuItem>
-                  }
-                />
+                <MenuItem value="create">
+                  <LuPlus />
+                  create team
+                </MenuItem>
               </MenuContent>
             </MenuRoot>
           )}
+
+          <CreateTeamDialog
+            isOpen={isCreateTeamDialogVisible}
+            onClose={() => {
+              setCreateTeamDialogVisibility(false);
+            }}
+          />
 
           {routes.map((route) => (
             <ChakraLink
