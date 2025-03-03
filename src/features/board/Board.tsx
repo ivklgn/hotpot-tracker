@@ -158,7 +158,7 @@ async function createColumn({ boardId, teamId }: { boardId: string; teamId: stri
 }
 
 async function deleteBoard({ boardId }: { boardId: string }) {
-  return await db.transact([db.tx.boards[boardId].delete()]);
+  return await db.transact([db.tx.boards[boardId].update({ deletedAt: JSON.stringify(new Date()) })]);
 }
 
 interface BoardHeaderProps {

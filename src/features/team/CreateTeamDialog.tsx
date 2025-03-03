@@ -101,7 +101,7 @@ async function createTeamWithMember({
   const membershipId = id();
 
   const result = await db.transact([
-    db.tx.teams[teamId].update({ name: teamName, creatorId: userId }),
+    db.tx.teams[teamId].update({ name: teamName, creatorId: userId, createdAt: JSON.stringify(new Date()) }),
     db.tx.memberships[membershipId].update({ teamId, userId, userEmail }),
     db.tx.memberships[membershipId].link({ teams: teamId }),
   ]);

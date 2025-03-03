@@ -16,6 +16,9 @@ export function BoardsPage() {
       $: {
         where: {
           teamId: currentTeamId as string,
+          deletedAt: {
+            $isNull: true,
+          },
         },
       },
     },
