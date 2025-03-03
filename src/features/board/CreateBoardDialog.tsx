@@ -96,6 +96,10 @@ export const CreateBoardDialog: React.FC<CreateTeamDialogProps> = ({ opener }) =
 
 async function createBoard({ name, teamId }: { name: string; teamId: string }) {
   const boardId = id();
-  await db.transact([db.tx.boards[boardId].update({ name, teamId }).link({ teams: teamId })]);
+  await db.transact([
+    db.tx.boards[boardId]
+      .update({ name, teamId, createdAt: JSON.stringify(new Date()) })
+      .link({ teams: teamId }),
+  ]);
   return boardId;
 }

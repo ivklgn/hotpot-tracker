@@ -112,7 +112,7 @@ export function Task({ task }: TaskProps) {
 }
 
 async function deleteTask({ taskId }: { taskId: string }) {
-  return await db.transact([db.tx.tasks[taskId].delete()]);
+  return await db.transact([db.tx.tasks[taskId].update({ deletedAt: JSON.stringify(new Date()) })]);
 }
 
 async function renameTask({ newTitle, taskId }: { taskId: string; newTitle: string }) {

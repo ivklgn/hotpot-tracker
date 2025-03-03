@@ -140,7 +140,15 @@ interface ColumnEditProps {
 function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
   const { currentTeamId } = useAccount();
   const { data: statuses } = db.useQuery({
-    statuses: {},
+    statuses: {
+      $: {
+        where: {
+          deletedAt: {
+            $isNull: true,
+          },
+        },
+      },
+    },
   });
   const { data: memberships } = db.useQuery({
     memberships: {
