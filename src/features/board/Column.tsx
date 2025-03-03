@@ -302,10 +302,6 @@ export function Column({ column, defaultEditable = false, onDrag, onDragTask }: 
   const [, columnDrop] = useDrop({
     accept: 'column',
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    drop: (task: any) => {
-      return onDragTask?.(task.id, column?.id as string);
-    },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     hover(item: any, monitor) {
       if (!column) {
         return;
