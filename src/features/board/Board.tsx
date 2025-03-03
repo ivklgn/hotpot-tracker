@@ -38,7 +38,15 @@ export function Board({ board, mode = 'view' }: BoardProps) {
             tasks: {
               smartParams: {},
             },
-            statuses: {},
+            statuses: {
+              $: {
+                where: {
+                  deletedAt: {
+                    $isNull: true,
+                  },
+                },
+              },
+            },
             contributors: {
               memberships: {},
             },
