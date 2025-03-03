@@ -113,7 +113,6 @@ const _schema = i.schema({
         on: 'tasks',
         has: 'one',
         label: 'columns',
-        onDelete: 'cascade',
       },
       reverse: {
         on: 'columns',
