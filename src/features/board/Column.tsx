@@ -409,7 +409,7 @@ async function createStatusAndUpdateColumn({
     db.tx.statuses[statusId].update({ name, teamId, createdAt: JSON.stringify(new Date()) }),
     db.tx.statuses[statusId].link({ teams: teamId }),
     db.tx.columns[columnId].update({ statusId }),
-    db.tx.columns[columnId].link({ statuses: columnId }),
+    db.tx.columns[columnId].link({ statuses: statusId }),
   ]);
 }
 
