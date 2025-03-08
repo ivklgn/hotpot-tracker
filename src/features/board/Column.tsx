@@ -1,17 +1,18 @@
 import {
   Box,
   Flex,
-  Heading,
   Fieldset,
   IconButton,
   Button,
   ButtonGroup,
   Link as ChakraLink,
+  Group,
+  Text,
 } from '@chakra-ui/react';
 import { Field } from '@/components/ui/field';
 import { CreatableSelect, Select } from 'chakra-react-select';
-import { useRef, useState } from 'react';
-import { LuX, LuPencil, LuPlus } from 'react-icons/lu';
+import { useMemo, useRef, useState } from 'react';
+import { LuX, LuPencil, LuPlus, LuShieldCheck } from 'react-icons/lu';
 import { db } from '../../instantdb';
 import { id, InstaQLResult } from '@instantdb/react';
 import { useAccount } from '../account/AccountContext';
@@ -21,6 +22,7 @@ import { Link } from 'wouter';
 import { useDrag, useDrop } from 'react-dnd';
 import { AppSchema } from '../../../instant.schema';
 import { SmartParams } from '../smart-params';
+import { ToggleTip } from '../../components/ui/toggle-tip';
 
 type ColumnType = InstaQLResult<
   AppSchema,
@@ -44,35 +46,51 @@ interface ColumnHeaderProps {
 }
 
 function ColumnHeader({ column, isEdit, onCreateTask, onEditClick, onCloseEdit }: ColumnHeaderProps) {
+  const hintText = useMemo(() => {
+    if (column?.approveRule === 'all-contributors') {
+      return 'Need approve from all contributors';
+    }
+    if (column?.approveRule === 'one-of-contributors') {
+      return 'Need approve from one of contributors';
+    }
+    return 'No approve rules for this column';
+  }, [column?.approveRule]);
+
   return (
     <Flex direction="row" alignItems="baseline" ml={2}>
-      <UserAvatars
-        users={
-          column?.contributors && column.contributors.every((contributor) => !!contributor.memberships)
-            ? column.contributors.map((contributor) => ({
-                userId: contributor.memberships?.userId as string,
-                userEmail: contributor.memberships?.userEmail as string,
-              }))
-            : []
-        }
-        size="xs"
-      />
-      <Heading size="md" ml="2" mt="2">
-        {column?.statuses ? column.statuses.name : undefined}
-      </Heading>
+      <ToggleTip content={hintText} showArrow>
+        <Flex direction="row" alignItems="baseline" cursor="pointer">
+          <Group>
+            <UserAvatars
+              users={
+                column?.contributors && column.contributors.every((contributor) => !!contributor.memberships)
+                  ? column.contributors.map((contributor) => ({
+                      userId: contributor.memberships?.userId as string,
+                      userEmail: contributor.memberships?.userEmail as string,
+                    }))
+                  : []
+              }
+              size="2xs"
+            />
+            <Text fontWeight="bold">{column?.statuses ? column.statuses.name : undefined}</Text>
+            {column?.approveRule && <LuShieldCheck color="yellow.400" />}
+          </Group>
+        </Flex>
+      </ToggleTip>
+
       <ButtonGroup size="xs" variant="outline" ml="auto">
         {!isEdit && (
-          <IconButton aria-label="Create task" variant="plain" size="xs" onClick={onCreateTask}>
+          <IconButton aria-label="Create task" variant="plain" onClick={onCreateTask}>
             <LuPlus />
           </IconButton>
         )}
         {isEdit && (
-          <IconButton aria-label="Close edit" variant="plain" size="xs" onClick={onCloseEdit} ml="auto">
+          <IconButton aria-label="Close edit" variant="plain" onClick={onCloseEdit} ml="auto">
             <LuX />
           </IconButton>
         )}
         {!isEdit && (
-          <IconButton aria-label="Edit column" variant="plain" size="xs" onClick={onEditClick}>
+          <IconButton aria-label="Edit column" variant="plain" onClick={onEditClick}>
             <LuPencil />
           </IconButton>
         )}

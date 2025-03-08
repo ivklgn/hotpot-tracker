@@ -10,6 +10,7 @@ import { SmartParams } from '../smart-params';
 import { Editor } from '@/components/Editor/Editor';
 import { JSONContent } from '@tiptap/react';
 import { ConfirmAction } from '../../components/ConfirmAction';
+import { TaskApprove } from './TaskApprove';
 
 interface TaskProps {
   task?: InstaQLEntity<AppSchema, 'tasks', { smartParams: {}; columns: {} }>;
@@ -26,7 +27,6 @@ export function Task({ task }: TaskProps) {
 
   const handleUpdateContent = (newContent: JSONContent) => {
     if (!newContent || !task) return;
-
     updateTaskContent({ taskId: task.id, newContent: JSON.stringify(newContent) });
   };
 
@@ -82,7 +82,9 @@ export function Task({ task }: TaskProps) {
             </Editable.SubmitTrigger>
           </Editable.Control>
         </Editable.Root>
-        <ButtonGroup size="xs" variant="outline">
+        <ButtonGroup size="xs">
+          <TaskApprove task={task} />
+
           <ConfirmAction
             opener={
               <Button variant="outline" colorPalette="red">
