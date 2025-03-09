@@ -8,11 +8,13 @@ import {
   Link as ChakraLink,
   Group,
   Text,
+  Badge,
+  HStack,
 } from '@chakra-ui/react';
 import { Field } from '@/components/ui/field';
 import { CreatableSelect, Select } from 'chakra-react-select';
 import { useMemo, useRef, useState } from 'react';
-import { LuX, LuPencil, LuPlus, LuShieldCheck } from 'react-icons/lu';
+import { LuX, LuPencil, LuPlus, LuShieldCheck, LuShieldQuestion } from 'react-icons/lu';
 import { db } from '../../instantdb';
 import { id, InstaQLResult } from '@instantdb/react';
 import { useAccount } from '../account/AccountContext';
@@ -28,7 +30,7 @@ type ColumnType = InstaQLResult<
   AppSchema,
   {
     columns: {
-      tasks: { smartParams: object };
+      tasks: { smartParams: object; approves: object };
       statuses: object;
       contributors: {
         memberships: object;
@@ -73,7 +75,7 @@ function ColumnHeader({ column, isEdit, onCreateTask, onEditClick, onCloseEdit }
               size="2xs"
             />
             <Text fontWeight="bold">{column?.statuses ? column.statuses.name : undefined}</Text>
-            {column?.approveRule && <LuShieldCheck color="yellow.400" />}
+            {column?.approveRule && column?.contributors?.length > 0 && <LuShieldCheck color="yellow.400" />}
           </Group>
         </Flex>
       </ToggleTip>
@@ -116,7 +118,12 @@ function ColumnTasks({ column, onDragTask }: ColumnTasksProps) {
   return (
     <Flex direction="column" p="2" gap="2" maxH="480px" overflowY="scroll" ref={taskDrop} height="100%">
       {(column?.tasks || []).map((task) => (
-        <ColumnTask key={task.id} task={task} />
+        <ColumnTask
+          key={task.id}
+          task={task}
+          columnApproveRule={column?.approveRule}
+          columnContributors={column?.contributors}
+        />
       ))}
     </Flex>
   );
@@ -124,9 +131,11 @@ function ColumnTasks({ column, onDragTask }: ColumnTasksProps) {
 
 interface ColumnTaskProps {
   task: ColumnType['tasks'][0];
+  columnApproveRule?: string;
+  columnContributors?: ColumnType['contributors'];
 }
 
-function ColumnTask({ task }: ColumnTaskProps) {
+function ColumnTask({ task, columnApproveRule, columnContributors }: ColumnTaskProps) {
   const [, /*{ isDragging }*/ drag] = useDrag({
     type: 'task',
     item: { id: task.id },
@@ -135,16 +144,58 @@ function ColumnTask({ task }: ColumnTaskProps) {
     }),
   });
 
+  // simplified version
+  const approved = useMemo(() => {
+    if (!columnApproveRule || !task?.approves || columnContributors?.length === 0) return undefined;
+
+    const approvedContributors = new Set(task.approves.map((a) => a.contributorId));
+
+    if (columnApproveRule === 'all-contributors') {
+      return columnContributors?.every((c) => approvedContributors.has(c.id));
+    }
+
+    if (columnApproveRule === 'one-of-contributors') {
+      return approvedContributors.size > 0;
+    }
+
+    return undefined;
+  }, [columnApproveRule, columnContributors, task?.approves]);
+
   return (
-    <Box bg="bg" shadow="md" borderRadius="md" mb="2" p="2" key={task.id} ref={drag}>
-      <ChakraLink asChild colorPalette="teal" fontWeight="medium" fontSize="md">
-        <Link to={`/task/${task.id}`}>{task.title}</Link>
-      </ChakraLink>
-      {task?.smartParams && (
-        <Box mt="2">
-          <SmartParams type="board-task" smartParams={task.smartParams} taskId={task.id} />
-        </Box>
-      )}
+    <Box
+      bg="bg"
+      shadow="md"
+      borderRadius="md"
+      mb="2"
+      p="2"
+      key={task.id}
+      ref={approved === undefined || approved ? drag : undefined}
+    >
+      <Box>
+        <ChakraLink asChild colorPalette="teal" fontWeight="medium" fontSize="md">
+          <Link to={`/task/${task.id}`}>{task.title}</Link>
+        </ChakraLink>
+      </Box>
+      <HStack mt={2}>
+        {approved !== undefined ? (
+          approved ? (
+            <Badge variant="solid" colorPalette="green">
+              <LuShieldCheck />
+              Approved
+            </Badge>
+          ) : (
+            <Badge variant="solid" colorPalette="yellow">
+              <LuShieldQuestion />
+              Wait approves
+            </Badge>
+          )
+        ) : null}
+        {task?.smartParams && (
+          <Box>
+            <SmartParams type="board-task" smartParams={task.smartParams} taskId={task.id} />
+          </Box>
+        )}
+      </HStack>
     </Box>
   );
 }
@@ -292,7 +343,10 @@ function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
             }
             text="Are you sure to delete column?"
             onOk={() => {
-              deleteColumn({ columnId: column?.id as string }).then(() => {
+              deleteColumn({
+                columnId: column?.id as string,
+                contributorsIds: column?.contributors?.map((c) => c.id),
+              }).then(() => {
                 onClose();
               });
             }}
@@ -480,8 +534,11 @@ async function deleteContributors({ contributorsIds }: { contributorsIds: string
   return await db.transact(contributorsIds.map((ci) => db.tx.contributors[ci].delete()));
 }
 
-async function deleteColumn({ columnId }: { columnId: string }) {
-  return await db.transact([db.tx.columns[columnId].delete()]);
+async function deleteColumn({ columnId, contributorsIds }: { columnId: string; contributorsIds?: string[] }) {
+  return await db.transact([
+    db.tx.columns[columnId].delete(),
+    ...(contributorsIds || []).map((ci) => db.tx.contributors[ci].delete()),
+  ]);
 }
 
 async function createNewTask({ columnId, teamId }: { columnId: string; teamId: string }) {

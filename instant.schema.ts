@@ -186,6 +186,7 @@ const _schema = i.schema({
         label: 'tasks',
       },
     },
+
     contributorsMemberships: {
       forward: {
         on: 'contributors',
@@ -224,6 +225,7 @@ const _schema = i.schema({
         label: 'contributors',
       },
     },
+
     columnsStatuses: {
       forward: {
         on: 'columns',
@@ -262,6 +264,7 @@ const _schema = i.schema({
         label: 'columns',
       },
     },
+
     statusesTeams: {
       forward: {
         on: 'statuses',

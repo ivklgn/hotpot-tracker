@@ -37,6 +37,7 @@ export function Board({ board, mode = 'view' }: BoardProps) {
           columns: {
             tasks: {
               smartParams: {},
+              approves: {},
               $: {
                 where: {
                   deletedAt: {

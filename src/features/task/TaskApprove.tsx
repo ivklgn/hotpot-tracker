@@ -9,13 +9,14 @@ import { useAccount } from '../account/AccountContext';
 import { useCallback, useMemo } from 'react';
 
 interface TaskApproveProps {
-  task?: InstaQLEntity<AppSchema, 'tasks', { smartParams: {}; columns: {} }>;
+  task?: InstaQLEntity<AppSchema, 'tasks'>;
 }
 
 export function TaskApprove({ task }: TaskApproveProps) {
   const { user } = db.useAuth();
   const { currentTeamId } = useAccount();
-  const { data: columnsWithContributors, isLoading: isLoadingColumnsWithContributors } = db.useQuery(
+
+  const { data: columnData, isLoading: isLoadingColumns } = db.useQuery(
     task?.id
       ? {
           columns: {
@@ -23,145 +24,98 @@ export function TaskApprove({ task }: TaskApproveProps) {
               memberships: {},
             },
             $: {
-              where: {
-                id: task.columnId,
-              },
+              where: { id: task.columnId },
             },
           },
         }
       : null
   );
 
-  const { data: approves, isLoading: isLoadingApproves } = db.useQuery(
+  const { data: approvesData, isLoading: isLoadingApproves } = db.useQuery(
     task?.id
       ? {
           approves: {
             $: {
-              where: {
-                taskId: task.id,
-              },
+              where: { taskId: task.id },
             },
           },
         }
       : null
   );
 
-  const isLoading = useMemo(
-    () => isLoadingColumnsWithContributors || isLoadingApproves,
-    [isLoadingColumnsWithContributors, isLoadingApproves]
+  const isLoading = isLoadingColumns || isLoadingApproves;
+  const column = columnData?.columns?.[0];
+
+  const currentContributorId = useMemo(
+    () => column?.contributors?.find((c) => c.memberships?.userId === user?.id)?.id,
+    [column, user]
   );
 
-  const isAllowApprove = useMemo(() => {
-    const currentContributorId = columnsWithContributors?.columns?.[0]?.contributors?.find(
-      (c) => c.memberships?.userId === user?.id
-    )?.id;
-    return !!currentContributorId;
-  }, [columnsWithContributors, user]);
+  const alreadyApprovedSet = useMemo(
+    () => new Set(approvesData?.approves?.map((a) => a.contributorId)),
+    [approvesData]
+  );
 
-  const isApproveButtonDisabled = useMemo(() => isLoading || !isAllowApprove, [isLoading, isAllowApprove]);
-
-  const isApproved = useMemo(() => {
-    const currentContributorId = columnsWithContributors?.columns?.[0]?.contributors?.find(
-      (c) => c.memberships?.userId === user?.id
-    )?.id;
-    // @ts-ignore
-    return (
-      !!currentContributorId && approves?.approves?.find((a) => a?.contributorId === currentContributorId)
-    );
-  }, [approves, columnsWithContributors, user]);
+  const isAllowApprove = !!currentContributorId;
+  const isApproved = !!currentContributorId && alreadyApprovedSet.has(currentContributorId);
+  const isButtonDisabled = isLoading || !isAllowApprove;
 
   const handleToggleApproveClick = useCallback(() => {
-    const currentContributorId = columnsWithContributors?.columns?.[0]?.contributors?.find(
-      (c) => c.memberships?.userId === user?.id
-    )?.id;
-
     if (!currentContributorId) {
-      // TODO: possible?
-      console.error('contributor not found');
+      console.error('Contributor not found');
       return;
     }
 
-    if (!isApproved) {
-      approveTask({
-        taskId: task?.id as string,
-        teamId: currentTeamId as string,
-        contributorId: currentContributorId,
-      });
-    } else {
-      const approveId = approves?.approves?.find((a) => a?.contributorId === currentContributorId)?.id;
+    if (isApproved) {
+      const approveId = approvesData?.approves?.find((a) => a.contributorId === currentContributorId)?.id;
       if (!approveId) {
-        // TODO: possible?
-        console.error('approve not found');
+        console.error('Approval record not found');
         return;
       }
-      revokeApprove({ approveId });
+      db.transact([db.tx.approves[approveId].delete()]);
+    } else {
+      const approveId = id();
+      db.transact([
+        db.tx.approves[approveId].update({
+          taskId: task?.id as string,
+          teamId: currentTeamId as string,
+          contributorId: currentContributorId,
+          createdAt: new Date().toISOString(),
+        }),
+        db.tx.approves[approveId].link({
+          teams: currentTeamId,
+          tasks: task?.id,
+          contributors: currentContributorId,
+        }),
+      ]);
     }
-  }, [approves?.approves, columnsWithContributors?.columns, currentTeamId, isApproved, task?.id, user?.id]);
+  }, [approvesData, currentContributorId, isApproved, task?.id, currentTeamId]);
 
-  if (
-    !task ||
-    columnsWithContributors?.columns?.length === 0 ||
-    !columnsWithContributors?.columns?.[0]?.approveRule ||
-    columnsWithContributors?.columns?.[0]?.contributors.length === 0
-  ) {
+  if (!task || !column || !column.approveRule || column.contributors.length === 0) {
     return null;
   }
 
-  console.log({
-    approves,
-    contributors: columnsWithContributors?.columns?.[0]?.contributors,
-    isAllowApprove,
-    isApproved,
-  });
-
-  const alreadyApprovedUsers = approves?.approves?.map((a) => a?.contributorId);
-
   return (
-    <Tooltip showArrow content="Wait appove">
+    <Tooltip showArrow content="Wait approve">
       <Button
         variant="outline"
-        colorPalette={!isApproved ? 'green' : 'red'}
+        colorPalette={isApproved ? 'red' : 'green'}
         onClick={handleToggleApproveClick}
         loading={isLoading}
-        disabled={isApproveButtonDisabled}
+        disabled={isButtonDisabled}
       >
         <UserAvatars
-          users={columnsWithContributors?.columns?.[0]?.contributors
-            ?.filter((c) => alreadyApprovedUsers?.includes(c.id))
-            .map((c) => ({
-              userId: c.memberships?.userId as string,
-              userEmail: c.memberships?.userEmail as string,
+          users={column.contributors
+            ?.filter((c) => alreadyApprovedSet.has(c.id))
+            ?.map((c) => ({
+              userId: c?.memberships?.userId as string,
+              userEmail: c?.memberships?.userEmail as string,
             }))}
           size="2xs"
         />
         <LuShieldCheck />
-        {!isAllowApprove ? 'Approve' : !isApproved ? 'Approve' : 'Revoke approve'}
+        {isApproved ? 'Revoke Approve' : 'Approve'}
       </Button>
     </Tooltip>
   );
-}
-
-async function approveTask({
-  taskId,
-  teamId,
-  contributorId,
-}: {
-  taskId: string;
-  teamId: string;
-  contributorId: string;
-}) {
-  const approveId = id();
-  return await db.transact([
-    db.tx.approves[approveId].update({
-      taskId,
-      teamId,
-      contributorId,
-      createdAt: JSON.stringify(new Date()),
-    }),
-    db.tx.approves[approveId].link({ teams: teamId, tasks: taskId, contributors: contributorId }),
-  ]);
-}
-
-async function revokeApprove({ approveId }: { approveId: string }) {
-  return await db.transact([db.tx.approves[approveId].delete()]);
 }
