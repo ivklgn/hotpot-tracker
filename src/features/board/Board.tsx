@@ -267,6 +267,12 @@ async function renameBoard({ newName, boardId }: { boardId: string; newName: str
 }
 
 async function changeTaskColumn({ taskId, columnId }: { taskId: string; columnId: string }) {
+  db.queryOnce({ approves: { $: { where: { taskId }, limit: 1 } } }).then((res) => {
+    if (res.data.approves.length > 0) {
+      const approveId = res.data.approves?.[0].id;
+      db.transact([db.tx.approves[approveId].delete()]);
+    }
+  });
   return await db.transact([
     db.tx.tasks[taskId].merge({ columnId }),
     db.tx.tasks[taskId].link({ columns: columnId }),
