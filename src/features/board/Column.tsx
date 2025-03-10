@@ -115,9 +115,13 @@ function ColumnTasks({ column, onDragTask }: ColumnTasksProps) {
     },
   });
 
+  if (!column?.tasks) {
+    return null;
+  }
+
   return (
     <Flex direction="column" p="2" gap="2" maxH="480px" overflowY="scroll" ref={taskDrop} height="100%">
-      {(column?.tasks || []).map((task) => (
+      {column?.tasks.map((task) => (
         <ColumnTask
           key={task.id}
           task={task}
