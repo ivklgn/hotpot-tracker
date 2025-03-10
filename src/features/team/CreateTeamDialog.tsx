@@ -35,6 +35,7 @@ export const CreateTeamDialog: React.FC<CreateTeamDialogProps> = ({ opener, isOp
       teamName,
       userEmail: user?.email as string,
       userId: user?.id as string,
+      creatorId: user?.id,
     });
 
     setTeamName('');
@@ -92,17 +93,19 @@ async function createTeamWithMember({
   teamName,
   userEmail,
   userId,
+  creatorId,
 }: {
   teamName: string;
   userEmail: string;
   userId: string;
+  creatorId?: string;
 }) {
   const teamId = id();
   const membershipId = id();
 
   const result = await db.transact([
-    db.tx.teams[teamId].update({ name: teamName, creatorId: userId, createdAt: JSON.stringify(new Date()) }),
-    db.tx.memberships[membershipId].update({ teamId, userId, userEmail }),
+    db.tx.teams[teamId].update({ name: teamName, creatorId, createdAt: JSON.stringify(new Date()) }),
+    db.tx.memberships[membershipId].update({ teamId, userId, creatorId, userEmail }),
     db.tx.memberships[membershipId].link({ teams: teamId }),
   ]);
 

@@ -12,23 +12,26 @@ const _schema = i.schema({
       userEmail: i.string(),
       status: i.string(),
       createdAt: i.date(),
+      creatorId: i.string(),
     }),
     memberships: i.entity({
       teamId: i.string(),
       userEmail: i.string(),
       userId: i.string(),
       createdAt: i.date(),
+      creatorId: i.string(),
     }),
     teams: i.entity({
-      creatorId: i.string(),
       name: i.string(),
       createdAt: i.date(),
+      creatorId: i.string(),
     }),
     boards: i.entity({
       name: i.string(),
       teamId: i.string(),
       createdAt: i.date().indexed(),
       deletedAt: i.date().indexed(),
+      creatorId: i.string(),
     }),
     columns: i.entity({
       boardId: i.string(),
@@ -37,12 +40,14 @@ const _schema = i.schema({
       statusId: i.string(),
       position: i.number().indexed(),
       createdAt: i.date().indexed(),
+      creatorId: i.string(),
     }),
     statuses: i.entity({
       name: i.string(),
       teamId: i.string(),
       createdAt: i.date().indexed(),
       deletedAt: i.date().indexed(),
+      creatorId: i.string(),
     }),
     smartParams: i.entity({
       name: i.string(),
@@ -50,14 +55,16 @@ const _schema = i.schema({
       value: i.string(),
       boardId: i.string(),
       taskId: i.string(),
-      createdAt: i.date(),
       teamId: i.string(),
+      createdAt: i.date(),
+      creatorId: i.string(),
     }),
     contributors: i.entity({
       columnId: i.string(),
       membershipId: i.string(),
       teamId: i.string(),
       createdAt: i.date(),
+      creatorId: i.string(),
     }),
     tasks: i.entity({
       title: i.string(),
@@ -66,6 +73,7 @@ const _schema = i.schema({
       columnId: i.string(),
       createdAt: i.date().indexed(),
       deletedAt: i.date().indexed(),
+      creatorId: i.string(),
     }),
   },
   links: {

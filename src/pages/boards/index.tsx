@@ -51,8 +51,7 @@ export function BoardsPage() {
     <DndProvider backend={HTML5Backend}>
       <Stack direction="row" m={4} mt={4}>
         <VStack align="flex-start">
-          <SegmentedControl size="sm" defaultValue="All" items={['All', 'My', 'Favorites']} />
-          {/* <Text>size = </Text> */}
+          <SegmentedControl size="sm" defaultValue="All" items={['All', 'My']} />
         </VStack>
         <CreateBoardDialog opener={<Button size="xs">Create board</Button>} />
       </Stack>

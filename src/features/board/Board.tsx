@@ -155,7 +155,15 @@ export function Board({ board, mode = 'view' }: BoardProps) {
   );
 }
 
-async function createColumn({ boardId, teamId }: { boardId: string; teamId: string }) {
+async function createColumn({
+  boardId,
+  teamId,
+  creatorId,
+}: {
+  boardId: string;
+  teamId: string;
+  creatorId?: string;
+}) {
   const columnId = id();
   const { data: columns } = await db.queryOnce({ columns: { $: { where: { boardId } } } });
   const position = (columns?.columns || []).reduce((max, c) => (c.position > max ? c.position : max), 0);
@@ -164,8 +172,9 @@ async function createColumn({ boardId, teamId }: { boardId: string; teamId: stri
     db.tx.columns[columnId].update({
       boardId,
       teamId,
-      createdAt: JSON.stringify(new Date()),
       position: position + 1,
+      createdAt: JSON.stringify(new Date()),
+      creatorId,
     }),
     db.tx.columns[columnId].link({ boards: boardId }),
     db.tx.columns[columnId].link({ teams: teamId }),
@@ -185,6 +194,7 @@ function BoardHeader({ board, mode }: BoardHeaderProps) {
   const [, navigate] = useLocation();
   const { currentTeamId } = useAccount();
   const [name, setName] = useState<string>(board?.name || '');
+  const { user } = db.useAuth();
 
   const handleRenameBoard = ({ value: newName }: { value: string }) => {
     if (!newName) return;
@@ -234,7 +244,7 @@ function BoardHeader({ board, mode }: BoardHeaderProps) {
           <Button
             variant="outline"
             onClick={() => {
-              createColumn({ boardId: board.id, teamId: currentTeamId as string });
+              createColumn({ boardId: board.id, teamId: currentTeamId as string, creatorId: user?.id });
             }}
           >
             Add column

@@ -46,7 +46,7 @@ const SMART_PARAMS_TYPES = [
 
 type SmartParam = InstaQLEntity<AppSchema, 'smartParams'>;
 
-interface EditableSmartParam extends Pick<SmartParam, 'id' | 'name' | 'type' | 'value'> {
+interface EditableSmartParam extends Pick<SmartParam, 'id' | 'name' | 'type' | 'value' | 'creatorId'> {
   isNew: boolean;
 }
 
@@ -55,6 +55,7 @@ interface BaseProps {
   smartParams: InstaQLResult<AppSchema, { smartParams: {} }>['smartParams'];
   boardId?: string;
   taskId?: string;
+  creatorId?: string;
   isOpen: boolean;
   onClose?: () => void;
 }
@@ -81,6 +82,7 @@ export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTask
   const ref = useRef<HTMLInputElement>(null);
   const { currentTeamId } = useAccount();
   const contentRef = useRef<HTMLDivElement>(null);
+  const { user } = db.useAuth();
   const { data: memberships } = db.useQuery({
     memberships: {
       $: {
@@ -106,12 +108,14 @@ export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTask
               smartParams: idsForCreate,
               teamId: currentTeamId as string,
               boardId: props.boardId as string,
+              creatorId: user?.id as string,
             }
           : {
               type: 'task',
               smartParams: idsForCreate,
               teamId: currentTeamId as string,
               taskId: props.taskId as string,
+              creatorId: user?.id,
             }
       );
     }
@@ -127,7 +131,10 @@ export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTask
   };
 
   const handleAddParamClick = () => {
-    setEditedParams((prev) => [...prev, { id: id(), name: '', type: 'string', value: '', isNew: true }]);
+    setEditedParams((prev) => [
+      ...prev,
+      { id: id(), name: '', type: 'string', value: '', isNew: true, creatorId: user?.id as string },
+    ]);
   };
 
   const handleDeleteParamClick = (id: string, isNew: boolean) => {
@@ -161,10 +168,11 @@ export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTask
           type: param.type,
           value: param.value,
           isNew: false,
+          creatorId: user?.id as string,
         }))
       );
     }
-  }, [smartParams]);
+  }, [smartParams, user?.id]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -351,6 +359,7 @@ async function deleteSmartParam({ smartParamId }: { smartParamId: string }) {
 interface CreateSmartParams {
   smartParams: EditableSmartParam[];
   teamId: string;
+  creatorId?: string;
 }
 
 interface CreateBoardSmartParams extends CreateSmartParams {
@@ -390,6 +399,7 @@ async function createSmartParams(params: CreateBoardSmartParams | CreateTaskSmar
             taskId: isTaskSmartParams(params) ? params.taskId : undefined,
             teamId: params.teamId,
             createdAt: JSON.stringify(new Date()),
+            creatorId: params.creatorId,
           })
           .link({ teams: params.teamId }),
         params.type === 'board'
