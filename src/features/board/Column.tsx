@@ -226,6 +226,7 @@ function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
                 })),
                 columnId: column?.id as string,
                 teamId: currentTeamId as string,
+                creatorId: user?.id as string,
               });
             }}
             options={memberships?.memberships.map((member) => ({
@@ -450,16 +451,18 @@ async function updateContributors({
   userMemberships,
   columnId,
   teamId,
+  creatorId,
 }: {
   userMemberships: { userId: string; membershipId: string }[];
   columnId: string;
   teamId: string;
+  creatorId: string;
 }) {
   const contributorId = id();
   return await db.transact([
     ...userMemberships.map((mb) =>
       db.tx.contributors[contributorId]
-        .update({ membershipId: mb.membershipId, columnId, teamId })
+        .update({ membershipId: mb.membershipId, columnId, teamId, creatorId })
         .link({ memberships: mb.membershipId })
         .link({ columns: columnId })
         .link({ teams: teamId })

@@ -126,7 +126,14 @@ async function inviteMember({
   return await db.transact([
     db.tx.memberships[membershipId].update({ teamId, userEmail, creatorId }),
     db.tx.memberships[membershipId].link({ teams: teamId }),
-    db.tx.invites[inviteId].update({ userEmail, teamId, teamName, status: 'pending', membershipId }),
+    db.tx.invites[inviteId].update({
+      userEmail,
+      teamId,
+      teamName,
+      status: 'pending',
+      membershipId,
+      creatorId,
+    }),
     db.tx.invites[inviteId].link({ teams: teamId }),
   ]);
 }
