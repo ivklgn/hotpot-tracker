@@ -173,7 +173,7 @@ async function createColumn({
       boardId,
       teamId,
       position: position + 1,
-      createdAt: JSON.stringify(new Date()),
+      createdAt: new Date().toJSON(),
       creatorId,
     }),
     db.tx.columns[columnId].link({ boards: boardId }),
@@ -182,7 +182,7 @@ async function createColumn({
 }
 
 async function deleteBoard({ boardId }: { boardId: string }) {
-  return await db.transact([db.tx.boards[boardId].update({ deletedAt: JSON.stringify(new Date()) })]);
+  return await db.transact([db.tx.boards[boardId].update({ deletedAt: new Date().toJSON() })]);
 }
 
 interface BoardHeaderProps {

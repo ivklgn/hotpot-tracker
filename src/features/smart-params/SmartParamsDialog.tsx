@@ -398,7 +398,7 @@ async function createSmartParams(params: CreateBoardSmartParams | CreateTaskSmar
             boardId: isBoardSmartParams(params) ? params.boardId : undefined,
             taskId: isTaskSmartParams(params) ? params.taskId : undefined,
             teamId: params.teamId,
-            createdAt: JSON.stringify(new Date()),
+            createdAt: new Date().toJSON(),
             creatorId: params.creatorId,
           })
           .link({ teams: params.teamId }),

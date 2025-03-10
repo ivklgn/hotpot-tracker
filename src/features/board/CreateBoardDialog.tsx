@@ -107,7 +107,7 @@ async function createBoard({
   const boardId = id();
   await db.transact([
     db.tx.boards[boardId]
-      .update({ name, teamId, creatorId, createdAt: JSON.stringify(new Date()) })
+      .update({ name, teamId, creatorId, createdAt: new Date().toJSON() })
       .link({ teams: teamId }),
   ]);
   return boardId;

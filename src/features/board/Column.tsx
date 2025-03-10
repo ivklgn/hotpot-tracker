@@ -416,7 +416,7 @@ async function createStatusAndUpdateColumn({
 }) {
   const statusId = id();
   return await db.transact([
-    db.tx.statuses[statusId].update({ name, teamId, createdAt: JSON.stringify(new Date()), creatorId }),
+    db.tx.statuses[statusId].update({ name, teamId, createdAt: new Date().toJSON(), creatorId }),
     db.tx.statuses[statusId].link({ teams: teamId }),
     db.tx.columns[columnId].update({ statusId }),
     db.tx.columns[columnId].link({ statuses: statusId }),
@@ -494,7 +494,7 @@ async function createNewTask({
       title: 'Untitled task',
       teamId,
       columnId,
-      createdAt: JSON.stringify(new Date()),
+      createdAt: new Date().toJSON(),
       creatorId,
     }),
     db.tx.tasks[newTaskId].link({ columns: columnId }),
