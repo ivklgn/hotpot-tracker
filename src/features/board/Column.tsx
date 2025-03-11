@@ -8,8 +8,6 @@ import {
   Link as ChakraLink,
   Group,
   Text,
-  Badge,
-  HStack,
 } from '@chakra-ui/react';
 import { Field } from '@/components/ui/field';
 import { CreatableSelect, Select } from 'chakra-react-select';
