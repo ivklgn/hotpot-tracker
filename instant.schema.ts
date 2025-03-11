@@ -59,6 +59,12 @@ const _schema = i.schema({
       teamId: i.string(),
       createdAt: i.date(),
     }),
+    approves: i.entity({
+      taskId: i.string(),
+      contributorId: i.string(),
+      teamId: i.string(),
+      createdAt: i.date(),
+    }),
     tasks: i.entity({
       title: i.string(),
       content: i.json(),
@@ -69,6 +75,50 @@ const _schema = i.schema({
     }),
   },
   links: {
+    // approves
+
+    approvesTeams: {
+      forward: {
+        on: 'approves',
+        has: 'one',
+        label: 'teams',
+        onDelete: 'cascade',
+      },
+      reverse: {
+        on: 'teams',
+        has: 'many',
+        label: 'approves',
+      },
+    },
+    approvesTasks: {
+      forward: {
+        on: 'approves',
+        has: 'one',
+        label: 'tasks',
+        onDelete: 'cascade',
+      },
+      reverse: {
+        on: 'tasks',
+        has: 'many',
+        label: 'approves',
+      },
+    },
+    approvesContributors: {
+      forward: {
+        on: 'approves',
+        has: 'one',
+        label: 'contributors',
+        onDelete: 'cascade',
+      },
+      reverse: {
+        on: 'contributors',
+        has: 'many',
+        label: 'approves',
+      },
+    },
+
+    // smartParams
+
     smartParamsBoards: {
       forward: {
         on: 'smartParams',
@@ -108,6 +158,9 @@ const _schema = i.schema({
         label: 'smartParams',
       },
     },
+
+    // tasks
+
     tasksColumns: {
       forward: {
         on: 'tasks',
@@ -133,6 +186,7 @@ const _schema = i.schema({
         label: 'tasks',
       },
     },
+
     contributorsMemberships: {
       forward: {
         on: 'contributors',
@@ -171,6 +225,7 @@ const _schema = i.schema({
         label: 'contributors',
       },
     },
+
     columnsStatuses: {
       forward: {
         on: 'columns',
@@ -209,6 +264,7 @@ const _schema = i.schema({
         label: 'columns',
       },
     },
+
     statusesTeams: {
       forward: {
         on: 'statuses',
