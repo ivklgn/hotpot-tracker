@@ -1,4 +1,4 @@
-import { Box, Button, ButtonGroup, EmptyState, Stack, VStack } from '@chakra-ui/react';
+import { Button, ButtonGroup, EmptyState, Stack, VStack } from '@chakra-ui/react';
 import { HiColorSwatch } from 'react-icons/hi';
 import { CreateBoardDialog } from '../../features/board/CreateBoardDialog';
 import { db } from '../../instantdb';
@@ -52,6 +52,9 @@ export function BoardsPage() {
       </Stack>
       {boards?.boards &&
         boards?.boards?.length > 0 &&
+        // TODO: creatorId affect =\
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         boards?.boards?.map((board) => <Board board={board} key={board.id} mode="view" />)}
       {boards?.boards && boards?.boards?.length === 0 && (
         <EmptyState.Root>
