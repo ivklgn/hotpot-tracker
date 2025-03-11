@@ -176,30 +176,24 @@ function ColumnTask({ task, columnApproveRule, columnContributors }: ColumnTaskP
       ref={approved === undefined || approved ? drag : undefined}
     >
       <Box>
-        <ChakraLink asChild colorPalette="teal" fontWeight="medium" fontSize="md">
-          <Link to={`/task/${task.id}`}>{task.title}</Link>
+        <ChakraLink
+          asChild
+          colorPalette={approved !== undefined ? (approved ? 'teal' : 'yellow') : 'teal'}
+          fontWeight="medium"
+          fontSize="md"
+        >
+          <Link to={`/task/${task.id}`}>
+            {task.title} {approved !== undefined ? approved ? <LuShieldCheck /> : <LuShieldQuestion /> : null}
+          </Link>
         </ChakraLink>
       </Box>
-      <HStack mt={2}>
-        {approved !== undefined ? (
-          approved ? (
-            <Badge variant="solid" colorPalette="green">
-              <LuShieldCheck />
-              Approved
-            </Badge>
-          ) : (
-            <Badge variant="solid" colorPalette="yellow">
-              <LuShieldQuestion />
-              Wait approves
-            </Badge>
-          )
-        ) : null}
+      <Box mt={2}>
         {task?.smartParams && (
           <Box>
             <SmartParams type="board-task" smartParams={task.smartParams} taskId={task.id} />
           </Box>
         )}
-      </HStack>
+      </Box>
     </Box>
   );
 }
