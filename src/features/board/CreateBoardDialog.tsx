@@ -29,13 +29,14 @@ export const CreateBoardDialog: React.FC<CreateTeamDialogProps> = ({ opener }) =
   const [name, setName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const { currentTeamId } = useAccount();
+  const { user } = db.useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name) return;
     // TODO: check current team id ??
 
-    createBoard({ name, teamId: currentTeamId as string }).then((newBoardId) => {
+    createBoard({ name, teamId: currentTeamId as string, creatorId: user?.id }).then((newBoardId) => {
       navigate(`/board/${newBoardId}`);
     });
 
@@ -94,11 +95,19 @@ export const CreateBoardDialog: React.FC<CreateTeamDialogProps> = ({ opener }) =
   );
 };
 
-async function createBoard({ name, teamId }: { name: string; teamId: string }) {
+async function createBoard({
+  name,
+  teamId,
+  creatorId,
+}: {
+  name: string;
+  teamId: string;
+  creatorId?: string;
+}) {
   const boardId = id();
   await db.transact([
     db.tx.boards[boardId]
-      .update({ name, teamId, createdAt: JSON.stringify(new Date()) })
+      .update({ name, teamId, creatorId, createdAt: new Date().toJSON() })
       .link({ teams: teamId }),
   ]);
   return boardId;

@@ -15,10 +15,10 @@ export function AccountLayout({ children }: AccountLayoutProps) {
   const [, navigate] = useLocation();
 
   useEffect(() => {
-    if (!teams?.teams || teams.teams.length === 0) {
+    if (!isLoadingTeams && (!teams?.teams || teams.teams.length === 0)) {
       navigate('/workspace', { replace: true });
     }
-  }, [navigate, teams?.teams]);
+  }, [navigate, teams?.teams, isLoadingTeams]);
 
   if (isLoadingTeams) {
     return null;

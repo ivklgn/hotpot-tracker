@@ -212,6 +212,7 @@ interface ColumnEditProps {
 
 function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
   const { currentTeamId } = useAccount();
+  const { user } = db.useAuth();
   const { data: statuses } = db.useQuery({
     statuses: {
       $: {
@@ -266,6 +267,7 @@ function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
                 name: value,
                 teamId: currentTeamId as string,
                 columnId: column?.id as string,
+                creatorId: user?.id,
               });
             }}
           />
@@ -297,6 +299,7 @@ function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
                 })),
                 columnId: column?.id as string,
                 teamId: currentTeamId as string,
+                creatorId: user?.id as string,
               });
             }}
             options={memberships?.memberships.map((member) => ({
@@ -382,6 +385,7 @@ export function Column({ column, defaultEditable = false, onDrag, onDragTask }: 
   const ref = useRef<HTMLDivElement>(null);
   const { currentTeamId } = useAccount();
   const [isEdit, setEditMode] = useState(defaultEditable);
+  const { user } = db.useAuth();
 
   const [, columnDrop] = useDrop({
     accept: 'column',
@@ -456,7 +460,11 @@ export function Column({ column, defaultEditable = false, onDrag, onDragTask }: 
         column={column}
         isEdit={isEdit}
         onCreateTask={() =>
-          createNewTask({ columnId: column?.id as string, teamId: currentTeamId as string })
+          createNewTask({
+            columnId: column?.id as string,
+            teamId: currentTeamId as string,
+            creatorId: user?.id,
+          })
         }
         onEditClick={() => setEditMode(true)}
         onCloseEdit={() => setEditMode(false)}
@@ -475,14 +483,16 @@ async function createStatusAndUpdateColumn({
   name,
   teamId,
   columnId,
+  creatorId,
 }: {
   name: string;
   teamId: string;
   columnId: string;
+  creatorId?: string;
 }) {
   const statusId = id();
   return await db.transact([
-    db.tx.statuses[statusId].update({ name, teamId, createdAt: JSON.stringify(new Date()) }),
+    db.tx.statuses[statusId].update({ name, teamId, createdAt: new Date().toJSON(), creatorId }),
     db.tx.statuses[statusId].link({ teams: teamId }),
     db.tx.columns[columnId].update({ statusId }),
     db.tx.columns[columnId].link({ statuses: statusId }),
@@ -517,16 +527,18 @@ async function updateContributors({
   userMemberships,
   columnId,
   teamId,
+  creatorId,
 }: {
   userMemberships: { userId: string; membershipId: string }[];
   columnId: string;
   teamId: string;
+  creatorId: string;
 }) {
   const contributorId = id();
   return await db.transact([
     ...userMemberships.map((mb) =>
       db.tx.contributors[contributorId]
-        .update({ membershipId: mb.membershipId, columnId, teamId })
+        .update({ membershipId: mb.membershipId, columnId, teamId, creatorId })
         .link({ memberships: mb.membershipId })
         .link({ columns: columnId })
         .link({ teams: teamId })
@@ -545,7 +557,15 @@ async function deleteColumn({ columnId, contributorsIds }: { columnId: string; c
   ]);
 }
 
-async function createNewTask({ columnId, teamId }: { columnId: string; teamId: string }) {
+async function createNewTask({
+  columnId,
+  teamId,
+  creatorId,
+}: {
+  columnId: string;
+  teamId: string;
+  creatorId?: string;
+}) {
   const newTaskId = id();
 
   return await db.transact([
@@ -553,7 +573,8 @@ async function createNewTask({ columnId, teamId }: { columnId: string; teamId: s
       title: 'Untitled task',
       teamId,
       columnId,
-      createdAt: JSON.stringify(new Date()),
+      createdAt: new Date().toJSON(),
+      creatorId,
     }),
     db.tx.tasks[newTaskId].link({ columns: columnId }),
     db.tx.tasks[newTaskId].link({ teams: teamId }),

@@ -24,6 +24,7 @@ interface CreateTeamDialogProps {
 export const InviteMemberDialog: React.FC<CreateTeamDialogProps> = ({ opener }) => {
   const ref = useRef<HTMLInputElement>(null);
   const { currentTeamId } = useAccount();
+  const { user } = db.useAuth();
   const { data: memberships } = db.useQuery({
     memberships: {
       $: {
@@ -51,6 +52,7 @@ export const InviteMemberDialog: React.FC<CreateTeamDialogProps> = ({ opener }) 
       teamId: currentTeamId as string,
       userEmail: email,
       teamName: currentTeam?.teams?.[0]?.name as string,
+      creatorId: user?.id as string,
     });
 
     setEmail('');
@@ -111,18 +113,27 @@ async function inviteMember({
   teamId,
   userEmail,
   teamName,
+  creatorId,
 }: {
   teamId: string;
   userEmail: string;
   teamName: string;
+  creatorId?: string;
 }) {
   const inviteId = id();
   const membershipId = id();
 
   return await db.transact([
-    db.tx.memberships[membershipId].update({ teamId, userEmail }),
+    db.tx.memberships[membershipId].update({ teamId, userEmail, creatorId }),
     db.tx.memberships[membershipId].link({ teams: teamId }),
-    db.tx.invites[inviteId].update({ userEmail, teamId, teamName, status: 'pending', membershipId }),
+    db.tx.invites[inviteId].update({
+      userEmail,
+      teamId,
+      teamName,
+      status: 'pending',
+      membershipId,
+      creatorId,
+    }),
     db.tx.invites[inviteId].link({ teams: teamId }),
   ]);
 }

@@ -7,14 +7,20 @@ import { Board } from '../../features/board/Board';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { SegmentedControl } from '../../components/ui/segmented-control';
+import { useState } from 'react';
 
 export function BoardsPage() {
   const { currentTeamId } = useAccount();
+  const { user } = db.useAuth();
+  const [boardFilter, setBoardFilter] = useState('all');
   const { data: boards } = db.useQuery({
     boards: {
       smartParams: {},
       $: {
         where: {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-expect-error
+          creatorId: boardFilter === 'all' ? undefined : (user?.id as string),
           teamId: currentTeamId as string,
           deletedAt: {
             $isNull: true,
@@ -26,9 +32,28 @@ export function BoardsPage() {
 
   if (!boards) return null;
 
-  if (boards?.boards?.length === 0) {
-    return (
-      <Box flex="1" pt={8} mx={6}>
+  return (
+    <DndProvider backend={HTML5Backend}>
+      <Stack direction="row" m={4} mt={4}>
+        <VStack align="flex-start">
+          <SegmentedControl
+            size="sm"
+            value={boardFilter}
+            items={[
+              { label: 'All', value: 'all' },
+              { label: 'My', value: 'my' },
+            ]}
+            onValueChange={(value) => {
+              setBoardFilter(value.value);
+            }}
+          />
+        </VStack>
+        <CreateBoardDialog opener={<Button size="xs">Create board</Button>} />
+      </Stack>
+      {boards?.boards &&
+        boards?.boards?.length > 0 &&
+        boards?.boards?.map((board) => <Board board={board} key={board.id} mode="view" />)}
+      {boards?.boards && boards?.boards?.length === 0 && (
         <EmptyState.Root>
           <EmptyState.Content>
             <EmptyState.Indicator>
@@ -43,20 +68,7 @@ export function BoardsPage() {
             </ButtonGroup>
           </EmptyState.Content>
         </EmptyState.Root>
-      </Box>
-    );
-  }
-
-  return (
-    <DndProvider backend={HTML5Backend}>
-      <Stack direction="row" m={4} mt={4}>
-        <VStack align="flex-start">
-          <SegmentedControl size="sm" defaultValue="All" items={['All', 'My', 'Favorites']} />
-          {/* <Text>size = </Text> */}
-        </VStack>
-        <CreateBoardDialog opener={<Button size="xs">Create board</Button>} />
-      </Stack>
-      {boards?.boards?.map((board) => <Board board={board} key={board.id} mode="view" />)}
+      )}
     </DndProvider>
   );
 }
