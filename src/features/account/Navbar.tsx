@@ -9,7 +9,7 @@ import {
   MenuItemGroup,
 } from '@chakra-ui/react';
 import { MenuContent, MenuItem, MenuRoot, MenuTrigger } from '@/components/ui/menu';
-import { LuChartBarBig, LuPlus, LuAppWindow } from 'react-icons/lu';
+import { LuChartBarBig, LuPlus, LuAppWindow, LuSearch } from 'react-icons/lu';
 import { Status } from '../../components/ui/status';
 import { CreateTeamDialog } from '../team/CreateTeamDialog';
 import { Link, useLocation } from 'wouter';
@@ -21,6 +21,7 @@ import { UserAvatar } from '../../components/Avatars';
 const ROUTES = [
   { route: '/workspace', title: 'Workspace', icon: <LuAppWindow /> },
   { route: '/boards', title: 'Boards', icon: <LuChartBarBig /> },
+  { route: '/search', title: 'Search', icon: <LuSearch /> },
 ] as const;
 
 export function AccountNavbar() {

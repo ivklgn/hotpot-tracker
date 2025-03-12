@@ -9,6 +9,7 @@ import { BoardPage } from './pages/board';
 import { TaskPage } from './pages/task';
 import { NotFoundPage } from './pages/404';
 import { Landing } from './pages/landing';
+import { SearchPage } from './pages/search';
 
 export default function App() {
   const { user, isLoading } = db.useAuth();
@@ -25,6 +26,7 @@ export default function App() {
           <Route path="/boards" component={() => <BoardsPage />} />
           <Route path="/board/:boardId" component={() => <BoardPage />} />
           <Route path="/task/:taskId" component={() => <TaskPage />} />
+          <Route path="/search" component={() => <SearchPage />} />
           <Route path="/" component={() => <Landing />} />
           <Route path="/404" component={() => <NotFoundPage />} />
           <Route path="/auth" component={() => <Redirect to="/workspace" />} />
