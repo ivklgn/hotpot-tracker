@@ -73,7 +73,7 @@ const _schema = i.schema({
       createdAt: i.date(),
     }),
     tasks: i.entity({
-      title: i.string(),
+      title: i.string().indexed(),
       content: i.json(),
       teamId: i.string(),
       columnId: i.string(),
