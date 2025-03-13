@@ -21,6 +21,7 @@ import { Column } from './Column';
 import { CreateBoardDialog } from './CreateBoardDialog';
 import { AppSchema } from '../../../instant.schema';
 import { SmartParams } from '../smart-params';
+import { runMutation } from '../core/instantdb-mutation';
 
 type BoardViewMode = 'view' | 'edit';
 
@@ -72,7 +73,7 @@ export function Board({ board, mode = 'view' }: BoardProps) {
   );
 
   const handleDragTask = (taskId: string, targetColumnId: string) => {
-    changeTaskColumn({ taskId, columnId: targetColumnId });
+    runMutation(() => changeTaskColumn({ taskId, columnId: targetColumnId }));
   };
 
   const handleDragColumn = ({
@@ -86,10 +87,12 @@ export function Board({ board, mode = 'view' }: BoardProps) {
     fromColumnId: string;
     toColumnId: string;
   }) => {
-    changeColumnPosition({
-      from: { columnId: fromColumnId, position: targetIndex },
-      to: { columnId: toColumnId, position: replaceToIndex },
-    });
+    runMutation(() =>
+      changeColumnPosition({
+        from: { columnId: fromColumnId, position: targetIndex },
+        to: { columnId: toColumnId, position: replaceToIndex },
+      })
+    );
   };
 
   if (!board) {
@@ -166,6 +169,7 @@ async function createColumn({
   creatorId?: string;
 }) {
   const columnId = id();
+  // TODO: not work offline mode with queryOnce
   const { data: columns } = await db.queryOnce({ columns: { $: { where: { boardId } } } });
   const position = (columns?.columns || []).reduce((max, c) => (c.position > max ? c.position : max), 0);
 
@@ -199,7 +203,7 @@ function BoardHeader({ board, mode }: BoardHeaderProps) {
 
   const handleRenameBoard = ({ value: newName }: { value: string }) => {
     if (!newName) return;
-    renameBoard({ boardId: board?.id as string, newName });
+    runMutation(() => renameBoard({ boardId: board?.id as string, newName }));
   };
 
   if (!board) return null;
@@ -277,6 +281,7 @@ async function renameBoard({ newName, boardId }: { boardId: string; newName: str
 }
 
 async function changeTaskColumn({ taskId, columnId }: { taskId: string; columnId: string }) {
+  // TODO: not work offline mode with queryOnce
   db.queryOnce({ approves: { $: { where: { taskId }, limit: 1 } } }).then((res) => {
     if (res.data.approves.length > 0) {
       const approveId = res.data.approves?.[0].id;

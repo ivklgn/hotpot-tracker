@@ -4,6 +4,7 @@ import { useLocalStorage } from '../web-storage';
 import { db } from '../../instantdb';
 import { useEffect } from 'react';
 import { useLocation } from 'wouter';
+import { Toaster } from '../../components/ui/toaster';
 
 interface AccountLayoutProps {
   children: React.ReactNode;
@@ -29,6 +30,7 @@ export function AccountLayout({ children }: AccountLayoutProps) {
       <Flex direction="column" minH="100vh">
         {children}
       </Flex>
+      <Toaster />
     </AccountContext.Provider>
   );
 }

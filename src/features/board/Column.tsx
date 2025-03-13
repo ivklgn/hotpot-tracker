@@ -23,6 +23,7 @@ import { useDrag, useDrop } from 'react-dnd';
 import { AppSchema } from '../../../instant.schema';
 import { SmartParams } from '../smart-params';
 import { ToggleTip } from '../../components/ui/toggle-tip';
+import { runMutation } from '../core/instantdb-mutation';
 
 type ColumnType = InstaQLResult<
   AppSchema,
@@ -240,11 +241,13 @@ function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
             }))}
             placeholder="Select or create status"
             onChange={(value) => {
-              updateColumnStatus({
-                statusId: value?.value as string,
-                teamId: currentTeamId as string,
-                columnId: column?.id as string,
-              });
+              runMutation(() =>
+                updateColumnStatus({
+                  statusId: value?.value as string,
+                  teamId: currentTeamId as string,
+                  columnId: column?.id as string,
+                })
+              );
             }}
             value={
               column?.statuses
@@ -255,12 +258,14 @@ function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
                 : undefined
             }
             onCreateOption={(value) => {
-              createStatusAndUpdateColumn({
-                name: value,
-                teamId: currentTeamId as string,
-                columnId: column?.id as string,
-                creatorId: user?.id,
-              });
+              runMutation(() =>
+                createStatusAndUpdateColumn({
+                  name: value,
+                  teamId: currentTeamId as string,
+                  columnId: column?.id as string,
+                  creatorId: user?.id,
+                })
+              );
             }}
           />
         </Field>
@@ -269,30 +274,36 @@ function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
             isMulti
             onChange={(changedContributors) => {
               if (changedContributors.length === 0) {
-                deleteContributors({
-                  contributorsIds: column?.contributors?.map((c) => c.id) as string[],
-                });
+                runMutation(() =>
+                  deleteContributors({
+                    contributorsIds: column?.contributors?.map((c) => c.id) as string[],
+                  })
+                );
                 return;
               }
 
               if (changedContributors.length < (column?.contributors || []).length) {
-                deleteContributors({
-                  contributorsIds: column?.contributors
-                    ?.filter((c) => !changedContributors.find((v) => v.value === c.memberships?.userId))
-                    ?.map((c) => c.id) as string[],
-                });
+                runMutation(() =>
+                  deleteContributors({
+                    contributorsIds: column?.contributors
+                      ?.filter((c) => !changedContributors.find((v) => v.value === c.memberships?.userId))
+                      ?.map((c) => c.id) as string[],
+                  })
+                );
                 return;
               }
 
-              updateContributors({
-                userMemberships: changedContributors.map((v) => ({
-                  userId: v.value as string,
-                  membershipId: memberships?.memberships.find((m) => m.userId === v.value)?.id as string,
-                })),
-                columnId: column?.id as string,
-                teamId: currentTeamId as string,
-                creatorId: user?.id as string,
-              });
+              runMutation(() =>
+                updateContributors({
+                  userMemberships: changedContributors.map((v) => ({
+                    userId: v.value as string,
+                    membershipId: memberships?.memberships.find((m) => m.userId === v.value)?.id as string,
+                  })),
+                  columnId: column?.id as string,
+                  teamId: currentTeamId as string,
+                  creatorId: user?.id as string,
+                })
+              );
             }}
             options={memberships?.memberships.map((member) => ({
               value: member.userId,
@@ -312,10 +323,12 @@ function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
         <Field label="Approve rules">
           <Select
             onChange={(value) => {
-              updateColumnApproveRule({
-                approveRule: value?.value as 'one-of-contributors' | 'all-contributors',
-                columnId: column?.id as string,
-              });
+              runMutation(() =>
+                updateColumnApproveRule({
+                  approveRule: value?.value as 'one-of-contributors' | 'all-contributors',
+                  columnId: column?.id as string,
+                })
+              );
             }}
             options={[
               { label: 'Without approves', value: '' },
@@ -342,10 +355,12 @@ function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
             }
             text="Are you sure to delete column?"
             onOk={() => {
-              deleteColumn({
-                columnId: column?.id as string,
-                contributorsIds: column?.contributors?.map((c) => c.id),
-              }).then(() => {
+              runMutation(() =>
+                deleteColumn({
+                  columnId: column?.id as string,
+                  contributorsIds: column?.contributors?.map((c) => c.id),
+                })
+              ).then(() => {
                 onClose();
               });
             }}
@@ -451,13 +466,15 @@ export function Column({ column, defaultEditable = false, onDrag, onDragTask }: 
       <ColumnHeader
         column={column}
         isEdit={isEdit}
-        onCreateTask={() =>
-          createNewTask({
-            columnId: column?.id as string,
-            teamId: currentTeamId as string,
-            creatorId: user?.id,
-          })
-        }
+        onCreateTask={() => {
+          runMutation(() =>
+            createNewTask({
+              columnId: column?.id as string,
+              teamId: currentTeamId as string,
+              creatorId: user?.id,
+            })
+          );
+        }}
         onEditClick={() => setEditMode(true)}
         onCloseEdit={() => setEditMode(false)}
       />
