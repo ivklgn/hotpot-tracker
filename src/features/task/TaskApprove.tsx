@@ -48,8 +48,6 @@ export function TaskApprove({ task }: TaskApproveProps) {
   const isLoading = isLoadingColumns || isLoadingApproves;
   const column = columnData?.columns?.[0];
 
-  console.log(column?.statuses);
-
   const currentContributorId = useMemo(
     () => column?.contributors?.find((c) => c.memberships?.userId === user?.id)?.id,
     [column, user]
