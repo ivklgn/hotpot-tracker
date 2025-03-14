@@ -1,13 +1,6 @@
 export default {
   teams: {
-    bind: [
-      'isCreator',
-      'auth.id == data.creatorId',
-      'isMember',
-      "auth.id in data.ref('memberships.userId')",
-      'isKek',
-      'false',
-    ],
+    bind: ['isCreator', 'auth.id == data.creatorId', 'isMember', "auth.id in data.ref('memberships.userId')"],
     allow: {
       view: 'isMember',
       create: 'isCreator',
@@ -21,68 +14,66 @@ export default {
       "auth.id in data.ref('teams.memberships.userId')",
       'isInvitee',
       'auth.email == data.userEmail',
-      'isKek',
-      'false',
     ],
     allow: {
       view: 'isInvitee || isMember',
       create: 'isMember',
-      delete: 'isKek',
+      delete: 'isMember',
       update: 'isInvitee',
     },
   },
   boards: {
-    bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')", 'isKek', 'false'],
+    bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')"],
     allow: {
       view: 'isMember',
       create: 'isMember',
-      delete: 'isKek',
-      update: 'isKek',
+      delete: 'isMember',
+      update: 'isMember',
     },
   },
   columns: {
-    bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')", 'isKek', 'false'],
+    bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')"],
     allow: {
       view: 'isMember',
       create: 'isMember',
-      delete: 'isKek',
-      update: 'isKek',
+      delete: 'isMember',
+      update: 'isMember',
     },
   },
   tasks: {
-    bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')", 'isKek', 'false'],
+    bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')"],
     allow: {
       view: 'isMember',
       create: 'isMember',
-      delete: 'isKek',
-      update: 'isKek',
+      delete: 'isMember',
+      update: 'isMember',
     },
   },
   contributors: {
-    bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')", 'isKek', 'false'],
+    bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')"],
     allow: {
       view: 'isMember',
       create: 'isMember',
-      delete: 'isKek',
-      update: 'isKek',
+      delete: 'isMember',
+      update: 'isMember',
     },
   },
   statuses: {
-    bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')", 'isKek', 'false'],
+    bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')"],
     allow: {
       view: 'isMember',
       create: 'isMember',
-      delete: 'isKek',
-      update: 'isKek',
+      delete: 'isMember',
+      update: 'isMember',
     },
   },
   smartParams: {
-    bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')", 'isKek', 'false'],
+    bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')"],
     allow: {
       view: 'isMember',
       create: 'isMember',
-      delete: 'isKek',
-      update: 'isKek',
+      delete: 'isMember',
+      update: 'isMember',
     },
   },
   memberships: {
@@ -97,8 +88,6 @@ export default {
       "auth.id in data.ref('teams.creatorId')",
       'isInvitee',
       "auth.email in data.ref('teams.invites.userEmail')",
-      'isKek',
-      'false',
     ],
     allow: {
       view: 'isMember',
@@ -108,12 +97,12 @@ export default {
     },
   },
   approves: {
-    bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')", 'isKek', 'false'],
+    bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')"],
     allow: {
       view: 'isMember',
       create: 'isMember',
-      delete: 'isKek',
-      update: 'isKek',
+      delete: 'isMember',
+      update: 'isMember',
     },
   },
 };
