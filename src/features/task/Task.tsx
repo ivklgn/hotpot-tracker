@@ -1,4 +1,14 @@
-import { Box, Button, ButtonGroup, Editable, EmptyState, Flex, IconButton, VStack } from '@chakra-ui/react';
+import {
+  Badge,
+  Box,
+  Button,
+  ButtonGroup,
+  Editable,
+  EmptyState,
+  Flex,
+  IconButton,
+  VStack,
+} from '@chakra-ui/react';
 import { useState } from 'react';
 import { LuPencilLine, LuX, LuCheck } from 'react-icons/lu';
 import { db } from '../../instantdb';
@@ -85,7 +95,6 @@ export function Task({ task }: TaskProps) {
         </Editable.Root>
         <ButtonGroup size="xs">
           <TaskApprove task={task} />
-
           <ConfirmAction
             opener={
               <Button variant="outline" colorPalette="red">

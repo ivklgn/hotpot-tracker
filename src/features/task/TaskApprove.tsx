@@ -1,4 +1,4 @@
-import { Button } from '@chakra-ui/react';
+import { Badge, Button, Group } from '@chakra-ui/react';
 import { LuShieldCheck } from 'react-icons/lu';
 import { db } from '../../instantdb';
 import { AppSchema } from '../../../instant.schema';
@@ -21,6 +21,7 @@ export function TaskApprove({ task }: TaskApproveProps) {
     task?.id
       ? {
           columns: {
+            statuses: {},
             contributors: {
               memberships: {},
             },
@@ -46,6 +47,8 @@ export function TaskApprove({ task }: TaskApproveProps) {
 
   const isLoading = isLoadingColumns || isLoadingApproves;
   const column = columnData?.columns?.[0];
+
+  console.log(column?.statuses);
 
   const currentContributorId = useMemo(
     () => column?.contributors?.find((c) => c.memberships?.userId === user?.id)?.id,
@@ -94,32 +97,46 @@ export function TaskApprove({ task }: TaskApproveProps) {
     }
   }, [approvesData, currentContributorId, isApproved, task?.id, currentTeamId]);
 
-  if (!task || !column || !column.approveRule || column.contributors.length === 0) {
+  if (!task || !column) {
     return null;
   }
 
   return (
-    <Tooltip showArrow content="Wait approve">
-      <Button
-        variant="outline"
-        colorPalette={isApproved ? 'red' : 'green'}
-        onClick={handleToggleApproveClick}
-        loading={isLoading}
-        disabled={isButtonDisabled}
-      >
-        <UserAvatars
-          users={column.contributors
-            ?.filter((c) => alreadyApprovedSet.has(c.id))
-            ?.map((c) => ({
-              userId: c?.memberships?.userId as string,
-              userEmail: c?.memberships?.userEmail as string,
-            }))}
-          size="2xs"
-        />
-        <LuShieldCheck />
-        {isApproved ? 'Revoke Approve' : 'Approve'}
-      </Button>
-    </Tooltip>
+    <>
+      {column.statuses && (
+        <Group attached>
+          <Badge variant="outline" height="32px">
+            Status
+          </Badge>
+          <Badge variant="outline" height="32px">
+            {column.statuses.name}
+          </Badge>
+        </Group>
+      )}
+      {column.approveRule && column.contributors.length > 0 && (
+        <Tooltip showArrow content="Wait approve">
+          <Button
+            variant="outline"
+            colorPalette={isApproved ? 'red' : 'green'}
+            onClick={handleToggleApproveClick}
+            loading={isLoading}
+            disabled={isButtonDisabled}
+          >
+            <UserAvatars
+              users={column.contributors
+                ?.filter((c) => alreadyApprovedSet.has(c.id))
+                ?.map((c) => ({
+                  userId: c?.memberships?.userId as string,
+                  userEmail: c?.memberships?.userEmail as string,
+                }))}
+              size="2xs"
+            />
+            <LuShieldCheck />
+            {isApproved ? 'Revoke Approve' : 'Approve'}
+          </Button>
+        </Tooltip>
+      )}
+    </>
   );
 }
 
