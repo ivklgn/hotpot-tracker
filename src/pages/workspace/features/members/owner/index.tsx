@@ -4,6 +4,7 @@ import { ConfirmAction } from '../../../../../components/ConfirmAction';
 import { db } from '../../../../../instantdb';
 import { useAccount } from '../../../../../features/account/AccountContext';
 import { useMemo } from 'react';
+import { runTransaction } from '../../../../../core/instantdb-transaction';
 
 export function OwnerMembers() {
   const { currentTeamId } = useAccount();
@@ -71,10 +72,12 @@ export function OwnerMembers() {
                     }
                     text="Are you sure you want to delete this user?"
                     onOk={() => {
-                      deleteMembership({
-                        membershipId: member.membershipId,
-                        inviteId: member?.invite?.inviteId as string,
-                      });
+                      runTransaction(() =>
+                        deleteMembership({
+                          membershipId: member.membershipId,
+                          inviteId: member?.invite?.inviteId as string,
+                        })
+                      );
                     }}
                   />
                 )}

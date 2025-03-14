@@ -15,6 +15,7 @@ import { cloneElement, useRef, useState } from 'react';
 import React from 'react';
 import { db } from '../../instantdb';
 import { id } from '@instantdb/react';
+import { runTransaction } from '../../core/instantdb-transaction';
 
 interface CreateTeamDialogProps {
   opener?: React.ReactElement;
@@ -31,12 +32,14 @@ export const CreateTeamDialog: React.FC<CreateTeamDialogProps> = ({ opener, isOp
     e.preventDefault();
     if (!teamName) return;
 
-    await createTeamWithMember({
-      teamName,
-      userEmail: user?.email as string,
-      userId: user?.id as string,
-      creatorId: user?.id,
-    });
+    runTransaction(() =>
+      createTeamWithMember({
+        teamName,
+        userEmail: user?.email as string,
+        userId: user?.id as string,
+        creatorId: user?.id,
+      })
+    );
 
     setTeamName('');
     onClose?.();

@@ -20,6 +20,7 @@ import { db } from '../../instantdb';
 import { useAccount } from '../account/AccountContext';
 import { AppSchema } from '../../../instant.schema';
 import { isJSON } from '../../utils/json';
+import { runTransaction } from '../../core/instantdb-transaction';
 
 const SMART_PARAMS_TYPES = [
   {
@@ -101,30 +102,34 @@ export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTask
 
     const idsForCreate = editedParams.filter((param) => param.isNew && !!param.name && !!param.value);
     if (idsForCreate.length > 0) {
-      createSmartParams(
-        type === 'board'
-          ? {
-              type: 'board',
-              smartParams: idsForCreate,
-              teamId: currentTeamId as string,
-              boardId: props.boardId as string,
-              creatorId: user?.id as string,
-            }
-          : {
-              type: 'task',
-              smartParams: idsForCreate,
-              teamId: currentTeamId as string,
-              taskId: props.taskId as string,
-              creatorId: user?.id,
-            }
+      runTransaction(() =>
+        createSmartParams(
+          type === 'board'
+            ? {
+                type: 'board',
+                smartParams: idsForCreate,
+                teamId: currentTeamId as string,
+                boardId: props.boardId as string,
+                creatorId: user?.id as string,
+              }
+            : {
+                type: 'task',
+                smartParams: idsForCreate,
+                teamId: currentTeamId as string,
+                taskId: props.taskId as string,
+                creatorId: user?.id,
+              }
+        )
       );
     }
 
     const idsForUpdate = editedParams.filter((param) => !param.isNew && !!param.name && !!param.value);
     if (idsForUpdate) {
-      updateSmartParams({
-        smartParams: idsForUpdate,
-      });
+      runTransaction(() =>
+        updateSmartParams({
+          smartParams: idsForUpdate,
+        })
+      );
     }
 
     onClose?.();
@@ -143,7 +148,7 @@ export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTask
       return;
     }
 
-    deleteSmartParam({ smartParamId: id }).then(() => {
+    runTransaction(() => deleteSmartParam({ smartParamId: id })).then(() => {
       setEditedParams((prev) => prev.filter((param) => param.id !== id));
     });
   };

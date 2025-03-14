@@ -7,6 +7,7 @@ import { UserAvatars } from '../../components/Avatars';
 import { Tooltip } from '../../components/ui/tooltip';
 import { useAccount } from '../account/AccountContext';
 import { useCallback, useMemo } from 'react';
+import { runTransaction } from '../../core/instantdb-transaction';
 
 interface TaskApproveProps {
   task?: InstaQLEntity<AppSchema, 'tasks'>;
@@ -72,22 +73,24 @@ export function TaskApprove({ task }: TaskApproveProps) {
         console.error('Approval record not found');
         return;
       }
-      db.transact([db.tx.approves[approveId].delete()]);
+      runTransaction(() => deleteApprove(approveId));
     } else {
       const approveId = id();
-      db.transact([
-        db.tx.approves[approveId].update({
-          taskId: task?.id as string,
-          teamId: currentTeamId as string,
-          contributorId: currentContributorId,
-          createdAt: new Date().toISOString(),
-        }),
-        db.tx.approves[approveId].link({
-          teams: currentTeamId,
-          tasks: task?.id,
-          contributors: currentContributorId,
-        }),
-      ]);
+      runTransaction(() =>
+        db.transact([
+          db.tx.approves[approveId].update({
+            taskId: task?.id as string,
+            teamId: currentTeamId as string,
+            contributorId: currentContributorId,
+            createdAt: new Date().toISOString(),
+          }),
+          db.tx.approves[approveId].link({
+            teams: currentTeamId,
+            tasks: task?.id,
+            contributors: currentContributorId,
+          }),
+        ])
+      );
     }
   }, [approvesData, currentContributorId, isApproved, task?.id, currentTeamId]);
 
@@ -118,4 +121,8 @@ export function TaskApprove({ task }: TaskApproveProps) {
       </Button>
     </Tooltip>
   );
+}
+
+function deleteApprove(approveId: string) {
+  return db.transact([db.tx.approves[approveId].delete()]);
 }

@@ -5,6 +5,7 @@ import { HiColorSwatch } from 'react-icons/hi';
 import { EmptyState } from '../../../../components/ui/empty-state';
 import { db } from '../../../../instantdb';
 import { useMemo } from 'react';
+import { runTransaction } from '../../../../core/instantdb-transaction';
 
 export function ToWork() {
   const { user } = db.useAuth();
@@ -39,11 +40,13 @@ export function ToWork() {
             <Button
               size="xs"
               onClick={() => {
-                acceptInvite({
-                  inviteId: invite.id,
-                  membershipId: invite.membershipId,
-                  userId: user?.id as string,
-                });
+                runTransaction(() =>
+                  acceptInvite({
+                    inviteId: invite.id,
+                    membershipId: invite.membershipId,
+                    userId: user?.id as string,
+                  })
+                );
                 window.location.reload();
               }}
             >

@@ -10,6 +10,7 @@ import { TaskPage } from './pages/task';
 import { NotFoundPage } from './pages/404';
 import { Landing } from './pages/landing';
 import { SearchPage } from './pages/search';
+import { GlobalErrorBoundary } from './components/GlobalErrorBoundary';
 
 export default function App() {
   const { user, isLoading } = db.useAuth();
@@ -19,34 +20,32 @@ export default function App() {
 
   if (user) {
     return (
-      <AccountLayout>
-        {!isMainPage && <AccountNavbar />}
-        <Switch>
-          <Route path="/workspace" component={() => <WorkspacePage />} />
-          <Route path="/boards" component={() => <BoardsPage />} />
-          <Route path="/board/:boardId" component={() => <BoardPage />} />
-          <Route path="/task/:taskId" component={() => <TaskPage />} />
-          <Route path="/search" component={() => <SearchPage />} />
-          <Route path="/" component={() => <Landing />} />
-          <Route path="/404" component={() => <NotFoundPage />} />
-          <Route path="/auth" component={() => <Redirect to="/workspace" />} />
-          <Route>
-            <NotFoundPage />
-          </Route>
-        </Switch>
-      </AccountLayout>
+      <GlobalErrorBoundary>
+        <AccountLayout>
+          {!isMainPage && <AccountNavbar />}
+          <Switch>
+            <Route path="/workspace" component={() => <WorkspacePage />} />
+            <Route path="/boards" component={() => <BoardsPage />} />
+            <Route path="/board/:boardId" component={() => <BoardPage />} />
+            <Route path="/task/:taskId" component={() => <TaskPage />} />
+            <Route path="/search" component={() => <SearchPage />} />
+            <Route path="/" component={() => <Landing />} />
+            <Route path="/404" component={() => <NotFoundPage />} />
+            <Route path="/auth" component={() => <Redirect to="/workspace" />} />
+          </Switch>
+        </AccountLayout>
+      </GlobalErrorBoundary>
     );
   }
 
   return (
-    <Switch>
-      <Route path="/" component={() => <Landing />} />
-      <Route path="/404" component={() => <NotFoundPage />} />
-      <Route path="/auth" component={() => <AuthPage />} />
-      <Route path="/workspace" component={() => <Redirect to="/auth" />} />
-      <Route>
-        <NotFoundPage />
-      </Route>
-    </Switch>
+    <GlobalErrorBoundary>
+      <Switch>
+        <Route path="/" component={() => <Landing />} />
+        <Route path="/404" component={() => <NotFoundPage />} />
+        <Route path="/auth" component={() => <AuthPage />} />
+        <Route path="/workspace" component={() => <Redirect to="/auth" />} />
+      </Switch>
+    </GlobalErrorBoundary>
   );
 }

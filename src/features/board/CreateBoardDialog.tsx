@@ -17,6 +17,7 @@ import { db } from '../../instantdb';
 import { id } from '@instantdb/react';
 import { useAccount } from '../account/AccountContext';
 import { useLocation } from 'wouter';
+import { runTransaction } from '../../core/instantdb-transaction';
 
 interface CreateTeamDialogProps {
   opener: React.ReactElement;
@@ -34,12 +35,11 @@ export const CreateBoardDialog: React.FC<CreateTeamDialogProps> = ({ opener }) =
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name) return;
-    // TODO: check current team id ??
-
-    createBoard({ name, teamId: currentTeamId as string, creatorId: user?.id }).then((newBoardId) => {
-      navigate(`/board/${newBoardId}`);
-    });
-
+    runTransaction(() => createBoard({ name, teamId: currentTeamId as string, creatorId: user?.id })).then(
+      (newBoardId) => {
+        navigate(`/board/${newBoardId}`);
+      }
+    );
     setName('');
     setVisibility(false);
     setError(null);
