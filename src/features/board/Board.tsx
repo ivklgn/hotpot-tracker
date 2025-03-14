@@ -21,7 +21,7 @@ import { Column } from './Column';
 import { CreateBoardDialog } from './CreateBoardDialog';
 import { AppSchema } from '../../../instant.schema';
 import { SmartParams } from '../smart-params';
-import { runMutation } from '../core/instantdb-mutation';
+import { runTransaction } from '../../core/instantdb-transaction';
 
 type BoardViewMode = 'view' | 'edit';
 
@@ -73,7 +73,7 @@ export function Board({ board, mode = 'view' }: BoardProps) {
   );
 
   const handleDragTask = (taskId: string, targetColumnId: string) => {
-    runMutation(() => changeTaskColumn({ taskId, columnId: targetColumnId }));
+    runTransaction(() => changeTaskColumn({ taskId, columnId: targetColumnId }));
   };
 
   const handleDragColumn = ({
@@ -87,7 +87,7 @@ export function Board({ board, mode = 'view' }: BoardProps) {
     fromColumnId: string;
     toColumnId: string;
   }) => {
-    runMutation(() =>
+    runTransaction(() =>
       changeColumnPosition({
         from: { columnId: fromColumnId, position: targetIndex },
         to: { columnId: toColumnId, position: replaceToIndex },
@@ -203,7 +203,7 @@ function BoardHeader({ board, mode }: BoardHeaderProps) {
 
   const handleRenameBoard = ({ value: newName }: { value: string }) => {
     if (!newName) return;
-    runMutation(() => renameBoard({ boardId: board?.id as string, newName }));
+    runTransaction(() => renameBoard({ boardId: board?.id as string, newName }));
   };
 
   if (!board) return null;

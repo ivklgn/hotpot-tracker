@@ -15,7 +15,7 @@ import { cloneElement, useRef, useState } from 'react';
 import React from 'react';
 import { db } from '../../instantdb';
 import { id } from '@instantdb/react';
-import { runMutation } from '../core/instantdb-mutation';
+import { runTransaction } from '../../core/instantdb-transaction';
 
 interface CreateTeamDialogProps {
   opener?: React.ReactElement;
@@ -32,7 +32,7 @@ export const CreateTeamDialog: React.FC<CreateTeamDialogProps> = ({ opener, isOp
     e.preventDefault();
     if (!teamName) return;
 
-    runMutation(() =>
+    runTransaction(() =>
       createTeamWithMember({
         teamName,
         userEmail: user?.email as string,

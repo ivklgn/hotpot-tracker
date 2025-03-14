@@ -5,7 +5,7 @@ import { useAccount } from '../../../../features/account/AccountContext';
 import { db } from '../../../../instantdb';
 import { useState } from 'react';
 import { useLocation } from 'wouter';
-import { runMutation } from '../../../../features/core/instantdb-mutation';
+import { runTransaction } from '../../../../core/instantdb-transaction';
 
 export function Settings() {
   const { currentTeamId, setCurrentTeamId } = useAccount();
@@ -15,11 +15,11 @@ export function Settings() {
 
   const handleRenameTeam = ({ value: newName }: { value: string }) => {
     if (!newName) return;
-    runMutation(() => renameTeam({ teamId: currentTeam?.teams?.[0]?.id as string, newName }));
+    runTransaction(() => renameTeam({ teamId: currentTeam?.teams?.[0]?.id as string, newName }));
   };
 
   const handleDeleteTeamClick = () => {
-    runMutation(() =>
+    runTransaction(() =>
       deleteTeam({ teamId: currentTeam?.teams?.[0]?.id as string }).then(() => {
         setCurrentTeamId(undefined);
         navigate('/workspace', { replace: true });

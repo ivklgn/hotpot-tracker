@@ -17,8 +17,7 @@ import { db } from '../../instantdb';
 import { id } from '@instantdb/react';
 import { useAccount } from '../account/AccountContext';
 import { useLocation } from 'wouter';
-import { toaster } from '../../components/ui/toaster';
-import { runMutation } from '../core/instantdb-mutation';
+import { runTransaction } from '../../core/instantdb-transaction';
 
 interface CreateTeamDialogProps {
   opener: React.ReactElement;
@@ -36,7 +35,7 @@ export const CreateBoardDialog: React.FC<CreateTeamDialogProps> = ({ opener }) =
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name) return;
-    runMutation(() => createBoard({ name, teamId: currentTeamId as string, creatorId: user?.id })).then(
+    runTransaction(() => createBoard({ name, teamId: currentTeamId as string, creatorId: user?.id })).then(
       (newBoardId) => {
         navigate(`/board/${newBoardId}`);
       }

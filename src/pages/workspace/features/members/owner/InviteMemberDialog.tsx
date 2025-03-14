@@ -16,7 +16,7 @@ import React from 'react';
 import { db } from '../../../../../instantdb';
 import { useAccount } from '../../../../../features/account/AccountContext';
 import { id } from '@instantdb/react';
-import { runMutation } from '../../../../../features/core/instantdb-mutation';
+import { runTransaction } from '../../../../../core/instantdb-transaction';
 
 interface CreateTeamDialogProps {
   opener: React.ReactElement;
@@ -49,7 +49,7 @@ export const InviteMemberDialog: React.FC<CreateTeamDialogProps> = ({ opener }) 
       return;
     }
 
-    runMutation(() =>
+    runTransaction(() =>
       inviteMember({
         teamId: currentTeamId as string,
         userEmail: email,

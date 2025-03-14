@@ -23,7 +23,7 @@ import { useDrag, useDrop } from 'react-dnd';
 import { AppSchema } from '../../../instant.schema';
 import { SmartParams } from '../smart-params';
 import { ToggleTip } from '../../components/ui/toggle-tip';
-import { runMutation } from '../core/instantdb-mutation';
+import { runTransaction } from '../../core/instantdb-transaction';
 
 type ColumnType = InstaQLResult<
   AppSchema,
@@ -241,7 +241,7 @@ function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
             }))}
             placeholder="Select or create status"
             onChange={(value) => {
-              runMutation(() =>
+              runTransaction(() =>
                 updateColumnStatus({
                   statusId: value?.value as string,
                   teamId: currentTeamId as string,
@@ -258,7 +258,7 @@ function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
                 : undefined
             }
             onCreateOption={(value) => {
-              runMutation(() =>
+              runTransaction(() =>
                 createStatusAndUpdateColumn({
                   name: value,
                   teamId: currentTeamId as string,
@@ -274,7 +274,7 @@ function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
             isMulti
             onChange={(changedContributors) => {
               if (changedContributors.length === 0) {
-                runMutation(() =>
+                runTransaction(() =>
                   deleteContributors({
                     contributorsIds: column?.contributors?.map((c) => c.id) as string[],
                   })
@@ -283,7 +283,7 @@ function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
               }
 
               if (changedContributors.length < (column?.contributors || []).length) {
-                runMutation(() =>
+                runTransaction(() =>
                   deleteContributors({
                     contributorsIds: column?.contributors
                       ?.filter((c) => !changedContributors.find((v) => v.value === c.memberships?.userId))
@@ -293,7 +293,7 @@ function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
                 return;
               }
 
-              runMutation(() =>
+              runTransaction(() =>
                 updateContributors({
                   userMemberships: changedContributors.map((v) => ({
                     userId: v.value as string,
@@ -323,7 +323,7 @@ function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
         <Field label="Approve rules">
           <Select
             onChange={(value) => {
-              runMutation(() =>
+              runTransaction(() =>
                 updateColumnApproveRule({
                   approveRule: value?.value as 'one-of-contributors' | 'all-contributors',
                   columnId: column?.id as string,
@@ -355,7 +355,7 @@ function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
             }
             text="Are you sure to delete column?"
             onOk={() => {
-              runMutation(() =>
+              runTransaction(() =>
                 deleteColumn({
                   columnId: column?.id as string,
                   contributorsIds: column?.contributors?.map((c) => c.id),
@@ -467,7 +467,7 @@ export function Column({ column, defaultEditable = false, onDrag, onDragTask }: 
         column={column}
         isEdit={isEdit}
         onCreateTask={() => {
-          runMutation(() =>
+          runTransaction(() =>
             createNewTask({
               columnId: column?.id as string,
               teamId: currentTeamId as string,

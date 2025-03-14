@@ -7,7 +7,7 @@ import { UserAvatars } from '../../components/Avatars';
 import { Tooltip } from '../../components/ui/tooltip';
 import { useAccount } from '../account/AccountContext';
 import { useCallback, useMemo } from 'react';
-import { runMutation } from '../core/instantdb-mutation';
+import { runTransaction } from '../../core/instantdb-transaction';
 
 interface TaskApproveProps {
   task?: InstaQLEntity<AppSchema, 'tasks'>;
@@ -73,10 +73,10 @@ export function TaskApprove({ task }: TaskApproveProps) {
         console.error('Approval record not found');
         return;
       }
-      runMutation(() => deleteApprove(approveId));
+      runTransaction(() => deleteApprove(approveId));
     } else {
       const approveId = id();
-      runMutation(() =>
+      runTransaction(() =>
         db.transact([
           db.tx.approves[approveId].update({
             taskId: task?.id as string,

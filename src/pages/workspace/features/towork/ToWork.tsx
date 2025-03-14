@@ -5,7 +5,7 @@ import { HiColorSwatch } from 'react-icons/hi';
 import { EmptyState } from '../../../../components/ui/empty-state';
 import { db } from '../../../../instantdb';
 import { useMemo } from 'react';
-import { runMutation } from '../../../../features/core/instantdb-mutation';
+import { runTransaction } from '../../../../core/instantdb-transaction';
 
 export function ToWork() {
   const { user } = db.useAuth();
@@ -40,7 +40,7 @@ export function ToWork() {
             <Button
               size="xs"
               onClick={() => {
-                runMutation(() =>
+                runTransaction(() =>
                   acceptInvite({
                     inviteId: invite.id,
                     membershipId: invite.membershipId,

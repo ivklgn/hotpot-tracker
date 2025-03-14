@@ -10,7 +10,7 @@ import { TaskPage } from './pages/task';
 import { NotFoundPage } from './pages/404';
 import { Landing } from './pages/landing';
 import { SearchPage } from './pages/search';
-import { ErrorBoundary } from 'react-error-boundary';
+import { GlobalErrorBoundary } from './components/GlobalErrorBoundary';
 
 export default function App() {
   const { user, isLoading } = db.useAuth();
@@ -20,7 +20,7 @@ export default function App() {
 
   if (user) {
     return (
-      <ErrorBoundary fallback={<div>Something went wrong</div>} onError={(e) => console.error('boundary', e)}>
+      <GlobalErrorBoundary>
         <AccountLayout>
           {!isMainPage && <AccountNavbar />}
           <Switch>
@@ -32,24 +32,20 @@ export default function App() {
             <Route path="/" component={() => <Landing />} />
             <Route path="/404" component={() => <NotFoundPage />} />
             <Route path="/auth" component={() => <Redirect to="/workspace" />} />
-            <Route>
-              <NotFoundPage />
-            </Route>
           </Switch>
         </AccountLayout>
-      </ErrorBoundary>
+      </GlobalErrorBoundary>
     );
   }
 
   return (
-    <Switch>
-      <Route path="/" component={() => <Landing />} />
-      <Route path="/404" component={() => <NotFoundPage />} />
-      <Route path="/auth" component={() => <AuthPage />} />
-      <Route path="/workspace" component={() => <Redirect to="/auth" />} />
-      <Route>
-        <NotFoundPage />
-      </Route>
-    </Switch>
+    <GlobalErrorBoundary>
+      <Switch>
+        <Route path="/" component={() => <Landing />} />
+        <Route path="/404" component={() => <NotFoundPage />} />
+        <Route path="/auth" component={() => <AuthPage />} />
+        <Route path="/workspace" component={() => <Redirect to="/auth" />} />
+      </Switch>
+    </GlobalErrorBoundary>
   );
 }

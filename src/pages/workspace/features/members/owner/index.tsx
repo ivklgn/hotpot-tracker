@@ -4,7 +4,7 @@ import { ConfirmAction } from '../../../../../components/ConfirmAction';
 import { db } from '../../../../../instantdb';
 import { useAccount } from '../../../../../features/account/AccountContext';
 import { useMemo } from 'react';
-import { runMutation } from '../../../../../features/core/instantdb-mutation';
+import { runTransaction } from '../../../../../core/instantdb-transaction';
 
 export function OwnerMembers() {
   const { currentTeamId } = useAccount();
@@ -72,7 +72,7 @@ export function OwnerMembers() {
                     }
                     text="Are you sure you want to delete this user?"
                     onOk={() => {
-                      runMutation(() =>
+                      runTransaction(() =>
                         deleteMembership({
                           membershipId: member.membershipId,
                           inviteId: member?.invite?.inviteId as string,

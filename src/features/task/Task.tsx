@@ -11,7 +11,7 @@ import { Editor } from '@/components/Editor/Editor';
 import { JSONContent } from '@tiptap/react';
 import { ConfirmAction } from '../../components/ConfirmAction';
 import { TaskApprove } from './TaskApprove';
-import { runMutation } from '../core/instantdb-mutation';
+import { runTransaction } from '../../core/instantdb-transaction';
 
 interface TaskProps {
   task?: InstaQLEntity<AppSchema, 'tasks', { smartParams: {}; columns: {} }>;
@@ -23,12 +23,12 @@ export function Task({ task }: TaskProps) {
 
   const handleRenameBoard = ({ value: newTitle }: { value: string }) => {
     if (!newTitle || !task) return;
-    runMutation(() => renameTask({ taskId: task.id, newTitle }));
+    runTransaction(() => renameTask({ taskId: task.id, newTitle }));
   };
 
   const handleUpdateContent = (newContent: JSONContent) => {
     if (!newContent || !task) return;
-    runMutation(() => updateTaskContent({ taskId: task.id, newContent: JSON.stringify(newContent) }));
+    runTransaction(() => updateTaskContent({ taskId: task.id, newContent: JSON.stringify(newContent) }));
   };
 
   if (!task) {
@@ -94,7 +94,7 @@ export function Task({ task }: TaskProps) {
             }
             text="Are you sure you want to delete task? All content will be removed."
             onOk={() => {
-              runMutation(() => deleteTask({ taskId: task.id })).then(() => {
+              runTransaction(() => deleteTask({ taskId: task.id })).then(() => {
                 navigate('/boards');
               });
             }}
