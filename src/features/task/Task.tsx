@@ -1,14 +1,4 @@
-import {
-  Badge,
-  Box,
-  Button,
-  ButtonGroup,
-  Editable,
-  EmptyState,
-  Flex,
-  IconButton,
-  VStack,
-} from '@chakra-ui/react';
+import { Box, Button, ButtonGroup, Editable, EmptyState, Flex, IconButton, VStack } from '@chakra-ui/react';
 import { useState } from 'react';
 import { LuPencilLine, LuX, LuCheck } from 'react-icons/lu';
 import { db } from '../../instantdb';
