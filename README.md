@@ -1,7 +1,9 @@
 # Hotpot Tracker
 
-Provide InstantDB token in `.env` file.
+.env
 
 ```sh
-VITE_INSTANT_APP_ID=<TOKEN>
+VITE_INSTANT_APP_ID=
+INSTANT_CLI_AUTH_TOKEN=
+VITE_SENTRY_DSN=
 ```
