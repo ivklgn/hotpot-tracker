@@ -85,7 +85,6 @@ export function Task({ task }: TaskProps) {
         </Editable.Root>
         <ButtonGroup size="xs">
           <TaskApprove task={task} />
-
           <ConfirmAction
             opener={
               <Button variant="outline" colorPalette="red">
