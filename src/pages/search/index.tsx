@@ -17,8 +17,10 @@ import { useState } from 'react';
 import { db } from '../../instantdb';
 import { useDebounce } from '../../hooks/useDebounce';
 import { SmartParams } from '../../features/smart-params';
+import { useAccount } from '../../features/account/AccountContext';
 
 export function SearchPage() {
+  const { currentTeamId } = useAccount();
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 1000);
   const { data: tasks } = db.useQuery(
@@ -31,6 +33,7 @@ export function SearchPage() {
             },
             $: {
               where: {
+                teamId: currentTeamId as string,
                 title: { $like: `%${debouncedSearch}%` },
                 deletedAt: {
                   $isNull: true,

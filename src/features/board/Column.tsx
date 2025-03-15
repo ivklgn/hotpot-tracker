@@ -24,6 +24,7 @@ import { AppSchema } from '../../../instant.schema';
 import { SmartParams } from '../smart-params';
 import { ToggleTip } from '../../components/ui/toggle-tip';
 import { runTransaction } from '../../core/instantdb-transaction';
+import { CreateTaskDialogToColumn } from './CreateTaskDialog';
 
 type ColumnType = InstaQLResult<
   AppSchema,
@@ -390,9 +391,8 @@ interface ColumnProps {
 
 export function Column({ column, defaultEditable = false, onDrag, onDragTask }: ColumnProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const { currentTeamId } = useAccount();
   const [isEdit, setEditMode] = useState(defaultEditable);
-  const { user } = db.useAuth();
+  const [isVisibleCreateTaskDialog, setCreateTaskDialogVisibility] = useState(defaultEditable);
 
   const [, columnDrop] = useDrop({
     accept: 'column',
@@ -467,13 +467,7 @@ export function Column({ column, defaultEditable = false, onDrag, onDragTask }: 
         column={column}
         isEdit={isEdit}
         onCreateTask={() => {
-          runTransaction(() =>
-            createNewTask({
-              columnId: column?.id as string,
-              teamId: currentTeamId as string,
-              creatorId: user?.id,
-            })
-          );
+          setCreateTaskDialogVisibility(true);
         }}
         onEditClick={() => setEditMode(true)}
         onCloseEdit={() => setEditMode(false)}
@@ -484,6 +478,12 @@ export function Column({ column, defaultEditable = false, onDrag, onDragTask }: 
       ) : (
         <ColumnTasks column={column} onDragTask={onDragTask} />
       )}
+
+      <CreateTaskDialogToColumn
+        isOpen={isVisibleCreateTaskDialog}
+        onClose={() => setCreateTaskDialogVisibility(false)}
+        columnId={column?.id as string}
+      />
     </Box>
   );
 }
@@ -563,29 +563,5 @@ async function deleteColumn({ columnId, contributorsIds }: { columnId: string; c
   return await db.transact([
     db.tx.columns[columnId].delete(),
     ...(contributorsIds || []).map((ci) => db.tx.contributors[ci].delete()),
-  ]);
-}
-
-async function createNewTask({
-  columnId,
-  teamId,
-  creatorId,
-}: {
-  columnId: string;
-  teamId: string;
-  creatorId?: string;
-}) {
-  const newTaskId = id();
-
-  return await db.transact([
-    db.tx.tasks[newTaskId].update({
-      title: 'Untitled task',
-      teamId,
-      columnId,
-      createdAt: new Date().toJSON(),
-      creatorId,
-    }),
-    db.tx.tasks[newTaskId].link({ columns: columnId }),
-    db.tx.tasks[newTaskId].link({ teams: teamId }),
   ]);
 }
