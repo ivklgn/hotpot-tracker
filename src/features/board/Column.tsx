@@ -24,7 +24,7 @@ import { AppSchema } from '../../../instant.schema';
 import { SmartParams } from '../smart-params';
 import { ToggleTip } from '../../components/ui/toggle-tip';
 import { runTransaction } from '../../core/instantdb-transaction';
-import { CreateTaskDialogToColumn } from './CreateTaskDialog';
+import { CreateTaskToColumnDialog } from './CreateTaskToColumnDialog';
 
 type ColumnType = InstaQLResult<
   AppSchema,
@@ -479,7 +479,7 @@ export function Column({ column, defaultEditable = false, onDrag, onDragTask }: 
         <ColumnTasks column={column} onDragTask={onDragTask} />
       )}
 
-      <CreateTaskDialogToColumn
+      <CreateTaskToColumnDialog
         isOpen={isVisibleCreateTaskDialog}
         onClose={() => setCreateTaskDialogVisibility(false)}
         columnId={column?.id as string}

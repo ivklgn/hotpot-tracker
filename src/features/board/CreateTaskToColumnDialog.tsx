@@ -21,14 +21,14 @@ import { useAccount } from '../account/AccountContext';
 import { Select } from 'chakra-react-select';
 import { useDebounce } from '../../hooks/useDebounce';
 
-interface CreateTaskDialogToColumnProps {
+interface CreateTaskToColumnDialogProps {
   columnId: string;
   opener?: React.ReactElement;
   isOpen?: boolean;
   onClose?: () => void;
 }
 
-export const CreateTaskDialogToColumn: React.FC<CreateTaskDialogToColumnProps> = ({
+export const CreateTaskToColumnDialog: React.FC<CreateTaskToColumnDialogProps> = ({
   columnId,
   opener,
   isOpen,
@@ -183,6 +183,10 @@ function SearchTaskSelect({ onSelect }: SearchTaskSelectProps) {
     debouncedSearch && debouncedSearch.length >= 2
       ? {
           tasks: {
+            columns: {
+              contributors: {},
+            },
+            approves: {},
             $: {
               where: {
                 teamId: currentTeamId as string,
@@ -196,6 +200,20 @@ function SearchTaskSelect({ onSelect }: SearchTaskSelectProps) {
       : null
   );
 
+  const options = tasks?.tasks
+    ?.filter((task) => {
+      return (
+        !task.columns?.approveRule ||
+        (task.columns?.approveRule === 'one-of-contributors' && task.approves?.length > 0) ||
+        (task.columns?.approveRule === 'all-contributors' &&
+          task.approves?.length === task.columns?.contributors?.length)
+      );
+    })
+    ?.map((task) => ({
+      value: task.id,
+      label: task.title,
+    }));
+
   return (
     <Select
       placeholder="Find task"
@@ -205,16 +223,21 @@ function SearchTaskSelect({ onSelect }: SearchTaskSelectProps) {
       onInputChange={(value) => {
         setSearch(value);
       }}
-      options={tasks?.tasks?.map((task) => ({
-        value: task.id,
-        label: task.title,
-      }))}
+      options={options}
       isLoading={search !== debouncedSearch}
     />
   );
 }
 
 async function updateTaskColumn({ taskId, columnId }: { taskId: string; columnId: string }) {
+  // TODO: not work offline mode with queryOnce
+  db.queryOnce({ approves: { $: { where: { taskId }, limit: 1 } } }).then((res) => {
+    if (res.data.approves.length > 0) {
+      const approveId = res.data.approves?.[0].id;
+      db.transact([db.tx.approves[approveId].delete()]);
+    }
+  });
+
   return await db.transact([
     db.tx.tasks[taskId].update({
       columnId,
