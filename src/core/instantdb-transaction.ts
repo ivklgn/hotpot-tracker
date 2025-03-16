@@ -15,6 +15,6 @@ export function runTransaction<T>(transaction: () => Promise<T>) {
       type: 'error',
     });
 
-    instantTransactionError('BackendInteractionError', e.message, { originalError: e }).emit();
+    throw instantTransactionError('BackendInteractionError', e.message, { originalError: e });
   });
 }
