@@ -120,6 +120,7 @@ export const CreateTaskToColumnDialog: React.FC<CreateTaskToColumnDialogProps> =
             )}
             {tab === 'existing' && (
               <SearchTaskSelect
+                columnId={columnId}
                 onSelect={(taskId) => {
                   setExistingTaskId(taskId);
                 }}
@@ -172,10 +173,11 @@ async function createNewTask({
 }
 
 interface SearchTaskSelectProps {
+  columnId: string;
   onSelect?: (taskId: string) => void;
 }
 
-function SearchTaskSelect({ onSelect }: SearchTaskSelectProps) {
+function SearchTaskSelect({ columnId, onSelect }: SearchTaskSelectProps) {
   const { currentTeamId } = useAccount();
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 1000);
@@ -191,6 +193,7 @@ function SearchTaskSelect({ onSelect }: SearchTaskSelectProps) {
               where: {
                 teamId: currentTeamId as string,
                 title: { $like: `%${debouncedSearch}%` },
+                'columns.id': { $not: columnId },
               },
               // TODO: add limit?
               // limit: 10,
