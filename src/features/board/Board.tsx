@@ -12,7 +12,7 @@ import {
 import { Link, useLocation } from 'wouter';
 import { db } from '../../instantdb';
 import { HiColorSwatch } from 'react-icons/hi';
-import { id, InstaQLEntity } from '@instantdb/react';
+import { id, InstaQLEntity, InstaQLResult } from '@instantdb/react';
 import { useAccount } from '../account/AccountContext';
 import { ConfirmAction } from '../../components/ConfirmAction';
 import { LuPencilLine, LuX, LuCheck } from 'react-icons/lu';
@@ -72,8 +72,16 @@ export function Board({ board, mode = 'view' }: BoardProps) {
       : null
   );
 
-  const handleDragTask = (taskId: string, targetColumnId: string) => {
+  const handleDragTask = (taskId: string, targetColumnId: string, currentColumnId?: string) => {
     runTransaction(() => changeTaskColumn({ taskId, columnId: targetColumnId }));
+    const taskApprovesFromCurrentColumn = columns?.columns
+      .find((c) => c.id === currentColumnId)
+      ?.tasks.find((t) => t.id === taskId)
+      ?.approves.map((a) => a.id);
+
+    if (taskApprovesFromCurrentColumn?.length) {
+      runTransaction(() => removeApproves({ approvesIds: taskApprovesFromCurrentColumn }));
+    }
   };
 
   const handleDragColumn = ({
@@ -119,7 +127,7 @@ export function Board({ board, mode = 'view' }: BoardProps) {
   if (columns?.columns?.length === 0) {
     return (
       <Box my="2" minHeight="320px" mt="4" key={board.id}>
-        <BoardHeader board={board} mode={mode} />
+        <BoardHeader board={board} mode={mode} columns={columns.columns} />
         <Box flex="1" pt={8} mx={6}>
           <EmptyState.Root>
             <EmptyState.Content>
@@ -134,7 +142,15 @@ export function Board({ board, mode = 'view' }: BoardProps) {
                 <Button
                   size="xs"
                   onClick={() => {
-                    createColumn({ boardId: board.id, teamId: currentTeamId as string });
+                    runTransaction(() =>
+                      createColumn({
+                        boardId: board.id,
+                        teamId: currentTeamId as string,
+                        position:
+                          (columns?.columns?.reduce((max, c) => (c.position > max ? c.position : max), 0) ||
+                            0) + 1,
+                      })
+                    );
                   }}
                 >
                   Create column
@@ -149,7 +165,7 @@ export function Board({ board, mode = 'view' }: BoardProps) {
 
   return (
     <Box my="2" minHeight="320px" mt="4" key={board.id}>
-      <BoardHeader board={board} mode={mode} />
+      <BoardHeader board={board} mode={mode} columns={columns?.columns} />
       <Flex direction="row" scrollBehavior="smooth" overflowX="scroll" whiteSpace="none" w="100%">
         {columns?.columns.map((column) => (
           <Column column={column} onDrag={handleDragColumn} onDragTask={handleDragTask} key={column.id} />
@@ -163,21 +179,19 @@ async function createColumn({
   boardId,
   teamId,
   creatorId,
+  position,
 }: {
   boardId: string;
   teamId: string;
+  position: number;
   creatorId?: string;
 }) {
   const columnId = id();
-  // TODO: not work offline mode with queryOnce
-  const { data: columns } = await db.queryOnce({ columns: { $: { where: { boardId } } } });
-  const position = (columns?.columns || []).reduce((max, c) => (c.position > max ? c.position : max), 0);
-
   return await db.transact([
     db.tx.columns[columnId].update({
       boardId,
       teamId,
-      position: position + 1,
+      position,
       createdAt: new Date().toJSON(),
       creatorId,
     }),
@@ -186,16 +200,13 @@ async function createColumn({
   ]);
 }
 
-async function deleteBoard({ boardId }: { boardId: string }) {
-  return await db.transact([db.tx.boards[boardId].update({ deletedAt: new Date().toJSON() })]);
-}
-
 interface BoardHeaderProps {
   board?: InstaQLEntity<AppSchema, 'boards', { smartParams: {} }>;
+  columns?: InstaQLResult<AppSchema, { columns: {} }>['columns'];
   mode: BoardViewMode;
 }
 
-function BoardHeader({ board, mode }: BoardHeaderProps) {
+function BoardHeader({ board, mode, columns }: BoardHeaderProps) {
   const [, navigate] = useLocation();
   const { currentTeamId } = useAccount();
   const [name, setName] = useState<string>(board?.name || '');
@@ -249,7 +260,14 @@ function BoardHeader({ board, mode }: BoardHeaderProps) {
           <Button
             variant="outline"
             onClick={() => {
-              createColumn({ boardId: board.id, teamId: currentTeamId as string, creatorId: user?.id });
+              runTransaction(() =>
+                createColumn({
+                  boardId: board.id,
+                  teamId: currentTeamId as string,
+                  creatorId: user?.id,
+                  position: (columns?.reduce((max, c) => (c.position > max ? c.position : max), 0) || 0) + 1,
+                })
+              );
             }}
           >
             Add column
@@ -276,18 +294,19 @@ function BoardHeader({ board, mode }: BoardHeaderProps) {
   );
 }
 
+async function removeApproves({ approvesIds }: { approvesIds: string[] }) {
+  return await db.transact(approvesIds.map((ai) => db.tx.approves[ai].delete()));
+}
+
+async function deleteBoard({ boardId }: { boardId: string }) {
+  return await db.transact([db.tx.boards[boardId].update({ deletedAt: new Date().toJSON() })]);
+}
+
 async function renameBoard({ newName, boardId }: { boardId: string; newName: string }) {
   return await db.transact([db.tx.boards[boardId].merge({ name: newName })]);
 }
 
 async function changeTaskColumn({ taskId, columnId }: { taskId: string; columnId: string }) {
-  // TODO: not work offline mode with queryOnce
-  db.queryOnce({ approves: { $: { where: { taskId }, limit: 1 } } }).then((res) => {
-    if (res.data.approves.length > 0) {
-      const approveId = res.data.approves?.[0].id;
-      db.transact([db.tx.approves[approveId].delete()]);
-    }
-  });
   return await db.transact([
     db.tx.tasks[taskId].merge({ columnId }),
     db.tx.tasks[taskId].link({ columns: columnId }),

@@ -103,7 +103,7 @@ function ColumnHeader({ column, isEdit, onCreateTask, onEditClick, onCloseEdit }
 
 interface ColumnTasksProps {
   column?: ColumnType;
-  onDragTask?: (taskId: string, targetColumnId: string) => void;
+  onDragTask?: (taskId: string, targetColumnId: string, currentColumnId?: string) => void;
 }
 
 function ColumnTasks({ column, onDragTask }: ColumnTasksProps) {
@@ -111,7 +111,7 @@ function ColumnTasks({ column, onDragTask }: ColumnTasksProps) {
     accept: 'task',
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     drop: (task: any) => {
-      return onDragTask?.(task.id, column?.id as string);
+      return onDragTask?.(task.id, column?.id as string, task?.columnId);
     },
   });
 
@@ -142,7 +142,7 @@ interface ColumnTaskProps {
 function ColumnTask({ task, columnApproveRule, columnContributors }: ColumnTaskProps) {
   const [, /*{ isDragging }*/ drag] = useDrag({
     type: 'task',
-    item: { id: task.id },
+    item: { id: task.id, columnId: task.columnId },
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
@@ -386,7 +386,7 @@ interface ColumnProps {
     fromColumnId: string;
     toColumnId: string;
   }) => void;
-  onDragTask?: (taskId: string, targetColumnId: string) => void;
+  onDragTask?: (taskId: string, targetColumnId: string, currentColumnId?: string) => void;
 }
 
 export function Column({ column, defaultEditable = false, onDrag, onDragTask }: ColumnProps) {
