@@ -39,6 +39,7 @@ export const CreateTaskToColumnDialog: React.FC<CreateTaskToColumnDialogProps> =
   const [title, setTitle] = useState('');
   const [existingTaskId, setExistingTaskId] = useState<string>();
   const [tab, setTab] = useState<'new' | 'existing'>('new');
+  const [taskApproveIds, setTaskApproveIds] = useState<string[]>([]);
   const { currentTeamId } = useAccount();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -61,6 +62,7 @@ export const CreateTaskToColumnDialog: React.FC<CreateTaskToColumnDialogProps> =
         updateTaskColumn({
           taskId: existingTaskId,
           columnId,
+          approvesIds: taskApproveIds,
         })
       ).then(() => {
         setExistingTaskId(undefined);
@@ -121,8 +123,11 @@ export const CreateTaskToColumnDialog: React.FC<CreateTaskToColumnDialogProps> =
             {tab === 'existing' && (
               <SearchTaskSelect
                 columnId={columnId}
-                onSelect={(taskId) => {
+                onSelect={(taskId, taskApproveIds) => {
                   setExistingTaskId(taskId);
+                  if (taskApproveIds) {
+                    setTaskApproveIds(taskApproveIds);
+                  }
                 }}
               />
             )}
@@ -174,7 +179,7 @@ async function createNewTask({
 
 interface SearchTaskSelectProps {
   columnId: string;
-  onSelect?: (taskId: string) => void;
+  onSelect?: (taskId: string, taskApproveIds?: string[]) => void;
 }
 
 function SearchTaskSelect({ columnId, onSelect }: SearchTaskSelectProps) {
@@ -215,13 +220,19 @@ function SearchTaskSelect({ columnId, onSelect }: SearchTaskSelectProps) {
     ?.map((task) => ({
       value: task.id,
       label: task.title,
+      meta: 1,
     }));
 
   return (
     <Select
       placeholder="Find task"
       onChange={(selectedValue) => {
-        onSelect?.(selectedValue?.value as string);
+        onSelect?.(
+          selectedValue?.value as string,
+          tasks?.tasks
+            ?.find((task) => task.id === selectedValue?.value)
+            ?.approves?.map((approve) => approve.id)
+        );
       }}
       onInputChange={(value) => {
         setSearch(value);
@@ -232,20 +243,21 @@ function SearchTaskSelect({ columnId, onSelect }: SearchTaskSelectProps) {
   );
 }
 
-async function updateTaskColumn({ taskId, columnId }: { taskId: string; columnId: string }) {
-  // TODO: not work offline mode with queryOnce
-  db.queryOnce({ approves: { $: { where: { taskId }, limit: 1 } } }).then((res) => {
-    if (res.data.approves.length > 0) {
-      const approveId = res.data.approves?.[0].id;
-      db.transact([db.tx.approves[approveId].delete()]);
-    }
-  });
-
+async function updateTaskColumn({
+  taskId,
+  columnId,
+  approvesIds,
+}: {
+  taskId: string;
+  columnId: string;
+  approvesIds: string[];
+}) {
   return await db.transact([
     db.tx.tasks[taskId].update({
       columnId,
       createdAt: new Date().toJSON(),
     }),
     db.tx.tasks[taskId].link({ columns: columnId }),
+    ...(approvesIds || []).map((ai) => db.tx.approves[ai].delete()),
   ]);
 }
