@@ -81,8 +81,44 @@ const _schema = i.schema({
       deletedAt: i.date().indexed(),
       creatorId: i.string(),
     }),
+    events: i.entity({
+      type: i.string(),
+      payload: i.json(),
+      teamId: i.string(),
+      membershipId: i.string(),
+      createdAt: i.date().indexed(),
+    }),
   },
   links: {
+    // events
+
+    eventsTeams: {
+      forward: {
+        on: 'events',
+        has: 'one',
+        label: 'teams',
+        onDelete: 'cascade',
+      },
+      reverse: {
+        on: 'teams',
+        has: 'many',
+        label: 'events',
+      },
+    },
+    eventsMemberships: {
+      forward: {
+        on: 'events',
+        has: 'one',
+        label: 'memberships',
+        ondelete: 'cascade',
+      },
+      reverse: {
+        on: 'memberships',
+        has: 'many',
+        label: 'events',
+      },
+    },
+
     // approves
 
     approvesTeams: {
