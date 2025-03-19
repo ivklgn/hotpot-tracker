@@ -236,7 +236,7 @@ const _schema = i.schema({
         on: 'contributors',
         has: 'one',
         label: 'memberships',
-        ondelete: 'cascade',
+        onDelete: 'cascade',
       },
       reverse: {
         on: 'memberships',
