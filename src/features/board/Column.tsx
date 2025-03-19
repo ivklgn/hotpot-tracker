@@ -14,7 +14,7 @@ import { CreatableSelect, Select } from 'chakra-react-select';
 import { useMemo, useRef, useState } from 'react';
 import { LuX, LuPencil, LuPlus, LuShieldCheck, LuShieldQuestion } from 'react-icons/lu';
 import { db } from '../../instantdb';
-import { id, InstaQLResult } from '@instantdb/react';
+import { id, InstaQLEntity, InstaQLResult } from '@instantdb/react';
 import { useAccount } from '../account/AccountContext';
 import { ConfirmAction } from '../../components/ConfirmAction';
 import { UserAvatars } from '../../components/Avatars';
@@ -103,15 +103,20 @@ function ColumnHeader({ column, isEdit, onCreateTask, onEditClick, onCloseEdit }
 
 interface ColumnTasksProps {
   column?: ColumnType;
-  onDragTask?: (taskId: string, targetColumn: ColumnType, currentColumnId?: string) => void;
+  onDragTask?: (
+    task: InstaQLEntity<AppSchema, 'tasks'>,
+    targetColumn: ColumnType,
+    currentColumnId?: string
+  ) => void;
 }
 
 function ColumnTasks({ column, onDragTask }: ColumnTasksProps) {
   const [, taskDrop] = useDrop({
     accept: 'task',
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    drop: (task: any) => {
-      return onDragTask?.(task.id, column as ColumnType, task?.columnId);
+    drop: ({ task, columnId }: any) => {
+      if (column?.id === columnId) return;
+      return onDragTask?.(task, column as ColumnType, columnId);
     },
   });
 
@@ -142,7 +147,7 @@ interface ColumnTaskProps {
 function ColumnTask({ task, columnApproveRule, columnContributors }: ColumnTaskProps) {
   const [, /*{ isDragging }*/ drag] = useDrag({
     type: 'task',
-    item: { id: task.id, columnId: task.columnId },
+    item: { task, columnId: task.columnId },
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
     }),
@@ -386,7 +391,11 @@ interface ColumnProps {
     fromColumnId: string;
     toColumnId: string;
   }) => void;
-  onDragTask?: (taskId: string, targetColumn: ColumnType, currentColumnId?: string) => void;
+  onDragTask?: (
+    task: InstaQLEntity<AppSchema, 'tasks'>,
+    targetColumn: ColumnType,
+    currentColumnId?: string
+  ) => void;
 }
 
 export function Column({ column, defaultEditable = false, onDrag, onDragTask }: ColumnProps) {

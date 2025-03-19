@@ -4,88 +4,114 @@ import { CreateTeamDialog } from '../../../../features/team/CreateTeamDialog';
 import { HiColorSwatch } from 'react-icons/hi';
 import { EmptyState } from '../../../../components/ui/empty-state';
 import { db } from '../../../../instantdb';
-import { useMemo } from 'react';
+import { useMemo, ReactNode } from 'react';
 import { runTransaction } from '../../../../core/instantdb-transaction';
 import { useAccount } from '../../../../features/account/AccountContext';
 import { deleteEvent } from '../../../../features/events';
 import { Link } from 'wouter';
 
+interface ToWorkItem {
+  message: ReactNode;
+  action: ReactNode;
+}
+
+interface Event {
+  id: string;
+  type: string;
+  payload?: {
+    taskId?: string;
+    taskTitle?: string;
+    [key: string]: string | undefined;
+  };
+}
+
+interface Invite {
+  id: string;
+  teamName: string;
+  membershipId: string;
+}
+
 export function ToWork() {
   const { user } = db.useAuth();
   const { data: teams } = db.useQuery({ teams: {} });
   const { currentTeamId } = useAccount();
+
   const { data: membership } = db.useQuery(
-    currentTeamId
+    currentTeamId && user?.id
       ? {
           memberships: {
             $: {
               where: {
-                userId: user?.id as string,
+                userId: user.id,
               },
             },
           },
         }
       : null
   );
+
   const { data: events } = db.useQuery(
     currentTeamId && membership?.memberships?.length
       ? {
           events: {
             $: {
               where: {
-                teamId: currentTeamId as string,
-                membershipId: membership?.memberships?.[0]?.id as string,
+                teamId: currentTeamId,
+                membershipId: membership.memberships[0].id,
               },
             },
           },
         }
       : null
   );
-  const { data: invites } = db.useQuery({
-    invites: {
-      $: {
-        where: {
-          userEmail: user?.email as string,
-          status: 'pending',
-        },
-      },
-    },
-  });
 
-  const toWork = useMemo(() => {
-    // TODO:
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let data: any[] = [];
+  const { data: invites } = db.useQuery(
+    user?.email
+      ? {
+          invites: {
+            $: {
+              where: {
+                userEmail: user.email,
+                status: 'pending',
+              },
+            },
+          },
+        }
+      : null
+  );
 
-    if (invites?.invites?.length && invites?.invites?.length > 0) {
-      data = [
-        ...data,
-        ...(invites?.invites || []).map((invite) => ({
-          message: (
-            <>
-              <Badge colorPalette="purple">invite</Badge> You have an invite to join{' '}
-              <strong>{invite.teamName}</strong> team!
-            </>
-          ),
-          action: (
-            <Button
-              size="xs"
-              onClick={() => {
+  const toWork = useMemo<ToWorkItem[]>(() => {
+    const data: ToWorkItem[] = [];
+
+    if (invites?.invites?.length) {
+      const inviteItems = invites.invites.map((invite: Invite) => ({
+        message: (
+          <>
+            <Badge colorPalette="purple">invite</Badge> You have an invite to join{' '}
+            <strong>{invite.teamName}</strong> team!
+          </>
+        ),
+        action: (
+          <Button
+            size="xs"
+            onClick={() => {
+              if (user?.id) {
                 runTransaction(() =>
                   acceptInvite({
                     inviteId: invite.id,
                     membershipId: invite.membershipId,
-                    userId: user?.id as string,
+                    userId: user.id,
                   })
                 );
                 window.location.reload();
-              }}
-            >
-              Accept
-            </Button>
-          ),
-        })),
-      ];
+              }
+            }}
+          >
+            Accept
+          </Button>
+        ),
+      }));
+      data.push(...inviteItems);
     }
 
     if (teams?.teams?.length === 0) {
@@ -103,15 +129,15 @@ export function ToWork() {
       });
     }
 
-    if (events?.events && events?.events?.length > 0) {
-      events?.events.forEach((event) => {
+    if (events?.events?.length) {
+      events.events.forEach((event: Event) => {
         if (event.type === 'review-task') {
           data.push({
             message: (
               <>
-                <Badge colorPalette="blue">review</Badge> You have a{' '}
+                <Badge colorPalette="blue">review</Badge> You have a task{' '}
                 <ChakraLink variant="underline" fontWeight="bold" asChild>
-                  <Link to={`/task/${event.payload?.taskId}`}>task</Link>
+                  <Link to={`/task/${event.payload?.taskId}`}>{event.payload?.taskTitle}</Link>
                 </ChakraLink>{' '}
                 to review!
               </>
@@ -133,7 +159,7 @@ export function ToWork() {
     }
 
     return data;
-  }, [invites?.invites, teams?.teams?.length, user?.id, events?.events]);
+  }, [invites?.invites, teams?.teams?.length, events?.events, user?.id]);
 
   if (toWork.length === 0) {
     return (
@@ -158,7 +184,7 @@ export function ToWork() {
       <Table.Body>
         {toWork.map((item, index) => (
           <Table.Row key={index}>
-            <Table.Cell key={item.message}>{item.message}</Table.Cell>
+            <Table.Cell>{item.message}</Table.Cell>
             <Table.Cell textAlign="end">{item.action}</Table.Cell>
           </Table.Row>
         ))}

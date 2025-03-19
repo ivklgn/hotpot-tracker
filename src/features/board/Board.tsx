@@ -73,15 +73,19 @@ export function Board({ board, mode = 'view' }: BoardProps) {
       : null
   );
 
-  const handleDragTask = (taskId: string, targetColumn: ColumnType, currentColumnId?: string) => {
-    runTransaction(() => changeTaskColumn({ taskId, columnId: targetColumn.id }));
+  const handleDragTask = (
+    task: InstaQLEntity<AppSchema, 'tasks'>,
+    targetColumn: ColumnType,
+    currentColumnId?: string
+  ) => {
+    runTransaction(() => changeTaskColumn({ taskId: task.id, columnId: targetColumn.id }));
 
     if (targetColumn.contributors && targetColumn.contributors.length > 0) {
       targetColumn.contributors.forEach((contributor) => {
         runTransaction(() =>
           createEvent({
             type: 'review-task',
-            payload: { taskId },
+            payload: { taskId: task.id, taskTitle: task.title },
             teamId: currentTeamId as string,
             membershipId: contributor.membershipId,
           })
@@ -91,7 +95,7 @@ export function Board({ board, mode = 'view' }: BoardProps) {
 
     const taskApprovesFromCurrentColumn = columns?.columns
       .find((c) => c.id === currentColumnId)
-      ?.tasks.find((t) => t.id === taskId)
+      ?.tasks.find((t) => t.id === task.id)
       ?.approves.map((a) => a.id);
 
     if (taskApprovesFromCurrentColumn?.length) {
