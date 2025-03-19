@@ -9,13 +9,7 @@ import {
   HStack,
   Link as ChakraLink,
   Separator,
-  Icon,
-  SimpleGrid,
-  useColorModeValue,
-  Button,
-  VStack,
 } from '@chakra-ui/react';
-import { FaKanbanBoard, FaUsers, FaTasks, FaComments, FaChartLine, FaLock } from 'react-icons/fa';
 import logoShort from '../assets/logo-short.png';
 import { Auth } from '../features/auth';
 import { db } from '../instantdb';
