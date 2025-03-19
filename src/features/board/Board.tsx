@@ -17,11 +17,12 @@ import { useAccount } from '../account/AccountContext';
 import { ConfirmAction } from '../../components/ConfirmAction';
 import { LuPencilLine, LuX, LuCheck } from 'react-icons/lu';
 import { useState } from 'react';
-import { Column } from './Column';
+import { Column, ColumnType } from './Column';
 import { CreateBoardDialog } from './CreateBoardDialog';
 import { AppSchema } from '../../../instant.schema';
 import { SmartParams } from '../smart-params';
 import { runTransaction } from '../../core/instantdb-transaction';
+import { createEvent } from '../events';
 
 type BoardViewMode = 'view' | 'edit';
 
@@ -72,8 +73,22 @@ export function Board({ board, mode = 'view' }: BoardProps) {
       : null
   );
 
-  const handleDragTask = (taskId: string, targetColumnId: string, currentColumnId?: string) => {
-    runTransaction(() => changeTaskColumn({ taskId, columnId: targetColumnId }));
+  const handleDragTask = (taskId: string, targetColumn: ColumnType, currentColumnId?: string) => {
+    runTransaction(() => changeTaskColumn({ taskId, columnId: targetColumn.id }));
+
+    if (targetColumn.contributors && targetColumn.contributors.length > 0) {
+      targetColumn.contributors.forEach((contributor) => {
+        runTransaction(() =>
+          createEvent({
+            type: 'review-task',
+            payload: { taskId },
+            teamId: currentTeamId as string,
+            membershipId: contributor.membershipId,
+          })
+        );
+      });
+    }
+
     const taskApprovesFromCurrentColumn = columns?.columns
       .find((c) => c.id === currentColumnId)
       ?.tasks.find((t) => t.id === taskId)

@@ -26,7 +26,7 @@ import { ToggleTip } from '../../components/ui/toggle-tip';
 import { runTransaction } from '../../core/instantdb-transaction';
 import { CreateTaskToColumnDialog } from './CreateTaskToColumnDialog';
 
-type ColumnType = InstaQLResult<
+export type ColumnType = InstaQLResult<
   AppSchema,
   {
     columns: {
@@ -103,7 +103,7 @@ function ColumnHeader({ column, isEdit, onCreateTask, onEditClick, onCloseEdit }
 
 interface ColumnTasksProps {
   column?: ColumnType;
-  onDragTask?: (taskId: string, targetColumnId: string, currentColumnId?: string) => void;
+  onDragTask?: (taskId: string, targetColumn: ColumnType, currentColumnId?: string) => void;
 }
 
 function ColumnTasks({ column, onDragTask }: ColumnTasksProps) {
@@ -111,7 +111,7 @@ function ColumnTasks({ column, onDragTask }: ColumnTasksProps) {
     accept: 'task',
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     drop: (task: any) => {
-      return onDragTask?.(task.id, column?.id as string, task?.columnId);
+      return onDragTask?.(task.id, column as ColumnType, task?.columnId);
     },
   });
 
@@ -386,7 +386,7 @@ interface ColumnProps {
     fromColumnId: string;
     toColumnId: string;
   }) => void;
-  onDragTask?: (taskId: string, targetColumnId: string, currentColumnId?: string) => void;
+  onDragTask?: (taskId: string, targetColumn: ColumnType, currentColumnId?: string) => void;
 }
 
 export function Column({ column, defaultEditable = false, onDrag, onDragTask }: ColumnProps) {

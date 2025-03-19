@@ -1,4 +1,4 @@
-import { Badge, Box, Button, Table } from '@chakra-ui/react';
+import { Badge, Box, Button, Table, Link as ChakraLink } from '@chakra-ui/react';
 import { LuPlus } from 'react-icons/lu';
 import { CreateTeamDialog } from '../../../../features/team/CreateTeamDialog';
 import { HiColorSwatch } from 'react-icons/hi';
@@ -6,10 +6,41 @@ import { EmptyState } from '../../../../components/ui/empty-state';
 import { db } from '../../../../instantdb';
 import { useMemo } from 'react';
 import { runTransaction } from '../../../../core/instantdb-transaction';
+import { useAccount } from '../../../../features/account/AccountContext';
+import { deleteEvent } from '../../../../features/events';
+import { Link } from 'wouter';
 
 export function ToWork() {
   const { user } = db.useAuth();
   const { data: teams } = db.useQuery({ teams: {} });
+  const { currentTeamId } = useAccount();
+  const { data: membership } = db.useQuery(
+    currentTeamId
+      ? {
+          memberships: {
+            $: {
+              where: {
+                userId: user?.id as string,
+              },
+            },
+          },
+        }
+      : null
+  );
+  const { data: events } = db.useQuery(
+    currentTeamId && membership?.memberships?.length
+      ? {
+          events: {
+            $: {
+              where: {
+                teamId: currentTeamId as string,
+                membershipId: membership?.memberships?.[0]?.id as string,
+              },
+            },
+          },
+        }
+      : null
+  );
   const { data: invites } = db.useQuery({
     invites: {
       $: {
@@ -72,8 +103,37 @@ export function ToWork() {
       });
     }
 
+    if (events?.events && events?.events?.length > 0) {
+      events?.events.forEach((event) => {
+        if (event.type === 'review-task') {
+          data.push({
+            message: (
+              <>
+                <Badge colorPalette="blue">review</Badge> You have a{' '}
+                <ChakraLink variant="underline" fontWeight="bold" asChild>
+                  <Link to={`/task/${event.payload?.taskId}`}>task</Link>
+                </ChakraLink>{' '}
+                to review!
+              </>
+            ),
+            action: (
+              <Button
+                size="xs"
+                onClick={() => {
+                  runTransaction(() => deleteEvent({ eventId: event.id }));
+                }}
+                variant="outline"
+              >
+                Mark as done
+              </Button>
+            ),
+          });
+        }
+      });
+    }
+
     return data;
-  }, [invites?.invites, teams?.teams?.length, user?.id]);
+  }, [invites?.invites, teams?.teams?.length, user?.id, events?.events]);
 
   if (toWork.length === 0) {
     return (
