@@ -6,6 +6,7 @@ import { Members } from './features/members';
 import { ToWork } from './features/towork/ToWork';
 import { db } from '../../instantdb';
 import { useAccount } from '../../features/account/AccountContext';
+import Helm from '../../components/Helm';
 
 export function WorkspacePage() {
   const { user } = db.useAuth();
@@ -16,6 +17,7 @@ export function WorkspacePage() {
   if (teams?.teams?.length === 0) {
     return (
       <Box flex="1" pt={8} mx={6} key={currentTeamId}>
+        <Helm title="Workspace" />
         <Tabs.Root defaultValue="towork" lazyMount>
           <Tabs.List>
             <Tabs.Trigger value="towork">
@@ -34,6 +36,7 @@ export function WorkspacePage() {
   if (user?.id === currentTeam?.teams?.[0]?.creatorId) {
     return (
       <Box flex="1" pt={8} mx={6} key={currentTeamId}>
+        <Helm title="Workspace" />
         <Tabs.Root defaultValue="towork" lazyMount>
           <Tabs.List>
             <Tabs.Trigger value="towork">
@@ -65,6 +68,7 @@ export function WorkspacePage() {
 
   return (
     <Box flex="1" pt={8} mx={6} key={currentTeamId}>
+      <Helm title="Workspace" />
       <Tabs.Root defaultValue="towork" lazyMount>
         <Tabs.List>
           <Tabs.Trigger value="towork">

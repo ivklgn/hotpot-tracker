@@ -3,6 +3,7 @@ import { db } from '../../instantdb';
 import { Board } from '../../features/board/Board';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import Helm from '../../components/Helm';
 
 export function BoardPage() {
   const params = useParams();
@@ -56,6 +57,7 @@ export function BoardPage() {
 
   return (
     <DndProvider backend={HTML5Backend}>
+      <Helm title={board.boards?.[0]?.name || 'Board'} />
       <Board board={board.boards?.[0]} mode="edit" />
     </DndProvider>
   );

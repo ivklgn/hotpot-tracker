@@ -18,6 +18,7 @@ import { db } from '../../instantdb';
 import { useDebounce } from '../../hooks/useDebounce';
 import { SmartParams } from '../../features/smart-params';
 import { useAccount } from '../../features/account/AccountContext';
+import Helm from '../../components/Helm';
 
 export function SearchPage() {
   const { currentTeamId } = useAccount();
@@ -48,6 +49,7 @@ export function SearchPage() {
 
   return (
     <Box flex="1" pt={8} mx={6}>
+      <Helm title="Search task" />
       <InputGroup
         flex="1"
         startElement={search !== debouncedSearch ? <Spinner size="xs" /> : <LuSearch />}

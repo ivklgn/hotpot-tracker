@@ -1,12 +1,14 @@
 import { EmptyState, VStack, ButtonGroup, Button } from '@chakra-ui/react';
 import { HiColorSwatch } from 'react-icons/hi';
 import { useLocation } from 'wouter';
+import Helm from '../components/Helm';
 
 export function NotFoundPage() {
   const [, navigate] = useLocation();
 
   return (
     <EmptyState.Root>
+      <Helm title="404 | Not found" />
       <EmptyState.Content>
         <EmptyState.Indicator>
           <HiColorSwatch />

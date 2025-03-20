@@ -1,5 +1,6 @@
 import { Box, Heading } from '@chakra-ui/react';
 import { Auth } from '../../features/auth';
+import Helm from '../../components/Helm';
 
 export function AuthPage() {
   return (
@@ -14,6 +15,7 @@ export function AuthPage() {
         padding: '16px',
       }}
     >
+      <Helm title="Auth" />
       <Box
         bg="chakra-body-bg"
         borderWidth="1px"

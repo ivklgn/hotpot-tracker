@@ -32,6 +32,7 @@ export default function App() {
             <Route path="/" component={() => <Landing />} />
             <Route path="/404" component={() => <NotFoundPage />} />
             <Route path="/auth" component={() => <Redirect to="/workspace" />} />
+            <Route path="*" component={() => <NotFoundPage />} />
           </Switch>
         </AccountLayout>
       </GlobalErrorBoundary>
@@ -45,6 +46,7 @@ export default function App() {
         <Route path="/404" component={() => <NotFoundPage />} />
         <Route path="/auth" component={() => <AuthPage />} />
         <Route path="/workspace" component={() => <Redirect to="/auth" />} />
+        <Route path="*" component={() => <NotFoundPage />} />
       </Switch>
     </GlobalErrorBoundary>
   );

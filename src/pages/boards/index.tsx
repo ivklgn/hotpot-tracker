@@ -8,6 +8,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { SegmentedControl } from '../../components/ui/segmented-control';
 import { useState } from 'react';
+import Helm from '../../components/Helm';
 
 export function BoardsPage() {
   const { currentTeamId } = useAccount();
@@ -64,6 +65,7 @@ export function BoardsPage() {
 
   return (
     <DndProvider backend={HTML5Backend}>
+      <Helm title="Boards" />
       <Stack direction="row" m={4} mt={4}>
         <VStack align="flex-start">
           <SegmentedControl
