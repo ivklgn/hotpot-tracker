@@ -15,6 +15,36 @@ export function BoardsPage() {
   const [boardFilter, setBoardFilter] = useState('all');
   const { data: boards } = db.useQuery({
     boards: {
+      columns: {
+        tasks: {
+          smartParams: {},
+          approves: {},
+          $: {
+            where: {
+              deletedAt: {
+                $isNull: true,
+              },
+            },
+          },
+        },
+        statuses: {
+          $: {
+            where: {
+              deletedAt: {
+                $isNull: true,
+              },
+            },
+          },
+        },
+        contributors: {
+          memberships: {},
+        },
+        $: {
+          order: {
+            position: 'asc',
+          },
+        },
+      },
       smartParams: {},
       $: {
         where: {

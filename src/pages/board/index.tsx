@@ -8,6 +8,36 @@ export function BoardPage() {
   const params = useParams();
   const { data: board } = db.useQuery({
     boards: {
+      columns: {
+        tasks: {
+          smartParams: {},
+          approves: {},
+          $: {
+            where: {
+              deletedAt: {
+                $isNull: true,
+              },
+            },
+          },
+        },
+        statuses: {
+          $: {
+            where: {
+              deletedAt: {
+                $isNull: true,
+              },
+            },
+          },
+        },
+        contributors: {
+          memberships: {},
+        },
+        $: {
+          order: {
+            position: 'asc',
+          },
+        },
+      },
       smartParams: {},
       $: {
         where: {

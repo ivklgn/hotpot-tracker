@@ -28,50 +28,27 @@ type BoardViewMode = 'view' | 'edit';
 
 interface BoardProps {
   mode: BoardViewMode;
-  board?: InstaQLEntity<AppSchema, 'boards', { smartParams: {} }>;
+  board?: InstaQLEntity<
+    AppSchema,
+    'boards',
+    {
+      smartParams: {};
+      columns: {
+        tasks: {
+          smartParams: {};
+          approves: {};
+        };
+        statuses: {};
+        contributors: {
+          memberships: {};
+        };
+      };
+    }
+  >;
 }
 
 export function Board({ board, mode = 'view' }: BoardProps) {
   const { currentTeamId } = useAccount();
-  const { data: columns } = db.useQuery(
-    board
-      ? {
-          columns: {
-            tasks: {
-              smartParams: {},
-              approves: {},
-              $: {
-                where: {
-                  deletedAt: {
-                    $isNull: true,
-                  },
-                },
-              },
-            },
-            statuses: {
-              $: {
-                where: {
-                  deletedAt: {
-                    $isNull: true,
-                  },
-                },
-              },
-            },
-            contributors: {
-              memberships: {},
-            },
-            $: {
-              where: {
-                boardId: board.id,
-              },
-              order: {
-                position: 'asc',
-              },
-            },
-          },
-        }
-      : null
-  );
 
   const handleDragTask = (
     task: InstaQLEntity<AppSchema, 'tasks'>,
@@ -93,8 +70,8 @@ export function Board({ board, mode = 'view' }: BoardProps) {
       });
     }
 
-    const taskApprovesFromCurrentColumn = columns?.columns
-      .find((c) => c.id === currentColumnId)
+    const taskApprovesFromCurrentColumn = board?.columns
+      ?.find((c) => c.id === currentColumnId)
       ?.tasks.find((t) => t.id === task.id)
       ?.approves.map((a) => a.id);
 
@@ -143,10 +120,10 @@ export function Board({ board, mode = 'view' }: BoardProps) {
     );
   }
 
-  if (columns?.columns?.length === 0) {
+  if (board?.columns?.length === 0) {
     return (
       <Box my="2" minHeight="320px" mt="4" key={board.id}>
-        <BoardHeader board={board} mode={mode} columns={columns.columns} />
+        <BoardHeader board={board} mode={mode} columns={board?.columns} />
         <Box flex="1" pt={8} mx={6}>
           <EmptyState.Root>
             <EmptyState.Content>
@@ -166,7 +143,7 @@ export function Board({ board, mode = 'view' }: BoardProps) {
                         boardId: board.id,
                         teamId: currentTeamId as string,
                         position:
-                          (columns?.columns?.reduce((max, c) => (c.position > max ? c.position : max), 0) ||
+                          (board?.columns?.reduce((max, c) => (c.position > max ? c.position : max), 0) ||
                             0) + 1,
                       })
                     );
@@ -184,9 +161,9 @@ export function Board({ board, mode = 'view' }: BoardProps) {
 
   return (
     <Box my="2" minHeight="320px" mt="4" key={board.id}>
-      <BoardHeader board={board} mode={mode} columns={columns?.columns} />
+      <BoardHeader board={board} mode={mode} columns={board?.columns} />
       <Flex direction="row" scrollBehavior="smooth" overflowX="scroll" whiteSpace="none" w="100%">
-        {columns?.columns.map((column) => (
+        {board?.columns?.map((column) => (
           <Column column={column} onDrag={handleDragColumn} onDragTask={handleDragTask} key={column.id} />
         ))}
       </Flex>
