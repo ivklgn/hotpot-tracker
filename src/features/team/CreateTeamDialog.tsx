@@ -16,6 +16,8 @@ import React from 'react';
 import { db } from '../../instantdb';
 import { id } from '@instantdb/react';
 import { runTransaction } from '../../core/instantdb-transaction';
+import { toaster } from '../../components/ui/toaster';
+import { isConwayError } from 'conway-errors';
 
 interface CreateTeamDialogProps {
   opener?: React.ReactElement;
@@ -32,13 +34,24 @@ export const CreateTeamDialog: React.FC<CreateTeamDialogProps> = ({ opener, isOp
     e.preventDefault();
     if (!teamName) return;
 
-    runTransaction(() =>
-      createTeamWithMember({
-        teamName,
-        userEmail: user?.email as string,
-        userId: user?.id as string,
-        creatorId: user?.id,
-      })
+    runTransaction(
+      () =>
+        createTeamWithMember({
+          teamName,
+          userEmail: user?.email as string,
+          userId: user?.id as string,
+          creatorId: user?.id,
+        }),
+      (e) => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        if (isConwayError(e) && e.originalError?.hint?.expected === 'perms-pass?') {
+          toaster.create({
+            title: 'Maximum 2 teams allowed',
+            type: 'error',
+          });
+        }
+      }
     );
 
     setTeamName('');
@@ -108,6 +121,7 @@ async function createTeamWithMember({
 
   const result = await db.transact([
     db.tx.teams[teamId].update({ name: teamName, creatorId, createdAt: new Date().toJSON() }),
+    db.tx.teams[teamId].link({ users: userId }),
     db.tx.memberships[membershipId].update({ teamId, userId, creatorId, userEmail }),
     db.tx.memberships[membershipId].link({ teams: teamId }),
   ]);

@@ -3,7 +3,7 @@ export default {
     bind: ['isCreator', 'auth.id == data.creatorId', 'isMember', "auth.id in data.ref('memberships.userId')"],
     allow: {
       view: 'isMember',
-      create: 'isCreator',
+      create: "isCreator && size(data.ref('users.teams.id')) <= 2",
       delete: 'isCreator',
       update: 'isCreator',
     },

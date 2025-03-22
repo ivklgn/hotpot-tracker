@@ -361,10 +361,22 @@ const _schema = i.schema({
         label: 'memberships',
       },
     },
+    teamsUsers: {
+      forward: {
+        on: 'teams',
+        has: 'one',
+        label: 'users',
+        onDelete: 'cascade',
+      },
+      reverse: {
+        on: '$users',
+        has: 'many',
+        label: 'teams',
+      },
+    },
   },
 });
 
-// This helps Typescript display better intellisense
 type _AppSchema = typeof _schema;
 type AppSchema = _AppSchema;
 const schema: AppSchema = _schema;
