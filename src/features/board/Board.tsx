@@ -23,6 +23,7 @@ import { AppSchema } from '../../../instant.schema';
 import { SmartParams } from '../smart-params';
 import { runTransaction } from '../../core/instantdb-transaction';
 import { createEvent } from '../events';
+import { toaster } from '../../components/ui/toaster';
 
 type BoardViewMode = 'view' | 'edit';
 
@@ -256,13 +257,25 @@ function BoardHeader({ board, mode, columns }: BoardHeaderProps) {
           <Button
             variant="outline"
             onClick={() => {
-              runTransaction(() =>
-                createColumn({
-                  boardId: board.id,
-                  teamId: currentTeamId as string,
-                  creatorId: user?.id,
-                  position: (columns?.reduce((max, c) => (c.position > max ? c.position : max), 0) || 0) + 1,
-                })
+              runTransaction(
+                () =>
+                  createColumn({
+                    boardId: board.id,
+                    teamId: currentTeamId as string,
+                    creatorId: user?.id,
+                    position:
+                      (columns?.reduce((max, c) => (c.position > max ? c.position : max), 0) || 0) + 1,
+                  }),
+                (result) => {
+                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                  // @ts-expect-error
+                  if (result.isErr() && result.error.originalError?.hint?.expected === 'perms-pass?') {
+                    toaster.create({
+                      title: 'Maximum 10 columns allowed',
+                      type: 'error',
+                    });
+                  }
+                }
               );
             }}
           >

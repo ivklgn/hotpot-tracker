@@ -93,9 +93,14 @@ export function Task({ task }: TaskProps) {
             }
             text="Are you sure you want to delete task? All content will be removed."
             onOk={() => {
-              runTransaction(() => deleteTask({ taskId: task.id })).then(() => {
-                navigate('/boards');
-              });
+              runTransaction(
+                () => deleteTask({ taskId: task.id }),
+                (result) => {
+                  if (result.isOk()) {
+                    navigate('/boards');
+                  }
+                }
+              );
             }}
           />
         </ButtonGroup>

@@ -17,7 +17,6 @@ import { db } from '../../instantdb';
 import { id } from '@instantdb/react';
 import { runTransaction } from '../../core/instantdb-transaction';
 import { toaster } from '../../components/ui/toaster';
-import { isConwayError } from 'conway-errors';
 
 interface CreateTeamDialogProps {
   opener?: React.ReactElement;
@@ -42,10 +41,10 @@ export const CreateTeamDialog: React.FC<CreateTeamDialogProps> = ({ opener, isOp
           userId: user?.id as string,
           creatorId: user?.id,
         }),
-      (e) => {
+      (result) => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
-        if (isConwayError(e) && e.originalError?.hint?.expected === 'perms-pass?') {
+        if (result.isErr() && result.error.originalError?.hint?.expected === 'perms-pass?') {
           toaster.create({
             title: 'Maximum 2 teams allowed',
             type: 'error',

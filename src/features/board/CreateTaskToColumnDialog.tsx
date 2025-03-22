@@ -20,6 +20,7 @@ import { LuPlus, LuSearch } from 'react-icons/lu';
 import { useAccount } from '../account/AccountContext';
 import { Select } from 'chakra-react-select';
 import { useDebounce } from '../../hooks/useDebounce';
+import { toaster } from '../../components/ui/toaster';
 
 interface CreateTaskToColumnDialogProps {
   columnId: string;
@@ -46,28 +47,46 @@ export const CreateTaskToColumnDialog: React.FC<CreateTaskToColumnDialogProps> =
     e.preventDefault();
 
     if (tab === 'new' && title) {
-      runTransaction(() =>
-        createNewTask({
-          title,
-          columnId,
-          teamId: currentTeamId as string,
-          creatorId: user?.id,
-        })
-      ).then(() => {
-        setTitle('');
-        onClose?.();
-      });
+      runTransaction(
+        () =>
+          createNewTask({
+            title,
+            columnId,
+            teamId: currentTeamId as string,
+            creatorId: user?.id,
+          }),
+        (result) => {
+          if (result.isOk()) {
+            setTitle('');
+            onClose?.();
+          }
+
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-expect-error
+          if (result.isErr() && result.error.originalError?.hint?.expected === 'perms-pass?') {
+            onClose?.();
+            toaster.create({
+              title: 'Maximum 50 tasks allowed',
+              type: 'error',
+            });
+          }
+        }
+      );
     } else if (tab === 'existing' && existingTaskId) {
-      runTransaction(() =>
-        updateTaskColumn({
-          taskId: existingTaskId,
-          columnId,
-          approvesIds: taskApproveIds,
-        })
-      ).then(() => {
-        setExistingTaskId(undefined);
-        onClose?.();
-      });
+      runTransaction(
+        () =>
+          updateTaskColumn({
+            taskId: existingTaskId,
+            columnId,
+            approvesIds: taskApproveIds,
+          }),
+        (result) => {
+          if (result.isOk()) {
+            setExistingTaskId(undefined);
+            onClose?.();
+          }
+        }
+      );
     }
   };
 
@@ -151,32 +170,6 @@ export const CreateTaskToColumnDialog: React.FC<CreateTaskToColumnDialogProps> =
   );
 };
 
-async function createNewTask({
-  title,
-  columnId,
-  teamId,
-  creatorId,
-}: {
-  title: string;
-  columnId: string;
-  teamId: string;
-  creatorId?: string;
-}) {
-  const newTaskId = id();
-
-  return await db.transact([
-    db.tx.tasks[newTaskId].update({
-      title,
-      teamId,
-      columnId,
-      createdAt: new Date().toJSON(),
-      creatorId,
-    }),
-    db.tx.tasks[newTaskId].link({ columns: columnId }),
-    db.tx.tasks[newTaskId].link({ teams: teamId }),
-  ]);
-}
-
 interface SearchTaskSelectProps {
   columnId: string;
   onSelect?: (taskId: string, taskApproveIds?: string[]) => void;
@@ -259,5 +252,31 @@ async function updateTaskColumn({
     }),
     db.tx.tasks[taskId].link({ columns: columnId }),
     ...(approvesIds || []).map((ai) => db.tx.approves[ai].delete()),
+  ]);
+}
+
+async function createNewTask({
+  title,
+  columnId,
+  teamId,
+  creatorId,
+}: {
+  title: string;
+  columnId: string;
+  teamId: string;
+  creatorId?: string;
+}) {
+  const newTaskId = id();
+
+  return await db.transact([
+    db.tx.tasks[newTaskId].update({
+      title,
+      teamId,
+      columnId,
+      createdAt: new Date().toJSON(),
+      creatorId,
+    }),
+    db.tx.tasks[newTaskId].link({ columns: columnId }),
+    db.tx.tasks[newTaskId].link({ teams: teamId }),
   ]);
 }

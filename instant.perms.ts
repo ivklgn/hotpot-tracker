@@ -26,7 +26,7 @@ export default {
     bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')"],
     allow: {
       view: 'isMember',
-      create: 'isMember',
+      create: "isMember && size(data.ref('teams.boards.id')) <= 5",
       delete: 'isMember',
       update: 'isMember',
     },
@@ -35,7 +35,7 @@ export default {
     bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')"],
     allow: {
       view: 'isMember',
-      create: 'isMember',
+      create: "isMember && size(data.ref('boards.columns.id')) <= 10",
       delete: 'isMember',
       update: 'isMember',
     },
@@ -44,7 +44,7 @@ export default {
     bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')"],
     allow: {
       view: 'isMember',
-      create: 'isMember',
+      create: "isMember && size(data.ref('teams.tasks.id')) <= 5",
       delete: 'isMember',
       update: 'isMember',
     },
@@ -71,7 +71,8 @@ export default {
     bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')"],
     allow: {
       view: 'isMember',
-      create: 'isMember',
+      create:
+        "isMember && data.boardId != null ? size(data.ref('boards.smartParams.id')) <= 5 : size(data.ref('tasks.smartParams.id')) <= 5",
       delete: 'isMember',
       update: 'isMember',
     },
@@ -91,7 +92,7 @@ export default {
     ],
     allow: {
       view: 'isMember',
-      create: 'isCreator',
+      create: "isCreator && size(data.ref('teams.memberships.id')) <= 5",
       delete: 'isCreator',
       update: 'isInvitee',
     },

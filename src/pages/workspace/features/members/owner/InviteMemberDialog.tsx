@@ -17,6 +17,7 @@ import { db } from '../../../../../instantdb';
 import { useAccount } from '../../../../../features/account/AccountContext';
 import { id } from '@instantdb/react';
 import { runTransaction } from '../../../../../core/instantdb-transaction';
+import { toaster } from '../../../../../components/ui/toaster';
 
 interface CreateTeamDialogProps {
   opener: React.ReactElement;
@@ -49,13 +50,24 @@ export const InviteMemberDialog: React.FC<CreateTeamDialogProps> = ({ opener }) 
       return;
     }
 
-    runTransaction(() =>
-      inviteMember({
-        teamId: currentTeamId as string,
-        userEmail: email,
-        teamName: currentTeam?.teams?.[0]?.name as string,
-        creatorId: user?.id as string,
-      })
+    runTransaction(
+      () =>
+        inviteMember({
+          teamId: currentTeamId as string,
+          userEmail: email,
+          teamName: currentTeam?.teams?.[0]?.name as string,
+          creatorId: user?.id as string,
+        }),
+      (result) => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        if (result.isErr() && result.error.originalError?.hint?.expected === 'perms-pass?') {
+          toaster.create({
+            title: 'Maximum 5 members per teams allowed',
+            type: 'error',
+          });
+        }
+      }
     );
 
     setEmail('');

@@ -361,14 +361,16 @@ function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
             }
             text="Are you sure to delete column?"
             onOk={() => {
-              runTransaction(() =>
-                deleteColumn({
-                  columnId: column?.id as string,
-                  contributorsIds: column?.contributors?.map((c) => c.id),
-                })
-              ).then(() => {
-                onClose();
-              });
+              runTransaction(
+                () =>
+                  deleteColumn({
+                    columnId: column?.id as string,
+                    contributorsIds: column?.contributors?.map((c) => c.id),
+                  }),
+                () => {
+                  onClose();
+                }
+              );
             }}
           />
         </Field>

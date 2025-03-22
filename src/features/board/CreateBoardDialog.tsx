@@ -35,9 +35,12 @@ export const CreateBoardDialog: React.FC<CreateTeamDialogProps> = ({ opener }) =
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name) return;
-    runTransaction(() => createBoard({ name, teamId: currentTeamId as string, creatorId: user?.id })).then(
-      (newBoardId) => {
-        navigate(`/board/${newBoardId}`);
+    runTransaction(
+      () => createBoard({ name, teamId: currentTeamId as string, creatorId: user?.id }),
+      (result) => {
+        if (result.isOk()) {
+          navigate(`/board/${result.value}`);
+        }
       }
     );
     setName('');
