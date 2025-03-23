@@ -18,6 +18,7 @@ import { useAccount } from '../../../../../features/account/AccountContext';
 import { id } from '@instantdb/react';
 import { runTransaction } from '../../../../../core/instantdb-transaction';
 import { toaster } from '../../../../../components/ui/toaster';
+import tariffLimits from '../../../../../../tariff-limits.json';
 
 interface CreateTeamDialogProps {
   opener: React.ReactElement;
@@ -63,7 +64,7 @@ export const InviteMemberDialog: React.FC<CreateTeamDialogProps> = ({ opener }) 
         // @ts-expect-error
         if (result.isErr() && result.error.originalError?.hint?.expected === 'perms-pass?') {
           toaster.create({
-            title: 'Maximum 5 members per teams allowed',
+            title: `Maximum ${tariffLimits.free.max_members_per_team} per team allowed`,
             type: 'error',
           });
         }

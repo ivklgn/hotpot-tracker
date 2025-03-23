@@ -22,6 +22,7 @@ import { AppSchema } from '../../../instant.schema';
 import { isJSON } from '../../utils/json';
 import { runTransaction } from '../../core/instantdb-transaction';
 import { toaster } from '../../components/ui/toaster';
+import tariffLimits from '../../../tariff-limits.json';
 
 const SMART_PARAMS_TYPES = [
   {
@@ -127,7 +128,7 @@ export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTask
           // @ts-expect-error
           if (result.isErr() && result.error.originalError?.hint?.expected === 'perms-pass?') {
             toaster.create({
-              title: `Maximum 5 smart params allowed for ${type}`,
+              title: `Maximum ${tariffLimits.free.max_smart_params} smart params allowed for ${type}`,
               type: 'error',
             });
           }

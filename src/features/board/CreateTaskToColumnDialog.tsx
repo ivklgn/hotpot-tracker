@@ -21,6 +21,7 @@ import { useAccount } from '../account/AccountContext';
 import { Select } from 'chakra-react-select';
 import { useDebounce } from '../../hooks/useDebounce';
 import { toaster } from '../../components/ui/toaster';
+import tariffLimits from '../../../tariff-limits.json';
 
 interface CreateTaskToColumnDialogProps {
   columnId: string;
@@ -66,7 +67,7 @@ export const CreateTaskToColumnDialog: React.FC<CreateTaskToColumnDialogProps> =
           if (result.isErr() && result.error.originalError?.hint?.expected === 'perms-pass?') {
             onClose?.();
             toaster.create({
-              title: 'Maximum 50 tasks allowed',
+              title: `Maximum ${tariffLimits.free.max_columns_per_board} tasks allowed`,
               type: 'error',
             });
           }
