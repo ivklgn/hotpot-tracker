@@ -18,15 +18,13 @@ import {
   Float,
   Span,
 } from '@chakra-ui/react';
-import logoShort from '../assets/logo-short.png';
-// Placeholder imports for mockup screenshots - these would need to be added to assets folder
-import mockupRecipe from '../assets/mockup-recipe-tracking.png';
-import mockupPlanning from '../assets/mockup-meal-planning.png';
-import mockupAnalytics from '../assets/mockup-taste-analytics.png';
+// import mockupRecipe from '../assets/mockup-recipe-tracking.png';
+// import mockupPlanning from '../assets/mockup-meal-planning.png';
+// import mockupAnalytics from '../assets/mockup-taste-analytics.png';
 import { Auth } from '../features/auth';
 import { db } from '../instantdb';
 import { UserAvatar } from '../components/Avatars';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { FaUtensils, FaClipboardList, FaUsers, FaChartLine, FaMobileAlt, FaShieldAlt } from 'react-icons/fa';
 import tariffLimits from '../../tariff-limits.json';
 
@@ -39,7 +37,7 @@ interface FeatureCardProps {
 }
 
 interface FeatureShowcaseProps {
-  image: string;
+  image?: string;
   title: string;
   description: string;
   features: string[];
@@ -172,9 +170,11 @@ const AuthForm = () => {
 };
 
 export function Landing() {
+  const [, navigate] = useLocation();
+
   return (
     <Box className={s.landing}>
-      <Box position="relative" overflow="hidden">
+      <Box position="relative" overflow="hidden" className={s.heroBlock}>
         <Container maxW="7xl" py={16}>
           <Stack
             direction={{ base: 'column', lg: 'row' }}
@@ -191,9 +191,8 @@ export function Landing() {
                 </Text>
               </Heading>
               <Text fontSize={{ base: 'lg', sm: 'xl' }} maxW="xl">
-                <strong>"Cook it the way you want it"</strong> <br />
-                Try simple and useful primitives to build a more efficient process for your hotpot projects.
-                Track ingredients, recipes, and dining experiences all in one place.
+                <strong>«Cook it the way you want it»</strong> <br />
+                Try simple and useful primitives to build a more efficient process for your projects.
               </Text>
               <Stack direction={{ base: 'column', sm: 'row' }} gap={4} mt={2}>
                 <Button
@@ -204,12 +203,15 @@ export function Landing() {
                   colorScheme="blue"
                   bg="blue.400"
                   _hover={{ bg: 'blue.500' }}
+                  onClick={() => {
+                    navigate('/auth');
+                  }}
                 >
                   Get Started
                 </Button>
-                {/* <Button rounded="full" size="lg" fontWeight="bold" px={6} variant="outline">
+                <Button rounded="full" size="lg" fontWeight="bold" px={6} variant="outline">
                   Learn More
-                </Button> */}
+                </Button>
               </Stack>
             </Stack>
             <AuthForm />
@@ -220,14 +222,12 @@ export function Landing() {
       <Box py={16}>
         <Container maxW="7xl">
           <VStack gap={8} mb={12}>
-            <Box mb="6">
-              <Image rounded="md" src={logoShort} alt="Hotpot Tracker Logo" maxW={120} />
-            </Box>
             <Heading fontSize={{ base: '3xl', md: '4xl' }} textAlign="center">
-              Features that make tracking easier
+              One more Trello?
             </Heading>
             <Text fontSize="xl" textAlign="center" maxW="3xl">
-              Everything you need to manage your hotpot experiences efficiently and deliciously
+              Almost.. But not quite. Hotpot Tracker provide couple new primitive features for improve your
+              workflow
             </Text>
           </VStack>
 
@@ -419,10 +419,9 @@ export function Landing() {
       <Box py={16}>
         <Container maxW="7xl">
           <Stack flex={1} gap={6} textAlign="center">
-            <Heading fontSize={{ base: '3xl', md: '4xl' }}>Ready to Start Tracking?</Heading>
+            <Heading fontSize={{ base: '3xl', md: '4xl' }}>Start now for free</Heading>
             <Text fontSize="xl" maxW="3xl" mx="auto">
-              Join thousands of hotpot enthusiasts who are managing their dining experiences smarter. Start
-              your culinary journey today!
+              You can start
             </Text>
             <Flex justify="center" mt={4}>
               <AuthForm />
@@ -439,8 +438,8 @@ export function Landing() {
             </Stack>
             <Stack direction={{ base: 'column', md: 'row' }} gap={8}>
               <ChakraLink>Blog</ChakraLink>
-              <ChakraLink>Help Center</ChakraLink>
-              <ChakraLink>Community</ChakraLink>
+              {/* <ChakraLink>Help Center</ChakraLink>
+              <ChakraLink>Community</ChakraLink> */}
             </Stack>
           </Stack>
         </Container>

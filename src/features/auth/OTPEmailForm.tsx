@@ -34,7 +34,7 @@ export function OTPEmailForm({ onCodeSendComplete }: OTPEmailFormProps) {
         <Fieldset.Content>
           <Field invalid={!!error} errorText={error ? 'Error sending code' : undefined}>
             <Input
-              autoFocus
+              // autoFocus
               placeholder="Enter your email"
               type="email"
               value={email as string}
