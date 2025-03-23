@@ -18,6 +18,8 @@ import { id } from '@instantdb/react';
 import { useAccount } from '../account/AccountContext';
 import { useLocation } from 'wouter';
 import { runTransaction } from '../../core/instantdb-transaction';
+import { toaster } from '../../components/ui/toaster';
+import tariffLimits from '../../../tariff-limits.json';
 
 interface CreateTeamDialogProps {
   opener: React.ReactElement;
@@ -35,9 +37,21 @@ export const CreateBoardDialog: React.FC<CreateTeamDialogProps> = ({ opener }) =
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name) return;
-    runTransaction(() => createBoard({ name, teamId: currentTeamId as string, creatorId: user?.id })).then(
-      (newBoardId) => {
-        navigate(`/board/${newBoardId}`);
+    runTransaction(
+      () => createBoard({ name, teamId: currentTeamId as string, creatorId: user?.id }),
+      (result) => {
+        if (result.isOk()) {
+          navigate(`/board/${result.value}`);
+        }
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        if (result.isErr() && result.error.originalError?.hint?.expected === 'perms-pass?') {
+          toaster.create({
+            title: `Maximum ${tariffLimits.free.max_boards_per_team} boards allowed`,
+            type: 'error',
+          });
+        }
       }
     );
     setName('');
@@ -73,6 +87,7 @@ export const CreateBoardDialog: React.FC<CreateTeamDialogProps> = ({ opener }) =
                 required
                 type="text"
                 minLength={1}
+                maxLength={20}
               />
             </Field>
           </DialogBody>

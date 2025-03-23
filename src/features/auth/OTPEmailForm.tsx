@@ -34,12 +34,13 @@ export function OTPEmailForm({ onCodeSendComplete }: OTPEmailFormProps) {
         <Fieldset.Content>
           <Field invalid={!!error} errorText={error ? 'Error sending code' : undefined}>
             <Input
-              autoFocus
+              // autoFocus
               placeholder="Enter your email"
               type="email"
               value={email as string}
               onChange={(e) => setEmail(e.target.value)}
               required
+              maxLength={254}
             />
           </Field>
         </Fieldset.Content>

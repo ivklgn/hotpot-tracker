@@ -1,9 +1,11 @@
+import tariffLimits from './tariff-limits.json';
+
 export default {
   teams: {
     bind: ['isCreator', 'auth.id == data.creatorId', 'isMember', "auth.id in data.ref('memberships.userId')"],
     allow: {
       view: 'isMember',
-      create: 'isCreator',
+      create: `isCreator && size(data.ref('users.teams.id')) <= ${tariffLimits.free.max_teams_per_account}`,
       delete: 'isCreator',
       update: 'isCreator',
     },
@@ -26,7 +28,7 @@ export default {
     bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')"],
     allow: {
       view: 'isMember',
-      create: 'isMember',
+      create: `isMember && size(data.ref('teams.boards.id')) <= ${tariffLimits.free.max_boards_per_team}`,
       delete: 'isMember',
       update: 'isMember',
     },
@@ -35,7 +37,7 @@ export default {
     bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')"],
     allow: {
       view: 'isMember',
-      create: 'isMember',
+      create: `isMember && size(data.ref('boards.columns.id')) <= ${tariffLimits.free.max_columns_per_board}`,
       delete: 'isMember',
       update: 'isMember',
     },
@@ -44,7 +46,7 @@ export default {
     bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')"],
     allow: {
       view: 'isMember',
-      create: 'isMember',
+      create: `isMember && size(data.ref('teams.tasks.id')) <= ${tariffLimits.free.max_tasks_per_team}`,
       delete: 'isMember',
       update: 'isMember',
     },
@@ -71,7 +73,7 @@ export default {
     bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')"],
     allow: {
       view: 'isMember',
-      create: 'isMember',
+      create: `isMember && data.boardId != null ? size(data.ref('boards.smartParams.id')) <= ${tariffLimits.free.max_smart_params} : size(data.ref('tasks.smartParams.id')) <= ${tariffLimits.free.max_smart_params}`,
       delete: 'isMember',
       update: 'isMember',
     },
@@ -91,7 +93,7 @@ export default {
     ],
     allow: {
       view: 'isMember',
-      create: 'isCreator',
+      create: `isCreator && size(data.ref('teams.memberships.id')) <= ${tariffLimits.free.max_members_per_team}`,
       delete: 'isCreator',
       update: 'isInvitee',
     },

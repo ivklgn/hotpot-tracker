@@ -21,6 +21,8 @@ import { useAccount } from '../account/AccountContext';
 import { AppSchema } from '../../../instant.schema';
 import { isJSON } from '../../utils/json';
 import { runTransaction } from '../../core/instantdb-transaction';
+import { toaster } from '../../components/ui/toaster';
+import tariffLimits from '../../../tariff-limits.json';
 
 const SMART_PARAMS_TYPES = [
   {
@@ -102,24 +104,35 @@ export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTask
 
     const idsForCreate = editedParams.filter((param) => param.isNew && !!param.name && !!param.value);
     if (idsForCreate.length > 0) {
-      runTransaction(() =>
-        createSmartParams(
-          type === 'board'
-            ? {
-                type: 'board',
-                smartParams: idsForCreate,
-                teamId: currentTeamId as string,
-                boardId: props.boardId as string,
-                creatorId: user?.id as string,
-              }
-            : {
-                type: 'task',
-                smartParams: idsForCreate,
-                teamId: currentTeamId as string,
-                taskId: props.taskId as string,
-                creatorId: user?.id,
-              }
-        )
+      runTransaction(
+        () =>
+          createSmartParams(
+            type === 'board'
+              ? {
+                  type: 'board',
+                  smartParams: idsForCreate,
+                  teamId: currentTeamId as string,
+                  boardId: props.boardId as string,
+                  creatorId: user?.id as string,
+                }
+              : {
+                  type: 'task',
+                  smartParams: idsForCreate,
+                  teamId: currentTeamId as string,
+                  taskId: props.taskId as string,
+                  creatorId: user?.id,
+                }
+          ),
+        (result) => {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-expect-error
+          if (result.isErr() && result.error.originalError?.hint?.expected === 'perms-pass?') {
+            toaster.create({
+              title: `Maximum ${tariffLimits.free.max_smart_params} smart params allowed for ${type}`,
+              type: 'error',
+            });
+          }
+        }
       );
     }
 
@@ -148,9 +161,14 @@ export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTask
       return;
     }
 
-    runTransaction(() => deleteSmartParam({ smartParamId: id })).then(() => {
-      setEditedParams((prev) => prev.filter((param) => param.id !== id));
-    });
+    runTransaction(
+      () => deleteSmartParam({ smartParamId: id }),
+      (result) => {
+        if (result.isOk()) {
+          setEditedParams((prev) => prev.filter((param) => param.id !== id));
+        }
+      }
+    );
   };
 
   const handleChangeParam = (id: string, fieldName: keyof EditableSmartParam, fieldValue?: string) => {
@@ -267,6 +285,7 @@ function SmartParamField({
           onChange={(e) => onChange?.(param.id, 'name', e.target.value)}
           value={param.name}
           maxW="160px"
+          maxLength={20}
         />
         <Select
           options={SMART_PARAMS_TYPES}
@@ -292,6 +311,7 @@ function SmartParamField({
             onChange={(e) => onChange?.(param.id, 'value', e.target.value)}
             value={paramValue}
             type="text"
+            maxLength={20}
           />
         )}
         {param.type === 'number' && (
@@ -311,6 +331,7 @@ function SmartParamField({
             onChange={(e) => onChange?.(param.id, 'value', e.target.value)}
             value={paramValue}
             type="text"
+            maxLength={20}
           />
         )}
         {param.type === 'date' && (

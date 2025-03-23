@@ -1,10 +1,12 @@
 import { Box, Heading } from '@chakra-ui/react';
 import { Auth } from '../../features/auth';
 import Helm from '../../components/Helm';
+import styles from './auth.module.css';
 
 export function AuthPage() {
   return (
     <Box
+      className={styles.authPage}
       style={{
         display: 'flex',
         flexDirection: 'column',
@@ -17,7 +19,7 @@ export function AuthPage() {
     >
       <Helm title="Auth" />
       <Box
-        bg="chakra-body-bg"
+        className={styles.authBox}
         borderWidth="1px"
         style={{
           width: '100%',
