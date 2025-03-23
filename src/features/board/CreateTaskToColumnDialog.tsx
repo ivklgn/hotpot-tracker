@@ -137,6 +137,7 @@ export const CreateTaskToColumnDialog: React.FC<CreateTaskToColumnDialogProps> =
                   required
                   type="text"
                   minLength={1}
+                  maxLength={80}
                 />
               </Field>
             )}

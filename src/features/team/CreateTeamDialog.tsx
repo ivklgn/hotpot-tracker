@@ -83,6 +83,7 @@ export const CreateTeamDialog: React.FC<CreateTeamDialogProps> = ({ opener, isOp
                 required
                 type="text"
                 minLength={1}
+                maxLength={20}
               />
             </Field>
           </DialogBody>

@@ -76,6 +76,7 @@ export const CreateBoardDialog: React.FC<CreateTeamDialogProps> = ({ opener }) =
                 required
                 type="text"
                 minLength={1}
+                maxLength={20}
               />
             </Field>
           </DialogBody>

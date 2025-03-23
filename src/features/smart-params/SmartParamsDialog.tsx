@@ -285,6 +285,7 @@ function SmartParamField({
           onChange={(e) => onChange?.(param.id, 'name', e.target.value)}
           value={param.name}
           maxW="160px"
+          maxLength={20}
         />
         <Select
           options={SMART_PARAMS_TYPES}
@@ -310,6 +311,7 @@ function SmartParamField({
             onChange={(e) => onChange?.(param.id, 'value', e.target.value)}
             value={paramValue}
             type="text"
+            maxLength={20}
           />
         )}
         {param.type === 'number' && (
@@ -329,6 +331,7 @@ function SmartParamField({
             onChange={(e) => onChange?.(param.id, 'value', e.target.value)}
             value={paramValue}
             type="text"
+            maxLength={20}
           />
         )}
         {param.type === 'date' && (

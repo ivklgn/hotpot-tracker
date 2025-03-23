@@ -103,6 +103,7 @@ export const InviteMemberDialog: React.FC<CreateTeamDialogProps> = ({ opener }) 
                 }}
                 required
                 type="email"
+                maxLength={254}
               />
             </Field>
           </DialogBody>

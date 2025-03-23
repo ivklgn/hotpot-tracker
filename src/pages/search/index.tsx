@@ -61,6 +61,7 @@ export function SearchPage() {
           onChange={(e) => {
             setSearch(e.target.value);
           }}
+          maxLength={80}
         />
       </InputGroup>
       <Flex direction="column" pt="6" gap="2" overflowY="scroll">

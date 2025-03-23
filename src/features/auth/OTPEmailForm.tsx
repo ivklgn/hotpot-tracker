@@ -40,6 +40,7 @@ export function OTPEmailForm({ onCodeSendComplete }: OTPEmailFormProps) {
               value={email as string}
               onChange={(e) => setEmail(e.target.value)}
               required
+              maxLength={254}
             />
           </Field>
         </Fieldset.Content>
