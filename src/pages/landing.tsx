@@ -19,6 +19,10 @@ import {
   Span,
 } from '@chakra-ui/react';
 import logoShort from '../assets/logo-short.png';
+// Placeholder imports for mockup screenshots - these would need to be added to assets folder
+import mockupRecipe from '../assets/mockup-recipe-tracking.png';
+import mockupPlanning from '../assets/mockup-meal-planning.png';
+import mockupAnalytics from '../assets/mockup-taste-analytics.png';
 import { Auth } from '../features/auth';
 import { db } from '../instantdb';
 import { UserAvatar } from '../components/Avatars';
@@ -26,10 +30,20 @@ import { Link } from 'wouter';
 import { FaUtensils, FaClipboardList, FaUsers, FaChartLine, FaMobileAlt, FaShieldAlt } from 'react-icons/fa';
 import tariffLimits from '../../tariff-limits.json';
 
+import s from './landing.module.css';
+
 interface FeatureCardProps {
   icon: React.ComponentType;
   title: string;
   text: string;
+}
+
+interface FeatureShowcaseProps {
+  image: string;
+  title: string;
+  description: string;
+  features: string[];
+  isReversed?: boolean;
 }
 
 const FeatureCard = ({ icon, title, text }: FeatureCardProps) => {
@@ -55,6 +69,54 @@ const FeatureCard = ({ icon, title, text }: FeatureCardProps) => {
       <Heading fontSize="xl">{title}</Heading>
       <Text color="gray.600">{text}</Text>
     </VStack>
+  );
+};
+
+const FeatureShowcase = ({
+  image,
+  title,
+  description,
+  features,
+  isReversed = false,
+}: FeatureShowcaseProps) => {
+  return (
+    <Stack
+      direction={{ base: 'column', lg: isReversed ? 'row-reverse' : 'row' }}
+      gap={{ base: 8, md: 10 }}
+      py={10}
+      align="center"
+    >
+      <Flex flex={1} justify="center">
+        <Image
+          rounded="md"
+          alt={`${title} screenshot`}
+          src={image}
+          objectFit="cover"
+          boxShadow="2xl"
+          width={{ base: '100%', md: '90%' }}
+          height="auto"
+          maxH="400px"
+          transition="transform 0.3s ease-in-out"
+          _hover={{ transform: 'scale(1.02)' }}
+        />
+      </Flex>
+      <Stack flex={1} gap={5}>
+        <Heading fontSize={{ base: '2xl', sm: '3xl' }}>{title}</Heading>
+        <Text fontSize={{ base: 'md', md: 'lg' }} color="gray.600">
+          {description}
+        </Text>
+        <VStack align="start" gap={3}>
+          {features.map((feature, index) => (
+            <HStack key={index} align="start" gap={2}>
+              <Box color="green.400" px={2}>
+                •
+              </Box>
+              <Text fontSize={{ base: 'md', md: 'lg' }}>{feature}</Text>
+            </HStack>
+          ))}
+        </VStack>
+      </Stack>
+    </Stack>
   );
 };
 
@@ -111,7 +173,7 @@ const AuthForm = () => {
 
 export function Landing() {
   return (
-    <Box>
+    <Box className={s.landing}>
       <Box position="relative" overflow="hidden">
         <Container maxW="7xl" py={16}>
           <Stack
@@ -158,6 +220,9 @@ export function Landing() {
       <Box py={16}>
         <Container maxW="7xl">
           <VStack gap={8} mb={12}>
+            <Box mb="6">
+              <Image rounded="md" src={logoShort} alt="Hotpot Tracker Logo" maxW={120} />
+            </Box>
             <Heading fontSize={{ base: '3xl', md: '4xl' }} textAlign="center">
               Features that make tracking easier
             </Heading>
@@ -198,6 +263,58 @@ export function Landing() {
               text="Your recipes and preferences are securely stored and backed up."
             />
           </SimpleGrid>
+        </Container>
+      </Box>
+
+      <Box py={16}>
+        <Container maxW="7xl">
+          <VStack gap={8} mb={12}>
+            <Heading fontSize={{ base: '3xl', md: '4xl' }} textAlign="center">
+              See Hotpot Tracker in Action
+            </Heading>
+            <Text fontSize="xl" textAlign="center" maxW="3xl">
+              Discover how our intuitive interface makes managing your hotpot experiences a delight
+            </Text>
+          </VStack>
+
+          <VStack gap={20}>
+            <FeatureShowcase
+              // image={mockupRecipe}
+              title="Intuitive Recipe Management"
+              description="Easily create, organize, and discover hotpot recipes that match your taste preferences."
+              features={[
+                'Drag-and-drop interface for building custom recipes',
+                'Smart ingredient pairing suggestions',
+                'Filter recipes by dietary preferences and restrictions',
+                'Save favorite combinations for quick access',
+              ]}
+            />
+
+            <FeatureShowcase
+              // image={mockupPlanning}
+              title="Smart Meal Planning"
+              description="Plan your hotpot gatherings with precision and eliminate the guesswork."
+              features={[
+                'Automatic portion calculations based on guest count',
+                'Integrated shopping lists with ingredient quantities',
+                'Preparation timelines and reminders',
+                'Dietary restriction tracking for guests',
+              ]}
+              isReversed={true}
+            />
+
+            <FeatureShowcase
+              // image={mockupAnalytics}
+              title="Personalized Analytics"
+              description="Gain insights into your hotpot preferences and discover new flavor combinations."
+              features={[
+                'Visual taste profile development over time',
+                'Ingredient pairing recommendations based on your history',
+                'Seasonal trend analysis for optimal ingredient selection',
+                'Community comparison to discover new possibilities',
+              ]}
+            />
+          </VStack>
         </Container>
       </Box>
 
@@ -296,38 +413,6 @@ export function Landing() {
               </VStack>
             </Box>
           </SimpleGrid>
-        </Container>
-      </Box>
-
-      <Box py={16}>
-        <Container maxW="7xl">
-          <Stack flex={1} gap={6} alignItems="center">
-            <Box mb="6">
-              <Image rounded="md" src={logoShort} alt="Hotpot Tracker Logo" maxW={120} />
-            </Box>
-            <Heading fontSize={{ base: '3xl', md: '4xl' }} textAlign="center">
-              Ready to Start Tracking?
-            </Heading>
-            <Text fontSize="xl" textAlign="center" maxW="3xl">
-              Join thousands of hotpot enthusiasts who are managing their dining experiences smarter. Our
-              platform helps you discover new flavors and perfect your hotpot technique.
-            </Text>
-            <Box mt={4}>
-              <Link to="/workspace">
-                <Button
-                  rounded="full"
-                  size="lg"
-                  fontWeight="bold"
-                  px={6}
-                  colorScheme="blue"
-                  bg="blue.400"
-                  _hover={{ bg: 'blue.500' }}
-                >
-                  Get Started For Free
-                </Button>
-              </Link>
-            </Box>
-          </Stack>
         </Container>
       </Box>
 

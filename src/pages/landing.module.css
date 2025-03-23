@@ -1,0 +1,8 @@
+.landing {
+  --gradient-stops: var(--gradient-from), var(--gradient-to);
+  --gradient: var(--gradient-via-stops, var(--gradient-stops));
+  background-image: linear-gradient(0deg, var(--gradient));
+  --gradient-from: var(--chakra-colors-transparent);
+  --mix---gradient-to: color-mix(in srgb, var(--chakra-colors-blue-300) 20%, transparent);
+  --gradient-to: var(--mix---gradient-to, var(--chakra-colors-blue-300));
+}
