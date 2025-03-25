@@ -16,6 +16,7 @@ import {
   Blockquote,
   Float,
   Span,
+  SimpleGrid,
 } from '@chakra-ui/react';
 import boardScreenshotLight from '../assets/board-screenshot-light.png';
 import boardScreenshotDark from '../assets/board-screenshot-dark.png';
@@ -32,6 +33,34 @@ import { useColorMode } from '../components/ui/color-mode';
 import { LuUserPlus, LuUsers, LuSquareMenu, LuSquareKanban } from 'react-icons/lu';
 
 import s from './landing.module.css';
+
+interface FeatureCardProps {
+  title: string;
+  text: string;
+}
+
+const FeatureCard = ({ title, text }: FeatureCardProps) => {
+  return (
+    <VStack
+      p={8}
+      rounded="xl"
+      shadow="md"
+      borderWidth="1px"
+      borderColor="gray.100"
+      gap={4}
+      align="start"
+      height="100%"
+      transition="all 0.3s"
+      _hover={{
+        transform: 'translateY(-5px)',
+        shadow: 'lg',
+      }}
+    >
+      <Heading fontSize="xl">{title}</Heading>
+      <Text color="gray.600">{text}</Text>
+    </VStack>
+  );
+};
 
 interface FeatureShowcaseProps {
   image?: string;
@@ -60,7 +89,7 @@ const FeatureShowcase = ({
           rounded="md"
           alt={`${title} screenshot`}
           src={image}
-          objectFit="cover"
+          objectFit="contain"
           boxShadow="2xl"
           width={{ base: '100%', md: '90%' }}
           height="auto"
@@ -119,11 +148,11 @@ const AuthForm = () => {
             </Link>
             <HStack gap={2}>
               <ChakraLink asChild variant="underline">
-                <Link to="/workspace">Go to workspace</Link>
+                <Link to="/workspace">В аккаунт</Link>
               </ChakraLink>
               <Separator orientation="vertical" height="4" />
               <ChakraLink asChild color="red.500" onClick={handleSignOutClick}>
-                <Link to="/workspace">Logout</Link>
+                <Link to="/workspace">Выход</Link>
               </ChakraLink>
             </HStack>
           </Stack>
@@ -131,7 +160,7 @@ const AuthForm = () => {
       ) : (
         <Box>
           <Text textStyle="2xl" textAlign="center" mb={4}>
-            Sign in/up with email
+            Войти/зарегистрироваться по email
           </Text>
           <Auth />
         </Box>
@@ -159,12 +188,13 @@ export function Landing() {
               <Heading fontWeight={800} fontSize={{ base: '3xl', sm: '4xl', md: '6xl' }} lineHeight="110%">
                 Hotpot{' '}
                 <Text as="span" color="blue.400">
-                  Tracker
+                  Tracker 🍲
                 </Text>
               </Heading>
               <Text fontSize={{ base: 'lg', sm: 'xl' }} maxW="xl">
-                <strong>«Cook it the way you want it»</strong> <br />
-                Try simple and useful primitives to build a more efficient process for your projects.
+                <strong>«Приготовь так, как считаешь нужным»</strong> <br />
+                Обычные agile-доски – это ресторан с шефом, где ты не влияешь на процесс. Hotpot – как хого:
+                собирай команду и готовь рабочий процесс по своему вкусу. 🥢
               </Text>
               <Stack direction={{ base: 'column', sm: 'row' }} gap={4} mt={2}>
                 <Button
@@ -179,10 +209,10 @@ export function Landing() {
                     navigate('/auth');
                   }}
                 >
-                  Get Started
+                  Начать
                 </Button>
                 <Button rounded="full" size="lg" fontWeight="bold" px={6} variant="outline">
-                  Learn More
+                  Подробнее
                 </Button>
               </Stack>
             </Stack>
@@ -195,11 +225,11 @@ export function Landing() {
         <Container maxW="7xl">
           <VStack gap={8} mb={12}>
             <Heading fontSize={{ base: '3xl', md: '4xl' }} textAlign="center">
-              One more Trello?
+              Еще один клон Trello?
             </Heading>
             <Text fontSize="xl" textAlign="center" maxW="3xl">
-              Almost.. But not quite. Hotpot Tracker provide couple new primitive features for improve your
-              workflow
+              Почти... Но не совсем. Hotpot Tracker не только содержит привычные примитивы как
+              доски/колонки/задачи, но и добавляет несколько простых и интересных инструментов
             </Text>
           </VStack>
           <Image
@@ -213,27 +243,106 @@ export function Landing() {
       <Box py={16}>
         <Container maxW="7xl">
           <Stack flex={1} gap={6} textAlign="center">
-            <Heading fontSize={{ base: '3xl', md: '4xl' }}>From engineers with love</Heading>
+            <Heading fontSize={{ base: '3xl', md: '4xl' }}>С любовью от инженеров 🤓</Heading>
             <Text fontSize="xl" maxW="3xl" mx="auto">
-              We provide the most important features from open-source systems like conversations in merge/pull
-              requests. Built by engineers who are passionate about both code and cuisine.
+              При работе с открытым исходным кодом у разработчиков есть масса эффективных инструментов, про
+              которые коллеги из бизнеса никогда не слышали.
             </Text>
+            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={10} textAlign="left">
+              <FeatureCard
+                title="Больше досок"
+                text="Создавай доски под определенные проекты/задачи вместо одной большой и универсальной."
+              />
+              <FeatureCard
+                title="Вовлечение команды"
+                text="Назначайте членов команды на всех этапах работы (колонках) в роли проверяющих"
+              />
+              <FeatureCard
+                title="Простые атрибуты"
+                text="Вместо навязанных полей в задачах - произвольные ключ-значения для выражения любых смыслов"
+              />
+              <FeatureCard
+                title="Одобрения"
+                text="Блокируйте ход задачи по этапам если ее не одобрят ваши коллеги"
+              />
+              <FeatureCard
+                title="Комментарии - зло"
+                text="Вместо этого обсуждайте определенную деталь в самом документе"
+              />
+              <FeatureCard
+                title="AI"
+                text="Чем точнее отобразишь процесс на доске тем лучше AI сможет его понять"
+              />
+            </SimpleGrid>
+          </Stack>
+        </Container>
+      </Box>
+
+      <Box py={16}>
+        <Container maxW="7xl">
+          <VStack gap={8} mb={12}>
+            <Heading fontSize={{ base: '3xl', md: '4xl' }} textAlign="center">
+              Интересные возможности
+            </Heading>
+          </VStack>
+
+          <VStack gap={20}>
+            <FeatureShowcase
+              image={colorMode === 'light' ? smartparamsScreenshotLight : smartparamsScreenshotDark}
+              title="Атрибуты для досок и задач"
+              description="Вместо навязанных полей в задачах - произвольные ключ-значения"
+              features={[
+                'Срок? Исполнитель? Приоритет? Прогресс? - атрибут',
+                'Одинаково работает как в задачах, так и в досках',
+                'Задачи автоматически наследуют параметры доски',
+              ]}
+            />
+
+            <FeatureShowcase
+              image={colorMode === 'light' ? columnScreenshotLight : columnScreenshotDark}
+              title="Проверки и одобрения"
+              description="Возможность указать проверяющих пользователей"
+              features={[
+                'Колонка - этап работы, в котором задача может быть проверена нужными людьми',
+                'Выбирайте пользователя, которым нужно одобрить задачу',
+                'Правила одобрения блокируют движения задачи по этапам',
+              ]}
+              isReversed={true}
+            />
+
+            <FeatureShowcase
+              // image={colorMode === 'light' ? smartparamsScreenshotLight : smartparamsScreenshotDark}
+              title="Обсуждения прямо в задачах"
+              description="Управляйте хаосом комментариев привязываясь к обсуждению чего то конкретного в задаче"
+              features={[
+                'Возможность создать обсуждение в задаче',
+                'В процессе общения обсуждение должно быть завершено и закрыто',
+                'Процесс обсуждения связан с одобрениями и проверками',
+              ]}
+            />
+          </VStack>
+        </Container>
+      </Box>
+
+      <Box py={16}>
+        <Container maxW="7xl">
+          <Stack flex={1} gap={6} textAlign="center">
             <Blockquote.Root bg="bg.subtle" padding="8" maxW="7xl">
               <Float placement="bottom-end" offset="10">
                 <Blockquote.Icon opacity="0.4" boxSize="10" rotate="180deg" />
               </Float>
-              <Blockquote.Content cite="Uzumaki Naruto">
-                If anyone thinks he is something when he is nothing, he deceives himself. Each one should test
-                his own actions. Then he can take pride in himself, without comparing himself to anyone else.
+              <Blockquote.Content>
+                Иногда важно отбросить лишнее. Наша система убирает навязанные правила, помогая выстроить
+                процесс, исходя из реальных вызовов.
               </Blockquote.Content>
               <Blockquote.Caption>
                 <cite>
                   <HStack mt="2" gap="3">
                     <Avatar.Root size="sm">
-                      <Avatar.Fallback name="Emily Jones" />
+                      <Avatar.Fallback name="Иван К., Автор" />
                       <Avatar.Image src="https://i.pravatar.cc/150?u=re" />
                     </Avatar.Root>
-                    <Span fontWeight="medium">Emily Jones</Span>
+                    <Span fontWeight="medium">Иван К., Автор</Span>
                   </HStack>
                 </cite>
               </Blockquote.Caption>
@@ -246,60 +355,11 @@ export function Landing() {
         <Container maxW="7xl">
           <VStack gap={8} mb={12}>
             <Heading fontSize={{ base: '3xl', md: '4xl' }} textAlign="center">
-              See Hotpot Tracker in Action
+              Цены
             </Heading>
             <Text fontSize="xl" textAlign="center" maxW="3xl">
-              Discover how our intuitive interface makes managing your hotpot experiences a delight
-            </Text>
-          </VStack>
-
-          <VStack gap={20}>
-            <FeatureShowcase
-              image={colorMode === 'light' ? smartparamsScreenshotLight : smartparamsScreenshotDark}
-              title="Smart Params"
-              description="Simple attributes for boards and tasks"
-              features={[
-                'Simple and usable attributes provide',
-                'Task inherit board smart params automatically',
-                'Filter recipes by dietary preferences and restrictions',
-              ]}
-            />
-
-            <FeatureShowcase
-              image={colorMode === 'light' ? columnScreenshotLight : columnScreenshotDark}
-              title="Column contributors"
-              description="Create stages with you temmate for focus on your problems"
-              features={[
-                'Automatic portion calculations based on guest count',
-                'Integrated shopping lists with ingredient quantities',
-                'Preparation timelines and reminders',
-              ]}
-              isReversed={true}
-            />
-
-            <FeatureShowcase
-              image={colorMode === 'light' ? smartparamsScreenshotLight : smartparamsScreenshotDark}
-              title="Personalized Analytics"
-              description="Gain insights into your hotpot preferences and discover new flavor combinations."
-              features={[
-                'Visual taste profile development over time',
-                'Ingredient pairing recommendations based on your history',
-                'Seasonal trend analysis for optimal ingredient selection',
-                'Community comparison to discover new possibilities',
-              ]}
-            />
-          </VStack>
-        </Container>
-      </Box>
-
-      <Box py={16}>
-        <Container maxW="7xl">
-          <VStack gap={8} mb={12}>
-            <Heading fontSize={{ base: '3xl', md: '4xl' }} textAlign="center">
-              Our plans
-            </Heading>
-            <Text fontSize="xl" textAlign="center" maxW="3xl">
-              Now we are in <strong>apha</strong>, you can try our system for free
+              Сейчас мы находимся в <strong>альфа</strong>-версии, вы можете попробовать нашу систему
+              бесплатно
             </Text>
           </VStack>
 
@@ -319,37 +379,37 @@ export function Landing() {
             >
               <Box bg="blue.400" py={4} px={6}>
                 <Text fontWeight="bold" fontSize="xl">
-                  Free
+                  Бесплатно
                 </Text>
               </Box>
               <VStack p={6} align="stretch" gap={6}>
                 <HStack>
                   <Heading fontSize="5xl">$0</Heading>
-                  <Text alignSelf="end">/ month</Text>
+                  <Text alignSelf="end">/ месяц</Text>
                 </HStack>
-                <Text>Perfect for individuals and small teams just getting started</Text>
+                <Text>Идеально подходит небольших команд</Text>
                 <Link to="/workspace">
                   <Button colorScheme="blue" size="lg" w="full">
-                    Get Started
+                    Начать
                   </Button>
                 </Link>
                 <VStack align="start">
-                  <Heading size="sm">Plan include:</Heading>
+                  <Heading size="sm">Ограничения:</Heading>
                   <HStack>
                     <Icon as={LuUserPlus} color="green.500" />
-                    <Text>{tariffLimits.free.max_teams_per_account} teams per account</Text>
+                    <Text>{tariffLimits.free.max_teams_per_account} команд на аккаунт</Text>
                   </HStack>
                   <HStack>
                     <Icon as={LuUsers} color="green.500" />
-                    <Text>{tariffLimits.free.max_members_per_team} members per team</Text>
+                    <Text>{tariffLimits.free.max_members_per_team} участников на команду</Text>
                   </HStack>
                   <HStack>
                     <Icon as={LuSquareKanban} color="green.500" />
-                    <Text>{tariffLimits.free.max_boards_per_team} boards per team</Text>
+                    <Text>{tariffLimits.free.max_boards_per_team} досок на команду</Text>
                   </HStack>
                   <HStack>
                     <Icon as={LuSquareMenu} color="green.500" />
-                    <Text>{tariffLimits.free.max_tasks_per_team} tasks per team</Text>
+                    <Text>{tariffLimits.free.max_tasks_per_team} задач на команду</Text>
                   </HStack>
                 </VStack>
               </VStack>
@@ -362,7 +422,7 @@ export function Landing() {
         <Container maxW="7xl">
           <Stack direction={{ base: 'column', md: 'row' }} gap={8} justify="space-between">
             <Stack gap={4} align={{ base: 'center', md: 'flex-start' }}>
-              <Text>© 2025 Hotpot Tracker. All rights reserved.</Text>
+              <Text>© 2025 Hotpot Tracker. Все права защищены.</Text>
             </Stack>
             <Stack direction={{ base: 'column', md: 'row' }} gap={8}>
               {/* <ChakraLink>Blog</ChakraLink> */}
