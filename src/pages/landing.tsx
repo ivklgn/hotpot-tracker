@@ -16,6 +16,7 @@ import {
   Blockquote,
   Float,
   Span,
+  SimpleGrid,
 } from '@chakra-ui/react';
 import boardScreenshotLight from '../assets/board-screenshot-light.png';
 import boardScreenshotDark from '../assets/board-screenshot-dark.png';
@@ -32,6 +33,34 @@ import { useColorMode } from '../components/ui/color-mode';
 import { LuUserPlus, LuUsers, LuSquareMenu, LuSquareKanban } from 'react-icons/lu';
 
 import s from './landing.module.css';
+
+interface FeatureCardProps {
+  title: string;
+  text: string;
+}
+
+const FeatureCard = ({ title, text }: FeatureCardProps) => {
+  return (
+    <VStack
+      p={8}
+      rounded="xl"
+      shadow="md"
+      borderWidth="1px"
+      borderColor="gray.100"
+      gap={4}
+      align="start"
+      height="100%"
+      transition="all 0.3s"
+      _hover={{
+        transform: 'translateY(-5px)',
+        shadow: 'lg',
+      }}
+    >
+      <Heading fontSize="xl">{title}</Heading>
+      <Text color="gray.600">{text}</Text>
+    </VStack>
+  );
+};
 
 interface FeatureShowcaseProps {
   image?: string;
@@ -60,13 +89,14 @@ const FeatureShowcase = ({
           rounded="md"
           alt={`${title} screenshot`}
           src={image}
-          objectFit="cover"
+          objectFit="contain"
           boxShadow="2xl"
           width={{ base: '100%', md: '90%' }}
           height="auto"
-          maxH="700px"
+          maxH="480px"
           transition="transform 0.3s ease-in-out"
           _hover={{ transform: 'scale(1.02)' }}
+          fit="contain"
         />
       </Flex>
       <Stack flex={1} gap={5}>
@@ -119,11 +149,11 @@ const AuthForm = () => {
             </Link>
             <HStack gap={2}>
               <ChakraLink asChild variant="underline">
-                <Link to="/workspace">Go to workspace</Link>
+                <Link to="/workspace">To account</Link>
               </ChakraLink>
               <Separator orientation="vertical" height="4" />
               <ChakraLink asChild color="red.500" onClick={handleSignOutClick}>
-                <Link to="/workspace">Logout</Link>
+                <Link to="/workspace">Sign out</Link>
               </ChakraLink>
             </HStack>
           </Stack>
@@ -131,7 +161,7 @@ const AuthForm = () => {
       ) : (
         <Box>
           <Text textStyle="2xl" textAlign="center" mb={4}>
-            Sign in/up with email
+            Sign in/register by email
           </Text>
           <Auth />
         </Box>
@@ -159,12 +189,13 @@ export function Landing() {
               <Heading fontWeight={800} fontSize={{ base: '3xl', sm: '4xl', md: '6xl' }} lineHeight="110%">
                 Hotpot{' '}
                 <Text as="span" color="blue.400">
-                  Tracker
+                  Tracker 🍲
                 </Text>
               </Heading>
               <Text fontSize={{ base: 'lg', sm: 'xl' }} maxW="xl">
-                <strong>«Cook it the way you want it»</strong> <br />
-                Try simple and useful primitives to build a more efficient process for your projects.
+                <strong>"Cook it the way you see fit"</strong> <br />
+                Regular agile boards are like a restaurant with a chef where you don't influence the process.
+                Hotpot is like hotpot: gather your team and prepare your workflow to your taste. 🥢
               </Text>
               <Stack direction={{ base: 'column', sm: 'row' }} gap={4} mt={2}>
                 <Button
@@ -195,11 +226,11 @@ export function Landing() {
         <Container maxW="7xl">
           <VStack gap={8} mb={12}>
             <Heading fontSize={{ base: '3xl', md: '4xl' }} textAlign="center">
-              One more Trello?
+              Another Trello Clone?
             </Heading>
             <Text fontSize="xl" textAlign="center" maxW="3xl">
-              Almost.. But not quite. Hotpot Tracker provide couple new primitive features for improve your
-              workflow
+              Almost... But not quite. Hotpot Tracker not only contains familiar primitives like
+              boards/columns/tasks, but also adds several simple and interesting tools
             </Text>
           </VStack>
           <Image
@@ -213,27 +244,110 @@ export function Landing() {
       <Box py={16}>
         <Container maxW="7xl">
           <Stack flex={1} gap={6} textAlign="center">
-            <Heading fontSize={{ base: '3xl', md: '4xl' }}>From engineers with love</Heading>
+            <Heading fontSize={{ base: '3xl', md: '4xl' }}>With love from engineers 🤓</Heading>
             <Text fontSize="xl" maxW="3xl" mx="auto">
-              We provide the most important features from open-source systems like conversations in merge/pull
-              requests. Built by engineers who are passionate about both code and cuisine.
+              When working with open source, developers have many effective tools that business colleagues
+              have never heard of.
             </Text>
+            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={10} textAlign="left">
+              <FeatureCard
+                title="More boards"
+                text="Create boards for specific projects/tasks instead of one large and universal one."
+              />
+              <FeatureCard
+                title="Team involvement"
+                text="Assign team members at all stages of work (columns) in the role of reviewers"
+              />
+              <FeatureCard
+                title="Simple attributes"
+                text="Instead of imposed fields in tasks - arbitrary key-values to express any meanings"
+              />
+              <FeatureCard
+                title="Approvals"
+                text="Block the progress of a task through stages if it's not approved by your colleagues"
+              />
+              <FeatureCard
+                title="Comments are evil"
+                text="Instead, discuss a specific detail in the document itself"
+              />
+              <FeatureCard
+                title="AI"
+                text="The more accurately you display the process on the board, the better AI will be able to understand it"
+              />
+            </SimpleGrid>
+          </Stack>
+        </Container>
+      </Box>
+
+      <Box py={16}>
+        <Container maxW="7xl">
+          <VStack gap={8} mb={12}>
+            <Heading fontSize={{ base: '3xl', md: '4xl' }} textAlign="center">
+              Interesting features
+            </Heading>
+          </VStack>
+
+          <VStack gap={20}>
+            <FeatureShowcase
+              image={colorMode === 'light' ? smartparamsScreenshotLight : smartparamsScreenshotDark}
+              title="Attributes for boards and tasks"
+              description="Instead of imposed fields in tasks - arbitrary key-values"
+              features={[
+                "Deadline? Assignee? Priority? Progress? - it's an attribute",
+                'Works the same way in both tasks and boards',
+                'Tasks automatically inherit board parameters',
+              ]}
+            />
+
+            <FeatureShowcase
+              image={colorMode === 'light' ? columnScreenshotLight : columnScreenshotDark}
+              title="Reviews and approvals"
+              description="Ability to specify reviewing users"
+              features={[
+                'Column - a stage of work in which a task can be reviewed by the right people',
+                'Choose a user who needs to approve the task',
+                'Approval rules block task movement through stages',
+              ]}
+              isReversed={true}
+            />
+
+            <FeatureShowcase
+              // image={colorMode === 'light' ? smartparamsScreenshotLight : smartparamsScreenshotDark}
+              title="Discussions right in the tasks"
+              description="Manage comment chaos by tying to a discussion of something specific in the task"
+              features={[
+                'Ability to create a discussion in a task',
+                'During communication, the discussion should be completed and closed',
+                'The discussion process is linked to approvals and reviews',
+              ]}
+            />
+          </VStack>
+        </Container>
+      </Box>
+
+      <Box py={16}>
+        <Container maxW="7xl">
+          <Stack flex={1} gap={6} textAlign="center">
             <Blockquote.Root bg="bg.subtle" padding="8" maxW="7xl">
               <Float placement="bottom-end" offset="10">
                 <Blockquote.Icon opacity="0.4" boxSize="10" rotate="180deg" />
               </Float>
-              <Blockquote.Content cite="Uzumaki Naruto">
-                If anyone thinks he is something when he is nothing, he deceives himself. Each one should test
-                his own actions. Then he can take pride in himself, without comparing himself to anyone else.
+              <Blockquote.Content>
+                Sometimes it's important to discard the unnecessary. Our system removes imposed rules, helping
+                to build a process based on real challenges.
               </Blockquote.Content>
               <Blockquote.Caption>
                 <cite>
                   <HStack mt="2" gap="3">
                     <Avatar.Root size="sm">
-                      <Avatar.Fallback name="Emily Jones" />
-                      <Avatar.Image src="https://i.pravatar.cc/150?u=re" />
+                      <Avatar.Fallback name="Ivan K., Author" />
+                      <Avatar.Image src="https://www.ivklgn.blog/assets/me.jpg" />
                     </Avatar.Root>
-                    <Span fontWeight="medium">Emily Jones</Span>
+                    <Span fontWeight="medium">
+                      <ChakraLink href="https://www.ivklgn.blog/" target="_blank">
+                        Ivan K., Creator of Hotpot Tracker
+                      </ChakraLink>
+                    </Span>
                   </HStack>
                 </cite>
               </Blockquote.Caption>
@@ -246,60 +360,10 @@ export function Landing() {
         <Container maxW="7xl">
           <VStack gap={8} mb={12}>
             <Heading fontSize={{ base: '3xl', md: '4xl' }} textAlign="center">
-              See Hotpot Tracker in Action
+              Pricing
             </Heading>
             <Text fontSize="xl" textAlign="center" maxW="3xl">
-              Discover how our intuitive interface makes managing your hotpot experiences a delight
-            </Text>
-          </VStack>
-
-          <VStack gap={20}>
-            <FeatureShowcase
-              image={colorMode === 'light' ? smartparamsScreenshotLight : smartparamsScreenshotDark}
-              title="Smart Params"
-              description="Simple attributes for boards and tasks"
-              features={[
-                'Simple and usable attributes provide',
-                'Task inherit board smart params automatically',
-                'Filter recipes by dietary preferences and restrictions',
-              ]}
-            />
-
-            <FeatureShowcase
-              image={colorMode === 'light' ? columnScreenshotLight : columnScreenshotDark}
-              title="Column contributors"
-              description="Create stages with you temmate for focus on your problems"
-              features={[
-                'Automatic portion calculations based on guest count',
-                'Integrated shopping lists with ingredient quantities',
-                'Preparation timelines and reminders',
-              ]}
-              isReversed={true}
-            />
-
-            <FeatureShowcase
-              image={colorMode === 'light' ? smartparamsScreenshotLight : smartparamsScreenshotDark}
-              title="Personalized Analytics"
-              description="Gain insights into your hotpot preferences and discover new flavor combinations."
-              features={[
-                'Visual taste profile development over time',
-                'Ingredient pairing recommendations based on your history',
-                'Seasonal trend analysis for optimal ingredient selection',
-                'Community comparison to discover new possibilities',
-              ]}
-            />
-          </VStack>
-        </Container>
-      </Box>
-
-      <Box py={16}>
-        <Container maxW="7xl">
-          <VStack gap={8} mb={12}>
-            <Heading fontSize={{ base: '3xl', md: '4xl' }} textAlign="center">
-              Our plans
-            </Heading>
-            <Text fontSize="xl" textAlign="center" maxW="3xl">
-              Now we are in <strong>apha</strong>, you can try our system for free
+              We are currently in <strong>alpha</strong> version, you can try our system for free
             </Text>
           </VStack>
 
@@ -316,6 +380,7 @@ export function Landing() {
                 transform: 'translateY(-5px)',
                 shadow: 'lg',
               }}
+              width="300px"
             >
               <Box bg="blue.400" py={4} px={6}>
                 <Text fontWeight="bold" fontSize="xl">
@@ -327,14 +392,14 @@ export function Landing() {
                   <Heading fontSize="5xl">$0</Heading>
                   <Text alignSelf="end">/ month</Text>
                 </HStack>
-                <Text>Perfect for individuals and small teams just getting started</Text>
+                <Text>Perfect for small teams</Text>
                 <Link to="/workspace">
                   <Button colorScheme="blue" size="lg" w="full">
                     Get Started
                   </Button>
                 </Link>
                 <VStack align="start">
-                  <Heading size="sm">Plan include:</Heading>
+                  <Heading size="sm">Limitations:</Heading>
                   <HStack>
                     <Icon as={LuUserPlus} color="green.500" />
                     <Text>{tariffLimits.free.max_teams_per_account} teams per account</Text>

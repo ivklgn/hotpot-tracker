@@ -340,9 +340,9 @@ export function Landing() {
                   <HStack mt="2" gap="3">
                     <Avatar.Root size="sm">
                       <Avatar.Fallback name="Иван К., Автор" />
-                      <Avatar.Image src="https://i.pravatar.cc/150?u=re" />
+                      <Avatar.Image src="https://www.ivklgn.blog/assets/me.jpg" />
                     </Avatar.Root>
-                    <Span fontWeight="medium">Иван К., Автор</Span>
+                    <Span fontWeight="medium">Иван К., Создатель Hotpot Tracker</Span>
                   </HStack>
                 </cite>
               </Blockquote.Caption>
@@ -376,6 +376,7 @@ export function Landing() {
                 transform: 'translateY(-5px)',
                 shadow: 'lg',
               }}
+              width="300px"
             >
               <Box bg="blue.400" py={4} px={6}>
                 <Text fontWeight="bold" fontSize="xl">
