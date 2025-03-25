@@ -93,10 +93,9 @@ const FeatureShowcase = ({
           boxShadow="2xl"
           width={{ base: '100%', md: '90%' }}
           height="auto"
-          maxH="480px"
+          maxH="700px"
           transition="transform 0.3s ease-in-out"
           _hover={{ transform: 'scale(1.02)' }}
-          fit="contain"
         />
       </Flex>
       <Stack flex={1} gap={5}>
@@ -149,11 +148,11 @@ const AuthForm = () => {
             </Link>
             <HStack gap={2}>
               <ChakraLink asChild variant="underline">
-                <Link to="/workspace">To account</Link>
+                <Link to="/workspace">В аккаунт</Link>
               </ChakraLink>
               <Separator orientation="vertical" height="4" />
               <ChakraLink asChild color="red.500" onClick={handleSignOutClick}>
-                <Link to="/workspace">Sign out</Link>
+                <Link to="/workspace">Выход</Link>
               </ChakraLink>
             </HStack>
           </Stack>
@@ -161,7 +160,7 @@ const AuthForm = () => {
       ) : (
         <Box>
           <Text textStyle="2xl" textAlign="center" mb={4}>
-            Sign in/register by email
+            Войти/зарегистрироваться по email
           </Text>
           <Auth />
         </Box>
@@ -193,9 +192,9 @@ export function Landing() {
                 </Text>
               </Heading>
               <Text fontSize={{ base: 'lg', sm: 'xl' }} maxW="xl">
-                <strong>"Cook it the way you see fit"</strong> <br />
-                Regular agile boards are like a restaurant with a chef where you don't influence the process.
-                Hotpot is like hotpot: gather your team and prepare your workflow to your taste. 🥢
+                <strong>«Приготовь так, как считаешь нужным»</strong> <br />
+                Обычные agile-доски – это ресторан с шефом, где ты не влияешь на процесс. Hotpot – как хого:
+                собирай команду и готовь рабочий процесс по своему вкусу. 🥢
               </Text>
               <Stack direction={{ base: 'column', sm: 'row' }} gap={4} mt={2}>
                 <Button
@@ -210,10 +209,10 @@ export function Landing() {
                     navigate('/auth');
                   }}
                 >
-                  Get Started
+                  Начать
                 </Button>
                 <Button rounded="full" size="lg" fontWeight="bold" px={6} variant="outline">
-                  Learn More
+                  Подробнее
                 </Button>
               </Stack>
             </Stack>
@@ -226,11 +225,11 @@ export function Landing() {
         <Container maxW="7xl">
           <VStack gap={8} mb={12}>
             <Heading fontSize={{ base: '3xl', md: '4xl' }} textAlign="center">
-              Another Trello Clone?
+              Еще один клон Trello?
             </Heading>
             <Text fontSize="xl" textAlign="center" maxW="3xl">
-              Almost... But not quite. Hotpot Tracker not only contains familiar primitives like
-              boards/columns/tasks, but also adds several simple and interesting tools
+              Почти... Но не совсем. Hotpot Tracker не только содержит привычные примитивы как
+              доски/колонки/задачи, но и добавляет несколько простых и интересных инструментов
             </Text>
           </VStack>
           <Image
@@ -244,35 +243,35 @@ export function Landing() {
       <Box py={16}>
         <Container maxW="7xl">
           <Stack flex={1} gap={6} textAlign="center">
-            <Heading fontSize={{ base: '3xl', md: '4xl' }}>With love from engineers 🤓</Heading>
+            <Heading fontSize={{ base: '3xl', md: '4xl' }}>С любовью от инженеров 🤓</Heading>
             <Text fontSize="xl" maxW="3xl" mx="auto">
-              When working with open source, developers have many effective tools that business colleagues
-              have never heard of.
+              При работе с открытым исходным кодом у разработчиков есть масса эффективных инструментов, про
+              которые коллеги из бизнеса никогда не слышали.
             </Text>
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={10} textAlign="left">
               <FeatureCard
-                title="More boards"
-                text="Create boards for specific projects/tasks instead of one large and universal one."
+                title="Больше досок"
+                text="Создавай доски под определенные проекты/задачи вместо одной большой и универсальной."
               />
               <FeatureCard
-                title="Team involvement"
-                text="Assign team members at all stages of work (columns) in the role of reviewers"
+                title="Вовлечение команды"
+                text="Назначайте членов команды на всех этапах работы (колонках) в роли проверяющих"
               />
               <FeatureCard
-                title="Simple attributes"
-                text="Instead of imposed fields in tasks - arbitrary key-values to express any meanings"
+                title="Простые атрибуты"
+                text="Вместо навязанных полей в задачах - произвольные ключ-значения для выражения любых смыслов"
               />
               <FeatureCard
-                title="Approvals"
-                text="Block the progress of a task through stages if it's not approved by your colleagues"
+                title="Одобрения"
+                text="Блокируйте ход задачи по этапам если ее не одобрят ваши коллеги"
               />
               <FeatureCard
-                title="Comments are evil"
-                text="Instead, discuss a specific detail in the document itself"
+                title="Комментарии - зло"
+                text="Вместо этого обсуждайте определенную деталь в самом документе"
               />
               <FeatureCard
                 title="AI"
-                text="The more accurately you display the process on the board, the better AI will be able to understand it"
+                text="Чем точнее отобразишь процесс на доске тем лучше AI сможет его понять"
               />
             </SimpleGrid>
           </Stack>
@@ -283,42 +282,42 @@ export function Landing() {
         <Container maxW="7xl">
           <VStack gap={8} mb={12}>
             <Heading fontSize={{ base: '3xl', md: '4xl' }} textAlign="center">
-              Interesting features
+              Интересные возможности
             </Heading>
           </VStack>
 
           <VStack gap={20}>
             <FeatureShowcase
               image={colorMode === 'light' ? smartparamsScreenshotLight : smartparamsScreenshotDark}
-              title="Attributes for boards and tasks"
-              description="Instead of imposed fields in tasks - arbitrary key-values"
+              title="Атрибуты для досок и задач"
+              description="Вместо навязанных полей в задачах - произвольные ключ-значения"
               features={[
-                "Deadline? Assignee? Priority? Progress? - it's an attribute",
-                'Works the same way in both tasks and boards',
-                'Tasks automatically inherit board parameters',
+                'Срок? Исполнитель? Приоритет? Прогресс? - атрибут',
+                'Одинаково работает как в задачах, так и в досках',
+                'Задачи автоматически наследуют параметры доски',
               ]}
             />
 
             <FeatureShowcase
               image={colorMode === 'light' ? columnScreenshotLight : columnScreenshotDark}
-              title="Reviews and approvals"
-              description="Ability to specify reviewing users"
+              title="Проверки и одобрения"
+              description="Возможность указать проверяющих пользователей"
               features={[
-                'Column - a stage of work in which a task can be reviewed by the right people',
-                'Choose a user who needs to approve the task',
-                'Approval rules block task movement through stages',
+                'Колонка - этап работы, в котором задача может быть проверена нужными людьми',
+                'Выбирайте пользователя, которым нужно одобрить задачу',
+                'Правила одобрения блокируют движения задачи по этапам',
               ]}
               isReversed={true}
             />
 
             <FeatureShowcase
               // image={colorMode === 'light' ? smartparamsScreenshotLight : smartparamsScreenshotDark}
-              title="Discussions right in the tasks"
-              description="Manage comment chaos by tying to a discussion of something specific in the task"
+              title="Обсуждения прямо в задачах"
+              description="Управляйте хаосом комментариев привязываясь к обсуждению чего то конкретного в задаче"
               features={[
-                'Ability to create a discussion in a task',
-                'During communication, the discussion should be completed and closed',
-                'The discussion process is linked to approvals and reviews',
+                'Возможность создать обсуждение в задаче',
+                'В процессе общения обсуждение должно быть завершено и закрыто',
+                'Процесс обсуждения связан с одобрениями и проверками',
               ]}
             />
           </VStack>
@@ -333,21 +332,17 @@ export function Landing() {
                 <Blockquote.Icon opacity="0.4" boxSize="10" rotate="180deg" />
               </Float>
               <Blockquote.Content>
-                Sometimes it's important to discard the unnecessary. Our system removes imposed rules, helping
-                to build a process based on real challenges.
+                Иногда важно отбросить лишнее. Наша система убирает навязанные правила, помогая выстроить
+                процесс, исходя из реальных вызовов.
               </Blockquote.Content>
               <Blockquote.Caption>
                 <cite>
                   <HStack mt="2" gap="3">
                     <Avatar.Root size="sm">
-                      <Avatar.Fallback name="Ivan K., Author" />
+                      <Avatar.Fallback name="Иван К., Автор" />
                       <Avatar.Image src="https://www.ivklgn.blog/assets/me.jpg" />
                     </Avatar.Root>
-                    <Span fontWeight="medium">
-                      <ChakraLink href="https://www.ivklgn.blog/" target="_blank">
-                        Ivan K., Creator of Hotpot Tracker
-                      </ChakraLink>
-                    </Span>
+                    <Span fontWeight="medium">Иван К., Создатель Hotpot Tracker</Span>
                   </HStack>
                 </cite>
               </Blockquote.Caption>
@@ -360,10 +355,11 @@ export function Landing() {
         <Container maxW="7xl">
           <VStack gap={8} mb={12}>
             <Heading fontSize={{ base: '3xl', md: '4xl' }} textAlign="center">
-              Pricing
+              Цены
             </Heading>
             <Text fontSize="xl" textAlign="center" maxW="3xl">
-              We are currently in <strong>alpha</strong> version, you can try our system for free
+              Сейчас мы находимся в <strong>альфа</strong>-версии, вы можете попробовать нашу систему
+              бесплатно
             </Text>
           </VStack>
 
@@ -384,37 +380,37 @@ export function Landing() {
             >
               <Box bg="blue.400" py={4} px={6}>
                 <Text fontWeight="bold" fontSize="xl">
-                  Free
+                  Бесплатно
                 </Text>
               </Box>
               <VStack p={6} align="stretch" gap={6}>
                 <HStack>
                   <Heading fontSize="5xl">$0</Heading>
-                  <Text alignSelf="end">/ month</Text>
+                  <Text alignSelf="end">/ месяц</Text>
                 </HStack>
-                <Text>Perfect for small teams</Text>
+                <Text>Идеально подходит небольших команд</Text>
                 <Link to="/workspace">
                   <Button colorScheme="blue" size="lg" w="full">
-                    Get Started
+                    Начать
                   </Button>
                 </Link>
                 <VStack align="start">
-                  <Heading size="sm">Limitations:</Heading>
+                  <Heading size="sm">Ограничения:</Heading>
                   <HStack>
                     <Icon as={LuUserPlus} color="green.500" />
-                    <Text>{tariffLimits.free.max_teams_per_account} teams per account</Text>
+                    <Text>{tariffLimits.free.max_teams_per_account} команд на аккаунт</Text>
                   </HStack>
                   <HStack>
                     <Icon as={LuUsers} color="green.500" />
-                    <Text>{tariffLimits.free.max_members_per_team} members per team</Text>
+                    <Text>{tariffLimits.free.max_members_per_team} участников на команду</Text>
                   </HStack>
                   <HStack>
                     <Icon as={LuSquareKanban} color="green.500" />
-                    <Text>{tariffLimits.free.max_boards_per_team} boards per team</Text>
+                    <Text>{tariffLimits.free.max_boards_per_team} досок на команду</Text>
                   </HStack>
                   <HStack>
                     <Icon as={LuSquareMenu} color="green.500" />
-                    <Text>{tariffLimits.free.max_tasks_per_team} tasks per team</Text>
+                    <Text>{tariffLimits.free.max_tasks_per_team} задач на команду</Text>
                   </HStack>
                 </VStack>
               </VStack>
@@ -427,7 +423,7 @@ export function Landing() {
         <Container maxW="7xl">
           <Stack direction={{ base: 'column', md: 'row' }} gap={8} justify="space-between">
             <Stack gap={4} align={{ base: 'center', md: 'flex-start' }}>
-              <Text>© 2025 Hotpot Tracker. All rights reserved.</Text>
+              <Text>© 2025 Hotpot Tracker. Все права защищены.</Text>
             </Stack>
             <Stack direction={{ base: 'column', md: 'row' }} gap={8}>
               {/* <ChakraLink>Blog</ChakraLink> */}
