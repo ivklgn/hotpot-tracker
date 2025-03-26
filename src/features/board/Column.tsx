@@ -355,7 +355,7 @@ function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
         <Field label="Danger zone" color="red">
           <ConfirmAction
             opener={
-              <Button variant="outline" colorPalette="red">
+              <Button variant="solid" colorPalette="red">
                 Delete column
               </Button>
             }

@@ -54,7 +54,7 @@ export function BoardsPage() {
           creatorId: boardFilter === 'all' ? undefined : (user?.id as string),
           teamId: currentTeamId as string,
           deletedAt: {
-            $isNull: true,
+            $isNull: boardFilter !== 'archived',
           },
         },
       },
@@ -74,6 +74,7 @@ export function BoardsPage() {
             items={[
               { label: 'All', value: 'all' },
               { label: 'My', value: 'my' },
+              { label: 'Archived', value: 'archived' },
             ]}
             onValueChange={(value) => {
               setBoardFilter(value.value);

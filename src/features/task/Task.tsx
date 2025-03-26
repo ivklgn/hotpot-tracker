@@ -87,7 +87,7 @@ export function Task({ task }: TaskProps) {
           <TaskApprove task={task} />
           <ConfirmAction
             opener={
-              <Button variant="outline" colorPalette="red">
+              <Button variant="solid" colorPalette="red">
                 Delete
               </Button>
             }

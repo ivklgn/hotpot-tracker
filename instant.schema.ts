@@ -27,7 +27,7 @@ const _schema = i.schema({
       creatorId: i.string(),
     }),
     boards: i.entity({
-      name: i.string(),
+      name: i.string().indexed(),
       teamId: i.string(),
       createdAt: i.date().indexed(),
       deletedAt: i.date().indexed(),

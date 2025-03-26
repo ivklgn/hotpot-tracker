@@ -73,7 +73,7 @@ export function Settings() {
           <Table.Cell textAlign="end">
             <ConfirmAction
               opener={
-                <Button variant="outline" size="xs" colorPalette="red">
+                <Button variant="solid" size="xs" colorPalette="red">
                   Delete
                 </Button>
               }

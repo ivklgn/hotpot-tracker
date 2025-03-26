@@ -23,8 +23,8 @@ import Helm from '../../components/Helm';
 export function SearchPage() {
   const { currentTeamId } = useAccount();
   const [search, setSearch] = useState('');
-  const debouncedSearch = useDebounce(search, 1000);
-  const { data: tasks } = db.useQuery(
+  const debouncedSearch = useDebounce(search, 1500);
+  const { data } = db.useQuery(
     debouncedSearch && debouncedSearch.length >= 2
       ? {
           tasks: {
@@ -35,10 +35,17 @@ export function SearchPage() {
             $: {
               where: {
                 teamId: currentTeamId as string,
-                title: { $like: `%${debouncedSearch}%` },
-                deletedAt: {
-                  $isNull: true,
-                },
+                title: { $ilike: `%${debouncedSearch}%` },
+              },
+              limit: 10,
+            },
+          },
+          boards: {
+            smartParams: {},
+            $: {
+              where: {
+                teamId: currentTeamId as string,
+                name: { $ilike: `%${debouncedSearch}%` },
               },
               limit: 10,
             },
@@ -47,16 +54,18 @@ export function SearchPage() {
       : null
   );
 
+  console.log(data);
+
   return (
     <Box flex="1" pt={8} mx={6}>
-      <Helm title="Search task" />
+      <Helm title="Search task and boards" />
       <InputGroup
         flex="1"
         startElement={search !== debouncedSearch ? <Spinner size="xs" /> : <LuSearch />}
         width="100%"
       >
         <Input
-          placeholder="Search tasks"
+          placeholder="Search tasks and boards"
           value={search}
           onChange={(e) => {
             setSearch(e.target.value);
@@ -65,21 +74,21 @@ export function SearchPage() {
         />
       </InputGroup>
       <Flex direction="column" pt="6" gap="2" overflowY="scroll">
-        {(!tasks || tasks?.tasks.length === 0) && (
+        {(!data?.tasks || data.tasks?.length === 0) && (
           <EmptyState.Root>
             <EmptyState.Content>
               <EmptyState.Indicator>
                 <LuSearch />
               </EmptyState.Indicator>
               <VStack textAlign="center">
-                <EmptyState.Title>{!tasks ? 'Search tasks' : 'Not found'}</EmptyState.Title>
+                <EmptyState.Title>{!data?.tasks ? 'Search tasks and boards' : 'Not found'}</EmptyState.Title>
                 <EmptyState.Description>Start search tasks by title</EmptyState.Description>
               </VStack>
             </EmptyState.Content>
           </EmptyState.Root>
         )}
-        {tasks?.tasks &&
-          tasks.tasks.map((task) => (
+        {data?.tasks &&
+          data?.tasks.map((task) => (
             <Card.Root size="sm" key={task.id}>
               <Card.Header>
                 <ChakraLink

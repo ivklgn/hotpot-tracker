@@ -282,21 +282,7 @@ function BoardHeader({ board, mode, columns }: BoardHeaderProps) {
           >
             Add column
           </Button>
-          {mode === 'edit' && (
-            <ConfirmAction
-              opener={
-                <Button variant="outline" colorPalette="red">
-                  Delete
-                </Button>
-              }
-              text="Are you sure you want to delete this board?"
-              onOk={() => {
-                deleteBoard({ boardId: board.id }).then(() => {
-                  navigate('/boards');
-                });
-              }}
-            />
-          )}
+          {mode === 'edit' && <DeleteBoardActions board={board} />}
         </ButtonGroup>
       </Flex>
       <SmartParams type="board" smartParams={board.smartParams || []} boardId={board.id} />
@@ -304,12 +290,77 @@ function BoardHeader({ board, mode, columns }: BoardHeaderProps) {
   );
 }
 
+function DeleteBoardActions({ board }: { board?: InstaQLEntity<AppSchema, 'boards'> }) {
+  const [, navigate] = useLocation();
+
+  if (!board) return null;
+
+  if (!board?.deletedAt) {
+    return (
+      <ConfirmAction
+        key={`board.id_${board.deletedAt}`}
+        opener={
+          <Button variant="outline" colorPalette="red">
+            Archive
+          </Button>
+        }
+        text="Are you sure you want to archive this board?"
+        onOk={() => {
+          runTransaction(() => archiveBoard({ boardId: board.id }));
+        }}
+      />
+    );
+  }
+
+  return [
+    <ConfirmAction
+      key={`board.id_${board.deletedAt}`}
+      opener={
+        <Button variant="outline" colorPalette="red">
+          Move from archive
+        </Button>
+      }
+      text="Task will return to boards"
+      onOk={() => {
+        runTransaction(() => undoArchiveBoard({ boardId: board.id }));
+      }}
+    />,
+    <ConfirmAction
+      key={`board.id_${board.deletedAt}`}
+      opener={
+        <Button colorPalette="red" variant="solid">
+          Delete
+        </Button>
+      }
+      text="Are you sure you want to delete this board? All columns will be deleted.This action cannot be undone."
+      onOk={() => {
+        runTransaction(
+          () => deleteBoard({ boardId: board.id }),
+          (result) => {
+            if (result.isOk()) {
+              navigate('/boards');
+            }
+          }
+        );
+      }}
+    />,
+  ];
+}
+
 async function removeApproves({ approvesIds }: { approvesIds: string[] }) {
   return await db.transact(approvesIds.map((ai) => db.tx.approves[ai].delete()));
 }
 
-async function deleteBoard({ boardId }: { boardId: string }) {
+async function archiveBoard({ boardId }: { boardId: string }) {
   return await db.transact([db.tx.boards[boardId].update({ deletedAt: new Date().toJSON() })]);
+}
+
+async function deleteBoard({ boardId }: { boardId: string }) {
+  return await db.transact([db.tx.boards[boardId].delete()]);
+}
+
+async function undoArchiveBoard({ boardId }: { boardId: string }) {
+  return await db.transact([db.tx.boards[boardId].update({ deletedAt: undefined })]);
 }
 
 async function renameBoard({ newName, boardId }: { boardId: string; newName: string }) {
