@@ -10,6 +10,8 @@ import {
   HStack,
   Separator,
   Text,
+  Heading,
+  Badge,
 } from '@chakra-ui/react';
 import { LuSearch } from 'react-icons/lu';
 import { InputGroup } from '../../components/ui/input-group';
@@ -54,11 +56,12 @@ export function SearchPage() {
       : null
   );
 
-  console.log(data);
+  const hasResults = (data?.tasks && data.tasks.length > 0) || (data?.boards && data.boards.length > 0);
+  const hasNoResults = debouncedSearch && debouncedSearch.length >= 2 && !hasResults;
 
   return (
     <Box flex="1" pt={8} mx={6}>
-      <Helm title="Search task and boards" />
+      <Helm title="Search tasks and boards" />
       <InputGroup
         flex="1"
         startElement={search !== debouncedSearch ? <Spinner size="xs" /> : <LuSearch />}
@@ -74,61 +77,127 @@ export function SearchPage() {
         />
       </InputGroup>
       <Flex direction="column" pt="6" gap="2" overflowY="scroll">
-        {(!data?.tasks || data.tasks?.length === 0) && (
+        {!hasResults && (
           <EmptyState.Root>
             <EmptyState.Content>
               <EmptyState.Indicator>
                 <LuSearch />
               </EmptyState.Indicator>
               <VStack textAlign="center">
-                <EmptyState.Title>{!data?.tasks ? 'Search tasks and boards' : 'Not found'}</EmptyState.Title>
-                <EmptyState.Description>Start search tasks by title</EmptyState.Description>
+                <EmptyState.Title>
+                  {!debouncedSearch || debouncedSearch.length < 2 ? 'Search tasks and boards' : 'Not found'}
+                </EmptyState.Title>
+                <EmptyState.Description>
+                  {hasNoResults
+                    ? 'No matching tasks or boards found'
+                    : 'Start searching by typing at least 2 characters'}
+                </EmptyState.Description>
               </VStack>
             </EmptyState.Content>
           </EmptyState.Root>
         )}
-        {data?.tasks &&
-          data?.tasks.map((task) => (
-            <Card.Root size="sm" key={task.id}>
-              <Card.Header>
-                <ChakraLink
-                  href={`/task/${task.id}`}
-                  colorPalette="teal"
-                  fontWeight="medium"
-                  fontSize="md"
-                  target="_blank"
-                >
-                  {task.title}
-                </ChakraLink>
-              </Card.Header>
-              <Card.Body color="fg.muted">
-                <HStack>
-                  {task.smartParams && task.smartParams.length > 0 && (
-                    <SmartParams type="board-task" smartParams={task.smartParams} taskId={task.id} />
-                  )}
-                  {task.columns ? (
-                    [
-                      <ChakraLink
-                        href={`/board/${task.columns.boardId}`}
-                        colorPalette="teal"
-                        fontWeight="medium"
-                        fontSize="xs"
-                        target="_blank"
-                      >
-                        Go to board
-                      </ChakraLink>,
-                      <Separator orientation="vertical" height="4" />,
-                      <Text textStyle="xs">
-                        Column: <strong>{task.columns.statuses?.name}</strong>
-                      </Text>,
-                    ]
-                  ) : (
-                    <Text textStyle="xs">No board & column</Text>
-                  )}
-                </HStack>
-              </Card.Body>
-            </Card.Root>
-          ))}
+
+        {hasResults && (
+          <VStack gap={4} align="stretch" width="100%">
+            {data?.tasks && data.tasks.length > 0 && (
+              <Box>
+                <Heading size="sm" mb={2}>
+                  Tasks
+                </Heading>
+                <VStack gap={2} align="stretch">
+                  {data.tasks.map((task) => (
+                    <Card.Root size="sm" key={task.id}>
+                      <Card.Header>
+                        <ChakraLink
+                          href={`/task/${task.id}`}
+                          colorPalette="teal"
+                          fontWeight="medium"
+                          fontSize="md"
+                          target="_blank"
+                        >
+                          {task.title}
+                        </ChakraLink>
+                      </Card.Header>
+                      <Card.Body color="fg.muted">
+                        <HStack>
+                          {task.smartParams && task.smartParams.length > 0 && (
+                            <SmartParams
+                              mode="view"
+                              type="board-task"
+                              smartParams={task.smartParams}
+                              taskId={task.id}
+                            />
+                          )}
+                          {task.columns ? (
+                            [
+                              <ChakraLink
+                                href={`/board/${task.columns.boardId}`}
+                                colorPalette="teal"
+                                fontWeight="medium"
+                                fontSize="xs"
+                                target="_blank"
+                              >
+                                Go to board
+                              </ChakraLink>,
+                              <Separator orientation="vertical" height="4" />,
+                              <Text textStyle="xs">
+                                Column: <strong>{task.columns.statuses?.name}</strong>
+                              </Text>,
+                            ]
+                          ) : (
+                            <Text textStyle="xs">No board & column</Text>
+                          )}
+                        </HStack>
+                      </Card.Body>
+                    </Card.Root>
+                  ))}
+                </VStack>
+              </Box>
+            )}
+
+            {data?.boards && data.boards.length > 0 && (
+              <Box>
+                <Heading size="sm" mb={2}>
+                  Boards
+                </Heading>
+                <VStack gap={2} align="stretch">
+                  {data.boards.map((board) => (
+                    <Card.Root size="sm" key={board.id}>
+                      <Card.Header>
+                        <ChakraLink
+                          href={`/board/${board.id}`}
+                          colorPalette="teal"
+                          fontWeight="medium"
+                          fontSize="md"
+                          target="_blank"
+                        >
+                          {board.name}
+                        </ChakraLink>
+                      </Card.Header>
+                      <Card.Body color="fg.muted">
+                        <HStack>
+                          {board.smartParams && board.smartParams.length > 0 && (
+                            <SmartParams
+                              mode="view"
+                              type="board"
+                              smartParams={board.smartParams}
+                              boardId={board.id}
+                            />
+                          )}
+                          {board.deletedAt && (
+                            <Badge colorPalette="red" variant="outline">
+                              Archived
+                            </Badge>
+                          )}
+                        </HStack>
+                      </Card.Body>
+                    </Card.Root>
+                  ))}
+                </VStack>
+              </Box>
+            )}
+          </VStack>
+        )}
       </Flex>
     </Box>
   );

@@ -9,6 +9,7 @@ import { isJSON } from '../../utils/json';
 
 interface BaseProps {
   smartParams: InstaQLResult<AppSchema, { smartParams: {} }>['smartParams'];
+  mode?: 'view' | 'edit';
 }
 
 interface BoardProps extends BaseProps {
@@ -34,7 +35,7 @@ function isTaskProps(props: SmartParamsProps): props is TaskProps {
   return (props as TaskProps).type === 'task';
 }
 
-export function SmartParams(props: SmartParamsProps) {
+export function SmartParams({ mode = 'edit', ...props }: SmartParamsProps) {
   const [isDialogOpen, setDialogOpen] = useState(false);
   const { data: boardParams } = db.useQuery(
     isTaskProps(props) && props?.taskBoardId
@@ -88,10 +89,8 @@ export function SmartParams(props: SmartParamsProps) {
           </Tag.Label>
         </Tag.Root>
       ))}
-      {props.type !== 'board-task' && props.smartParams.length === 0 && (
-        <Text>Click to add smart params</Text>
-      )}
-      {props.type === 'board' && (
+      {mode === 'edit' && props.smartParams.length === 0 && <Text>Click to add smart params</Text>}
+      {mode === 'edit' && props.type === 'board' && (
         <SmartParamsDialog
           isOpen={isDialogOpen}
           type="board"
@@ -105,7 +104,7 @@ export function SmartParams(props: SmartParamsProps) {
           onClose={() => setDialogOpen(false)}
         />
       )}
-      {props.type === 'task' && (
+      {mode === 'edit' && props.type === 'task' && (
         <SmartParamsDialog
           isOpen={isDialogOpen}
           type="task"
