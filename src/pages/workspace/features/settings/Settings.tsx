@@ -73,7 +73,7 @@ export function Settings() {
           <Table.Cell textAlign="end">
             <ConfirmAction
               opener={
-                <Button variant="outline" size="xs" colorPalette="red">
+                <Button variant="solid" size="xs" colorPalette="red">
                   Delete
                 </Button>
               }
@@ -88,7 +88,7 @@ export function Settings() {
 }
 
 async function renameTeam({ newName, teamId }: { teamId: string; newName: string }) {
-  return await db.transact([db.tx.teams[teamId].merge({ name: newName })]);
+  return await db.transact([db.tx.teams[teamId].merge({ updatedAt: new Date().toJSON(), name: newName })]);
 }
 
 async function deleteTeam({ teamId }: { teamId: string }) {

@@ -18,7 +18,14 @@ export async function createEvent({
   const eventId = id();
 
   return await db.transact([
-    db.tx.events[eventId].update({ type, payload, teamId, membershipId, createdAt: new Date().toJSON() }),
+    db.tx.events[eventId].update({
+      updatedAt: new Date().toJSON(),
+      type,
+      payload,
+      teamId,
+      membershipId,
+      createdAt: new Date().toJSON(),
+    }),
     db.tx.events[eventId].link({ teams: teamId }),
     db.tx.memberships[membershipId].link({ events: eventId }),
   ]);

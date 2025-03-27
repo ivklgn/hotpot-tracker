@@ -187,6 +187,7 @@ async function createColumn({
   const columnId = id();
   return await db.transact([
     db.tx.columns[columnId].update({
+      updatedAt: new Date().toJSON(),
       boardId,
       teamId,
       position,
@@ -205,7 +206,6 @@ interface BoardHeaderProps {
 }
 
 function BoardHeader({ board, mode, columns }: BoardHeaderProps) {
-  const [, navigate] = useLocation();
   const { currentTeamId } = useAccount();
   const [name, setName] = useState<string>(board?.name || '');
   const { user } = db.useAuth();
@@ -282,21 +282,7 @@ function BoardHeader({ board, mode, columns }: BoardHeaderProps) {
           >
             Add column
           </Button>
-          {mode === 'edit' && (
-            <ConfirmAction
-              opener={
-                <Button variant="outline" colorPalette="red">
-                  Delete
-                </Button>
-              }
-              text="Are you sure you want to delete this board?"
-              onOk={() => {
-                deleteBoard({ boardId: board.id }).then(() => {
-                  navigate('/boards');
-                });
-              }}
-            />
-          )}
+          {mode === 'edit' && <DeleteBoardActions board={board} />}
         </ButtonGroup>
       </Flex>
       <SmartParams type="board" smartParams={board.smartParams || []} boardId={board.id} />
@@ -304,21 +290,90 @@ function BoardHeader({ board, mode, columns }: BoardHeaderProps) {
   );
 }
 
+function DeleteBoardActions({ board }: { board?: InstaQLEntity<AppSchema, 'boards'> }) {
+  const [, navigate] = useLocation();
+
+  if (!board) return null;
+
+  if (!board?.deletedAt) {
+    return (
+      <ConfirmAction
+        key={`${board.id}_${board.deletedAt}`}
+        opener={
+          <Button variant="outline" colorPalette="red">
+            Archive
+          </Button>
+        }
+        text="Are you sure you want to archive this board?"
+        onOk={() => {
+          runTransaction(() => archiveBoard({ boardId: board.id }));
+        }}
+      />
+    );
+  }
+
+  return [
+    <ConfirmAction
+      key={`${board.id}_${board.deletedAt}`}
+      opener={
+        <Button variant="outline" colorPalette="red">
+          Move from archive
+        </Button>
+      }
+      text="Borad will return from archive"
+      onOk={() => {
+        runTransaction(() => undoArchiveBoard({ boardId: board.id }));
+      }}
+    />,
+    <ConfirmAction
+      key={`board.id_${board.deletedAt}`}
+      opener={
+        <Button colorPalette="red" variant="solid">
+          Delete
+        </Button>
+      }
+      text="Are you sure you want to delete this board? All columns will be deleted. This action cannot be undone."
+      onOk={() => {
+        runTransaction(
+          () => deleteBoard({ boardId: board.id }),
+          (result) => {
+            if (result.isOk()) {
+              navigate('/boards');
+            }
+          }
+        );
+      }}
+    />,
+  ];
+}
+
 async function removeApproves({ approvesIds }: { approvesIds: string[] }) {
   return await db.transact(approvesIds.map((ai) => db.tx.approves[ai].delete()));
 }
 
+async function archiveBoard({ boardId }: { boardId: string }) {
+  return await db.transact([
+    db.tx.boards[boardId].update({ updatedAt: new Date().toJSON(), deletedAt: new Date().toJSON() }),
+  ]);
+}
+
 async function deleteBoard({ boardId }: { boardId: string }) {
-  return await db.transact([db.tx.boards[boardId].update({ deletedAt: new Date().toJSON() })]);
+  return await db.transact([db.tx.boards[boardId].delete()]);
+}
+
+async function undoArchiveBoard({ boardId }: { boardId: string }) {
+  return await db.transact([
+    db.tx.boards[boardId].update({ updatedAt: new Date().toJSON(), deletedAt: undefined }),
+  ]);
 }
 
 async function renameBoard({ newName, boardId }: { boardId: string; newName: string }) {
-  return await db.transact([db.tx.boards[boardId].merge({ name: newName })]);
+  return await db.transact([db.tx.boards[boardId].merge({ updatedAt: new Date().toJSON(), name: newName })]);
 }
 
 async function changeTaskColumn({ taskId, columnId }: { taskId: string; columnId: string }) {
   return await db.transact([
-    db.tx.tasks[taskId].merge({ columnId }),
+    db.tx.tasks[taskId].merge({ updatedAt: new Date().toJSON(), columnId }),
     db.tx.tasks[taskId].link({ columns: columnId }),
   ]);
 }
@@ -331,7 +386,7 @@ async function changeColumnPosition({
   to: { columnId: string; position: number };
 }) {
   return await db.transact([
-    db.tx.columns[from.columnId].merge({ position: from.position }),
-    db.tx.columns[to.columnId].merge({ position: to.position }),
+    db.tx.columns[from.columnId].merge({ updatedAt: new Date().toJSON(), position: from.position }),
+    db.tx.columns[to.columnId].merge({ updatedAt: new Date().toJSON(), position: to.position }),
   ]);
 }

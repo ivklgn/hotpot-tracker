@@ -43,9 +43,6 @@ export function BoardPage() {
       $: {
         where: {
           id: params?.boardId as string,
-          deletedAt: {
-            $isNull: true,
-          },
         },
       },
     },

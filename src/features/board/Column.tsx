@@ -355,7 +355,7 @@ function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
         <Field label="Danger zone" color="red">
           <ConfirmAction
             opener={
-              <Button variant="outline" colorPalette="red">
+              <Button variant="solid" colorPalette="red">
                 Delete column
               </Button>
             }
@@ -512,9 +512,15 @@ async function createStatusAndUpdateColumn({
 }) {
   const statusId = id();
   return await db.transact([
-    db.tx.statuses[statusId].update({ name, teamId, createdAt: new Date().toJSON(), creatorId }),
+    db.tx.statuses[statusId].update({
+      updatedAt: new Date().toJSON(),
+      name,
+      teamId,
+      createdAt: new Date().toJSON(),
+      creatorId,
+    }),
     db.tx.statuses[statusId].link({ teams: teamId }),
-    db.tx.columns[columnId].update({ statusId }),
+    db.tx.columns[columnId].update({ updatedAt: new Date().toJSON(), statusId }),
     db.tx.columns[columnId].link({ statuses: statusId }),
   ]);
 }
@@ -528,7 +534,7 @@ async function updateColumnStatus({
   columnId: string;
 }) {
   return await db.transact([
-    db.tx.columns[columnId].update({ statusId }),
+    db.tx.columns[columnId].update({ updatedAt: new Date().toJSON(), statusId }),
     db.tx.columns[columnId].link({ statuses: statusId }),
   ]);
 }
@@ -540,7 +546,7 @@ async function updateColumnApproveRule({
   approveRule: 'one-of-contributors' | 'all-contributors';
   columnId: string;
 }) {
-  return await db.transact([db.tx.columns[columnId].update({ approveRule })]);
+  return await db.transact([db.tx.columns[columnId].update({ updatedAt: new Date().toJSON(), approveRule })]);
 }
 
 async function updateContributors({
@@ -558,7 +564,13 @@ async function updateContributors({
   return await db.transact([
     ...userMemberships.map((mb) =>
       db.tx.contributors[contributorId]
-        .update({ membershipId: mb.membershipId, columnId, teamId, creatorId })
+        .update({
+          updatedAt: new Date().toJSON(),
+          membershipId: mb.membershipId,
+          columnId,
+          teamId,
+          creatorId,
+        })
         .link({ memberships: mb.membershipId })
         .link({ columns: columnId })
         .link({ teams: teamId })

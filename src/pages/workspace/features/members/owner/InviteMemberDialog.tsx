@@ -141,9 +141,16 @@ async function inviteMember({
   const membershipId = id();
 
   return await db.transact([
-    db.tx.memberships[membershipId].update({ teamId, userEmail, creatorId, createdAt: new Date().toJSON() }),
+    db.tx.memberships[membershipId].update({
+      updatedAt: new Date().toJSON(),
+      teamId,
+      userEmail,
+      creatorId,
+      createdAt: new Date().toJSON(),
+    }),
     db.tx.memberships[membershipId].link({ teams: teamId }),
     db.tx.invites[inviteId].update({
+      updatedAt: new Date().toJSON(),
       userEmail,
       teamId,
       teamName,

@@ -66,7 +66,7 @@ export function OwnerMembers() {
                 {member.invite && (
                   <ConfirmAction
                     opener={
-                      <Button variant="outline" size="xs" colorPalette="red">
+                      <Button variant="solid" size="xs" colorPalette="red">
                         Delete
                       </Button>
                     }

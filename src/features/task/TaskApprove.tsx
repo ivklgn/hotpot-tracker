@@ -80,6 +80,7 @@ export function TaskApprove({ task }: TaskApproveProps) {
       runTransaction(() =>
         db.transact([
           db.tx.approves[approveId].update({
+            updatedAt: new Date().toJSON(),
             taskId: task?.id as string,
             teamId: currentTeamId as string,
             contributorId: currentContributorId,
