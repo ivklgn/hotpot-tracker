@@ -11,16 +11,21 @@ interface OTPCodeFormProps {
 }
 
 export function OTPCodeForm({ email }: OTPCodeFormProps) {
-  const [otp, setOTP] = useState(['', '', '', '', '', '']);
-  const [error, setError] = useState<Error | null>(null);
+  const [otp, setOTP] = useState<string[] | undefined>();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if (!otp) {
+      setErrorMessage('Invalid code format');
+      return;
+    }
+
     if (!email) return;
 
-    db.auth.signInWithMagicCode({ email, code: otp.join('') }).catch((err) => {
-      setError(err);
+    db.auth.signInWithMagicCode({ email, code: otp.join('') }).catch(() => {
+      setErrorMessage('Invalid code or unknown error');
     });
   };
 
@@ -32,12 +37,11 @@ export function OTPCodeForm({ email }: OTPCodeFormProps) {
         </Stack>
 
         <Fieldset.Content>
-          <Field invalid={!!error} errorText={error ? 'Invalid code or unknown error' : undefined}>
+          <Field invalid={!!errorMessage} errorText={errorMessage}>
             <PinInput
               count={6}
-              value={otp}
-              onValueChange={({ value }) => {
-                setOTP(value);
+              onValueComplete={(value) => {
+                setOTP(value.value);
               }}
             />
           </Field>

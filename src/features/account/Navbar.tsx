@@ -25,7 +25,7 @@ const ROUTES = [
 ] as const;
 
 export function AccountNavbar() {
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
   const { user } = db.useAuth();
   const { currentTeamId, setCurrentTeamId } = useAccount();
   const { data: teams } = db.useQuery({ teams: {} });
@@ -57,7 +57,9 @@ export function AccountNavbar() {
   }, [currentTeamId, teams?.teams]);
 
   const handleSignOutClick = () => {
-    db.auth.signOut();
+    db.auth.signOut().then(() => {
+      navigate('/');
+    });
   };
 
   return (
