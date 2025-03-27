@@ -298,7 +298,7 @@ function DeleteBoardActions({ board }: { board?: InstaQLEntity<AppSchema, 'board
   if (!board?.deletedAt) {
     return (
       <ConfirmAction
-        key={`board.id_${board.deletedAt}`}
+        key={`${board.id}_${board.deletedAt}`}
         opener={
           <Button variant="outline" colorPalette="red">
             Archive
@@ -314,13 +314,13 @@ function DeleteBoardActions({ board }: { board?: InstaQLEntity<AppSchema, 'board
 
   return [
     <ConfirmAction
-      key={`board.id_${board.deletedAt}`}
+      key={`${board.id}_${board.deletedAt}`}
       opener={
         <Button variant="outline" colorPalette="red">
           Move from archive
         </Button>
       }
-      text="Task will return to boards"
+      text="Borad will return from archive"
       onOk={() => {
         runTransaction(() => undoArchiveBoard({ boardId: board.id }));
       }}
@@ -332,7 +332,7 @@ function DeleteBoardActions({ board }: { board?: InstaQLEntity<AppSchema, 'board
           Delete
         </Button>
       }
-      text="Are you sure you want to delete this board? All columns will be deleted.This action cannot be undone."
+      text="Are you sure you want to delete this board? All columns will be deleted. This action cannot be undone."
       onOk={() => {
         runTransaction(
           () => deleteBoard({ boardId: board.id }),

@@ -128,6 +128,11 @@ export function SearchPage() {
                               taskId={task.id}
                             />
                           )}
+                          {task.deletedAt && (
+                            <Badge colorPalette="red" variant="outline">
+                              Archived
+                            </Badge>
+                          )}
                           {task.columns ? (
                             [
                               <ChakraLink

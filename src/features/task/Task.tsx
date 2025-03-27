@@ -85,24 +85,7 @@ export function Task({ task }: TaskProps) {
         </Editable.Root>
         <ButtonGroup size="xs">
           <TaskApprove task={task} />
-          <ConfirmAction
-            opener={
-              <Button variant="solid" colorPalette="red">
-                Delete
-              </Button>
-            }
-            text="Are you sure you want to delete task? All content will be removed."
-            onOk={() => {
-              runTransaction(
-                () => deleteTask({ taskId: task.id }),
-                (result) => {
-                  if (result.isOk()) {
-                    navigate('/boards');
-                  }
-                }
-              );
-            }}
-          />
+          <DeleteTaskActions task={task} />
         </ButtonGroup>
       </Flex>
 
@@ -118,8 +101,61 @@ export function Task({ task }: TaskProps) {
   );
 }
 
-async function deleteTask({ taskId }: { taskId: string }) {
-  return await db.transact([db.tx.tasks[taskId].update({ deletedAt: new Date().toJSON() })]);
+function DeleteTaskActions({ task }: { task?: InstaQLEntity<AppSchema, 'tasks'> }) {
+  const [, navigate] = useLocation();
+
+  if (!task) return null;
+
+  if (!task?.deletedAt) {
+    return (
+      <ConfirmAction
+        key={`${task.id}_${task.deletedAt}`}
+        opener={
+          <Button variant="outline" colorPalette="red">
+            Archive
+          </Button>
+        }
+        text="Are you sure you want to archive this task?"
+        onOk={() => {
+          runTransaction(() => archiveTask({ taskId: task.id }));
+        }}
+      />
+    );
+  }
+
+  return [
+    <ConfirmAction
+      key={`${task.id}_${task.deletedAt}`}
+      opener={
+        <Button variant="outline" colorPalette="red">
+          Move from archive
+        </Button>
+      }
+      text="Task will return from archive"
+      onOk={() => {
+        runTransaction(() => undoArchiveTask({ taskId: task.id }));
+      }}
+    />,
+    <ConfirmAction
+      key={`${task.id}_${task.deletedAt}`}
+      opener={
+        <Button colorPalette="red" variant="solid">
+          Delete
+        </Button>
+      }
+      text="Are you sure you want to delete this task? All content will be deleted. This action cannot be undone."
+      onOk={() => {
+        runTransaction(
+          () => deleteTask({ taskId: task.id }),
+          (result) => {
+            if (result.isOk()) {
+              navigate('/boards');
+            }
+          }
+        );
+      }}
+    />,
+  ];
 }
 
 async function renameTask({ newTitle, taskId }: { taskId: string; newTitle: string }) {
@@ -128,4 +164,16 @@ async function renameTask({ newTitle, taskId }: { taskId: string; newTitle: stri
 
 async function updateTaskContent({ newContent, taskId }: { taskId: string; newContent: string }) {
   return await db.transact([db.tx.tasks[taskId].merge({ content: newContent })]);
+}
+
+async function archiveTask({ taskId }: { taskId: string }) {
+  return await db.transact([db.tx.tasks[taskId].update({ deletedAt: new Date().toJSON() })]);
+}
+
+async function deleteTask({ taskId }: { taskId: string }) {
+  return await db.transact([db.tx.tasks[taskId].delete()]);
+}
+
+async function undoArchiveTask({ taskId }: { taskId: string }) {
+  return await db.transact([db.tx.tasks[taskId].update({ deletedAt: undefined })]);
 }

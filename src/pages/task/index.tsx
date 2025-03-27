@@ -12,9 +12,6 @@ export function TaskPage() {
       $: {
         where: {
           id: params?.taskId as string,
-          deletedAt: {
-            $isNull: true,
-          },
         },
       },
     },
