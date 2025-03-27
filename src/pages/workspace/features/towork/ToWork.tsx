@@ -203,7 +203,7 @@ async function acceptInvite({
   userId: string;
 }) {
   return db.transact([
-    db.tx.invites[inviteId].update({ status: 'accepted' }),
-    db.tx.memberships[membershipId].update({ userId }),
+    db.tx.invites[inviteId].update({ updatedAt: new Date().toJSON(), status: 'accepted' }),
+    db.tx.memberships[membershipId].update({ updatedAt: new Date().toJSON(), userId }),
   ]);
 }

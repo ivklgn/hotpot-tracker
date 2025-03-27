@@ -159,15 +159,19 @@ function DeleteTaskActions({ task }: { task?: InstaQLEntity<AppSchema, 'tasks'> 
 }
 
 async function renameTask({ newTitle, taskId }: { taskId: string; newTitle: string }) {
-  return await db.transact([db.tx.tasks[taskId].merge({ title: newTitle })]);
+  return await db.transact([db.tx.tasks[taskId].merge({ updatedAt: new Date().toJSON(), title: newTitle })]);
 }
 
 async function updateTaskContent({ newContent, taskId }: { taskId: string; newContent: string }) {
-  return await db.transact([db.tx.tasks[taskId].merge({ content: newContent })]);
+  return await db.transact([
+    db.tx.tasks[taskId].merge({ updatedAt: new Date().toJSON(), content: newContent }),
+  ]);
 }
 
 async function archiveTask({ taskId }: { taskId: string }) {
-  return await db.transact([db.tx.tasks[taskId].update({ deletedAt: new Date().toJSON() })]);
+  return await db.transact([
+    db.tx.tasks[taskId].update({ updatedAt: new Date().toJSON(), deletedAt: new Date().toJSON() }),
+  ]);
 }
 
 async function deleteTask({ taskId }: { taskId: string }) {
@@ -175,5 +179,7 @@ async function deleteTask({ taskId }: { taskId: string }) {
 }
 
 async function undoArchiveTask({ taskId }: { taskId: string }) {
-  return await db.transact([db.tx.tasks[taskId].update({ deletedAt: undefined })]);
+  return await db.transact([
+    db.tx.tasks[taskId].update({ updatedAt: new Date().toJSON(), deletedAt: undefined }),
+  ]);
 }

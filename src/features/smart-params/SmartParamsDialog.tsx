@@ -418,6 +418,7 @@ async function createSmartParams(params: CreateBoardSmartParams | CreateTaskSmar
       .transact([
         db.tx.smartParams[newSmartParam]
           .update({
+            updatedAt: new Date().toJSON(),
             name: sp.name,
             type: sp.type,
             value: sp.value,
@@ -445,7 +446,14 @@ async function updateSmartParams({ smartParams }: { smartParams: EditableSmartPa
   for (const sp of smartParams) {
     const newSmartParam = id();
     await db
-      .transact([db.tx.smartParams[sp.id].merge({ name: sp.name, type: sp.type, value: sp.value })])
+      .transact([
+        db.tx.smartParams[sp.id].merge({
+          updatedAt: new Date().toJSON(),
+          name: sp.name,
+          type: sp.type,
+          value: sp.value,
+        }),
+      ])
       .then(() => {
         ids.push(newSmartParam);
       });

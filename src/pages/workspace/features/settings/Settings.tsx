@@ -88,7 +88,7 @@ export function Settings() {
 }
 
 async function renameTeam({ newName, teamId }: { teamId: string; newName: string }) {
-  return await db.transact([db.tx.teams[teamId].merge({ name: newName })]);
+  return await db.transact([db.tx.teams[teamId].merge({ updatedAt: new Date().toJSON(), name: newName })]);
 }
 
 async function deleteTeam({ teamId }: { teamId: string }) {

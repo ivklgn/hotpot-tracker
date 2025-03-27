@@ -248,10 +248,7 @@ async function updateTaskColumn({
   approvesIds: string[];
 }) {
   return await db.transact([
-    db.tx.tasks[taskId].update({
-      columnId,
-      createdAt: new Date().toJSON(),
-    }),
+    db.tx.tasks[taskId].update({ updatedAt: new Date().toJSON(), columnId, createdAt: new Date().toJSON() }),
     db.tx.tasks[taskId].link({ columns: columnId }),
     ...(approvesIds || []).map((ai) => db.tx.approves[ai].delete()),
   ]);
@@ -272,6 +269,7 @@ async function createNewTask({
 
   return await db.transact([
     db.tx.tasks[newTaskId].update({
+      updatedAt: new Date().toJSON(),
       title,
       teamId,
       columnId,

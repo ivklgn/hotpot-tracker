@@ -187,6 +187,7 @@ async function createColumn({
   const columnId = id();
   return await db.transact([
     db.tx.columns[columnId].update({
+      updatedAt: new Date().toJSON(),
       boardId,
       teamId,
       position,
@@ -352,7 +353,9 @@ async function removeApproves({ approvesIds }: { approvesIds: string[] }) {
 }
 
 async function archiveBoard({ boardId }: { boardId: string }) {
-  return await db.transact([db.tx.boards[boardId].update({ deletedAt: new Date().toJSON() })]);
+  return await db.transact([
+    db.tx.boards[boardId].update({ updatedAt: new Date().toJSON(), deletedAt: new Date().toJSON() }),
+  ]);
 }
 
 async function deleteBoard({ boardId }: { boardId: string }) {
@@ -360,16 +363,18 @@ async function deleteBoard({ boardId }: { boardId: string }) {
 }
 
 async function undoArchiveBoard({ boardId }: { boardId: string }) {
-  return await db.transact([db.tx.boards[boardId].update({ deletedAt: undefined })]);
+  return await db.transact([
+    db.tx.boards[boardId].update({ updatedAt: new Date().toJSON(), deletedAt: undefined }),
+  ]);
 }
 
 async function renameBoard({ newName, boardId }: { boardId: string; newName: string }) {
-  return await db.transact([db.tx.boards[boardId].merge({ name: newName })]);
+  return await db.transact([db.tx.boards[boardId].merge({ updatedAt: new Date().toJSON(), name: newName })]);
 }
 
 async function changeTaskColumn({ taskId, columnId }: { taskId: string; columnId: string }) {
   return await db.transact([
-    db.tx.tasks[taskId].merge({ columnId }),
+    db.tx.tasks[taskId].merge({ updatedAt: new Date().toJSON(), columnId }),
     db.tx.tasks[taskId].link({ columns: columnId }),
   ]);
 }
@@ -382,7 +387,7 @@ async function changeColumnPosition({
   to: { columnId: string; position: number };
 }) {
   return await db.transact([
-    db.tx.columns[from.columnId].merge({ position: from.position }),
-    db.tx.columns[to.columnId].merge({ position: to.position }),
+    db.tx.columns[from.columnId].merge({ updatedAt: new Date().toJSON(), position: from.position }),
+    db.tx.columns[to.columnId].merge({ updatedAt: new Date().toJSON(), position: to.position }),
   ]);
 }
