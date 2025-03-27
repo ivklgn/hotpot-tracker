@@ -206,7 +206,6 @@ interface BoardHeaderProps {
 }
 
 function BoardHeader({ board, mode, columns }: BoardHeaderProps) {
-  const [, navigate] = useLocation();
   const { currentTeamId } = useAccount();
   const [name, setName] = useState<string>(board?.name || '');
   const { user } = db.useAuth();
