@@ -195,7 +195,7 @@ function ColumnTask({ task, columnApproveRule, columnContributors }: ColumnTaskP
       <Box mt={2}>
         {task?.smartParams && (
           <Box>
-            <SmartParams type="board-task" smartParams={task.smartParams} taskId={task.id} />
+            <SmartParams mode="view" type="board-task" smartParams={task.smartParams} taskId={task.id} />
           </Box>
         )}
       </Box>
