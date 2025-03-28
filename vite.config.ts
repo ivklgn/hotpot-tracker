@@ -13,8 +13,16 @@ export default defineConfig({
       project: 'hotpot-tracker',
     }),
   ],
-
   build: {
     sourcemap: true,
+  },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
   },
 });
