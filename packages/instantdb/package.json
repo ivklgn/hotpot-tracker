@@ -1,0 +1,16 @@
+{
+  "name": "@hotpot-tracker/instantdb",
+  "version": "0.0.1",
+  "main": "index.ts",
+  "scripts": {
+    "publish:schema": "instant-cli push schema",
+    "publish:perms": "instant-cli push perms"
+  },
+  "dependencies": {
+    "@instantdb/core": "^0.17.32",
+    "@hotpot-tracker/configuration": "workspace:*"
+  },
+  "devDependencies": {
+    "instant-cli": "^0.17.32"
+  }
+}

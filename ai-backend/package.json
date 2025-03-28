@@ -1,8 +1,10 @@
 {
-  "name": "ai-sdk-fastify-example",
-  "version": "0.0.0",
+  "name": "@hotpot-tracker/ai-backend",
+  "version": "0.0.1",
   "private": true,
   "dependencies": {
+    "@hotpot-tracker/configuration": "workspace:*",
+    "@hotpot-tracker/instantdb": "workspace:*",
     "@ai-sdk/openai": "1.3.3",
     "@instantdb/admin": "^0.17.32",
     "ai": "4.2.6",
