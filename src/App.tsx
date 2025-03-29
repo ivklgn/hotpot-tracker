@@ -12,6 +12,7 @@ import { Landing } from './pages/landing';
 import { Landing as LandingRu } from './pages/landing-ru';
 import { SearchPage } from './pages/search';
 import { GlobalErrorBoundary } from './components/GlobalErrorBoundary';
+import { AIPage } from './pages/ai';
 
 export default function App() {
   const { user, isLoading } = db.useAuth();
@@ -35,6 +36,7 @@ export default function App() {
             <Route path="/ru" component={() => <LandingRu />} />
             <Route path="/404" component={() => <NotFoundPage />} />
             <Route path="/auth" component={() => <Redirect to="/workspace" />} />
+            <Route path="/ai" component={() => <AIPage />} />
             <Route path="*" component={() => <NotFoundPage />} />
           </Switch>
         </AccountLayout>

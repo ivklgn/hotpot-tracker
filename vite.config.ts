@@ -11,6 +11,7 @@ export default defineConfig({
     sentryVitePlugin({
       org: 'hotpot-mp',
       project: 'hotpot-tracker',
+      telemetry: false,
     }),
   ],
 
