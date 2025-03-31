@@ -11,8 +11,19 @@ export default defineConfig({
     sentryVitePlugin({
       org: 'hotpot-mp',
       project: 'hotpot-tracker',
+      telemetry: false,
     }),
   ],
+
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
+  },
 
   build: {
     sourcemap: true,

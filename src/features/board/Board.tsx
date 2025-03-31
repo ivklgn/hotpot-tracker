@@ -15,7 +15,7 @@ import { HiColorSwatch } from 'react-icons/hi';
 import { id, InstaQLEntity, InstaQLResult } from '@instantdb/react';
 import { useAccount } from '../account/AccountContext';
 import { ConfirmAction } from '../../components/ConfirmAction';
-import { LuPencilLine, LuX, LuCheck } from 'react-icons/lu';
+import { LuPencilLine, LuX, LuCheck, LuWand } from 'react-icons/lu';
 import { useState } from 'react';
 import { Column, ColumnType } from './Column';
 import { CreateBoardDialog } from './CreateBoardDialog';
@@ -25,6 +25,7 @@ import { runTransaction } from '../../core/instantdb-transaction';
 import { createEvent } from '../events';
 import { toaster } from '../../components/ui/toaster';
 import tariffLimits from '../../../tariff-limits.json';
+import { AIReport } from '../ai/AIReport';
 
 type BoardViewMode = 'view' | 'edit';
 
@@ -255,6 +256,7 @@ function BoardHeader({ board, mode, columns }: BoardHeaderProps) {
           </Editable.Root>
         )}
         <ButtonGroup size="xs" variant="outline">
+          <AIReport boardId={board.id} />
           <Button
             variant="outline"
             onClick={() => {
