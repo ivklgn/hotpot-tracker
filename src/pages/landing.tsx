@@ -93,10 +93,9 @@ const FeatureShowcase = ({
           boxShadow="2xl"
           width={{ base: '100%', md: '90%' }}
           height="auto"
-          maxH="480px"
+          maxH="700px"
           transition="transform 0.3s ease-in-out"
           _hover={{ transform: 'scale(1.02)' }}
-          fit="contain"
         />
       </Flex>
       <Stack flex={1} gap={5}>
@@ -149,7 +148,7 @@ const AuthForm = () => {
             </Link>
             <HStack gap={2}>
               <ChakraLink asChild variant="underline">
-                <Link to="/workspace">To account</Link>
+                <Link to="/workspace">Account</Link>
               </ChakraLink>
               <Separator orientation="vertical" height="4" />
               <ChakraLink asChild color="red.500" onClick={handleSignOutClick}>
@@ -161,7 +160,7 @@ const AuthForm = () => {
       ) : (
         <Box>
           <Text textStyle="2xl" textAlign="center" mb={4}>
-            Sign in/register by email
+            Log in or register with email
           </Text>
           <Auth />
         </Box>
@@ -189,13 +188,17 @@ export function Landing() {
               <Heading fontWeight={800} fontSize={{ base: '3xl', sm: '4xl', md: '6xl' }} lineHeight="110%">
                 Hotpot{' '}
                 <Text as="span" color="blue.400">
-                  Tracker 🍲
+                  Tracker 🥢
                 </Text>
               </Heading>
               <Text fontSize={{ base: 'lg', sm: 'xl' }} maxW="xl">
-                <strong>"Cook it the way you see fit"</strong> <br />
-                Regular agile boards are like a restaurant with a chef where you don't influence the process.
-                Hotpot is like hotpot: gather your team and prepare your workflow to your taste. 🥢
+                <strong>“Cook it the way you want”</strong> <br />
+                Traditional agile boards are like restaurants with a chef—you don’t control the process.
+                Hotpot (
+                <ChakraLink href="https://en.wikipedia.org/wiki/Huoguo" target="_blank" variant="underline">
+                  hotpot
+                </ChakraLink>
+                ): cook your workflow your way.
               </Text>
               <Stack direction={{ base: 'column', sm: 'row' }} gap={4} mt={2}>
                 <Button
@@ -210,10 +213,10 @@ export function Landing() {
                     navigate('/auth');
                   }}
                 >
-                  Get Started
+                  Get started
                 </Button>
                 <Button rounded="full" size="lg" fontWeight="bold" px={6} variant="outline">
-                  Learn More
+                  <ChakraLink href="#about">Learn more</ChakraLink>
                 </Button>
               </Stack>
             </Stack>
@@ -226,11 +229,11 @@ export function Landing() {
         <Container maxW="7xl">
           <VStack gap={8} mb={12}>
             <Heading fontSize={{ base: '3xl', md: '4xl' }} textAlign="center">
-              Another Trello Clone?
+              Another Trello clone?
             </Heading>
             <Text fontSize="xl" textAlign="center" maxW="3xl">
-              Almost... But not quite. Hotpot Tracker not only contains familiar primitives like
-              boards/columns/tasks, but also adds several simple and interesting tools
+              Almost... but not quite. Besides simple primitives like boards and tasks, Hotpot offers built-in
+              tools for team engagement.
             </Text>
           </VStack>
           <Image
@@ -241,38 +244,38 @@ export function Landing() {
         </Container>
       </Box>
 
-      <Box py={16}>
+      <Box py={16} id="about">
         <Container maxW="7xl">
           <Stack flex={1} gap={6} textAlign="center">
-            <Heading fontSize={{ base: '3xl', md: '4xl' }}>With love from engineers 🤓</Heading>
+            <Heading fontSize={{ base: '3xl', md: '4xl' }}>Lovingly built by engineers 🤓</Heading>
             <Text fontSize="xl" maxW="3xl" mx="auto">
-              When working with open source, developers have many effective tools that business colleagues
-              have never heard of.
+              In software development, there are approaches and tools that are useful for business too. Hotpot
+              borrows ideas from Github/Gitlab to bring fresh thinking into team workflows.
             </Text>
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={10} textAlign="left">
               <FeatureCard
                 title="More boards"
-                text="Create boards for specific projects/tasks instead of one large and universal one."
+                text="Create boards for specific projects/tasks instead of one large universal one."
               />
               <FeatureCard
-                title="Team involvement"
-                text="Assign team members at all stages of work (columns) in the role of reviewers"
+                title="Team engagement"
+                text="Assign team members to every stage (column) as reviewers"
               />
               <FeatureCard
                 title="Simple attributes"
-                text="Instead of imposed fields in tasks - arbitrary key-values to express any meanings"
+                text="Instead of preset fields in tasks—custom key-value attributes to express any meaning"
               />
               <FeatureCard
                 title="Approvals"
-                text="Block the progress of a task through stages if it's not approved by your colleagues"
+                text="Block task progress between stages unless approved by peers"
               />
               <FeatureCard
                 title="Comments are evil"
-                text="Instead, discuss a specific detail in the document itself"
+                text="Instead, discuss specific ideas right in the document"
               />
               <FeatureCard
                 title="AI"
-                text="The more accurately you display the process on the board, the better AI will be able to understand it"
+                text="The better your process is described, the more helpful AI can be"
               />
             </SimpleGrid>
           </Stack>
@@ -283,7 +286,7 @@ export function Landing() {
         <Container maxW="7xl">
           <VStack gap={8} mb={12}>
             <Heading fontSize={{ base: '3xl', md: '4xl' }} textAlign="center">
-              Interesting features
+              Cool features
             </Heading>
           </VStack>
 
@@ -291,34 +294,33 @@ export function Landing() {
             <FeatureShowcase
               image={colorMode === 'light' ? smartparamsScreenshotLight : smartparamsScreenshotDark}
               title="Attributes for boards and tasks"
-              description="Instead of imposed fields in tasks - arbitrary key-values"
+              description="Instead of forced fields—define custom key-value pairs"
               features={[
-                "Deadline? Assignee? Priority? Progress? - it's an attribute",
-                'Works the same way in both tasks and boards',
-                'Tasks automatically inherit board parameters',
+                'Due date? Assignee? Priority? Progress? - all are attributes',
+                'Tasks inherit parameters from the board',
+                'Meaningful parameters lead to better AI reporting',
               ]}
             />
 
             <FeatureShowcase
               image={colorMode === 'light' ? columnScreenshotLight : columnScreenshotDark}
               title="Reviews and approvals"
-              description="Ability to specify reviewing users"
+              description="Assign reviewers to verify tasks"
               features={[
-                'Column - a stage of work in which a task can be reviewed by the right people',
-                'Choose a user who needs to approve the task',
-                'Approval rules block task movement through stages',
+                'Columns are workflow stages where a task can be reviewed',
+                'Choose users whose approval is required',
+                'Approval rules block stage movement',
               ]}
               isReversed={true}
             />
 
             <FeatureShowcase
-              // image={colorMode === 'light' ? smartparamsScreenshotLight : smartparamsScreenshotDark}
-              title="Discussions right in the tasks"
-              description="Manage comment chaos by tying to a discussion of something specific in the task"
+              title="Task-level discussions"
+              description="Manage comment chaos by linking discussions to specific ideas"
               features={[
-                'Ability to create a discussion in a task',
-                'During communication, the discussion should be completed and closed',
-                'The discussion process is linked to approvals and reviews',
+                'Create discussions inside a task',
+                'Discussions must be resolved and closed',
+                'Discussion process integrates with approvals and reviews',
               ]}
             />
           </VStack>
@@ -333,21 +335,19 @@ export function Landing() {
                 <Blockquote.Icon opacity="0.4" boxSize="10" rotate="180deg" />
               </Float>
               <Blockquote.Content>
-                Sometimes it's important to discard the unnecessary. Our system removes imposed rules, helping
-                to build a process based on real challenges.
+                Sometimes it’s important to remove the noise. Our system removes imposed rules, helping you
+                build processes based on real-world challenges.
               </Blockquote.Content>
               <Blockquote.Caption>
                 <cite>
                   <HStack mt="2" gap="3">
                     <Avatar.Root size="sm">
-                      <Avatar.Fallback name="Ivan K., Author" />
+                      <Avatar.Fallback name="Ivan K., Creator" />
                       <Avatar.Image src="https://www.ivklgn.blog/assets/me.jpg" />
                     </Avatar.Root>
-                    <Span fontWeight="medium">
-                      <ChakraLink href="https://www.ivklgn.blog/" target="_blank">
-                        Ivan K., Creator of Hotpot Tracker
-                      </ChakraLink>
-                    </Span>
+                    <ChakraLink href="https://www.ivklgn.blog" target="_blank">
+                      <Span fontWeight="medium">Ivan, Creator of Hotpot Tracker</Span>
+                    </ChakraLink>
                   </HStack>
                 </cite>
               </Blockquote.Caption>
@@ -363,7 +363,7 @@ export function Landing() {
               Pricing
             </Heading>
             <Text fontSize="xl" textAlign="center" maxW="3xl">
-              We are currently in <strong>alpha</strong> version, you can try our system for free
+              We’re currently in <strong>alpha</strong>, you can try the system for free
             </Text>
           </VStack>
 
@@ -395,11 +395,11 @@ export function Landing() {
                 <Text>Perfect for small teams</Text>
                 <Link to="/workspace">
                   <Button colorScheme="blue" size="lg" w="full">
-                    Get Started
+                    Get started
                   </Button>
                 </Link>
                 <VStack align="start">
-                  <Heading size="sm">Limitations:</Heading>
+                  <Heading size="sm">Limits:</Heading>
                   <HStack>
                     <Icon as={LuUserPlus} color="green.500" />
                     <Text>{tariffLimits.free.max_teams_per_account} teams per account</Text>
@@ -430,9 +430,9 @@ export function Landing() {
               <Text>© 2025 Hotpot Tracker. All rights reserved.</Text>
             </Stack>
             <Stack direction={{ base: 'column', md: 'row' }} gap={8}>
-              {/* <ChakraLink>Blog</ChakraLink> */}
-              {/* <ChakraLink>Help Center</ChakraLink>
-              <ChakraLink>Community</ChakraLink> */}
+              <ChakraLink href="https://www.ivklgn.blog" target="_blank">
+                Blog
+              </ChakraLink>
             </Stack>
           </Stack>
         </Container>

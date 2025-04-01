@@ -7,6 +7,7 @@ import {
   Spacer,
   HStack,
   MenuItemGroup,
+  Menu,
 } from '@chakra-ui/react';
 import { MenuContent, MenuItem, MenuRoot, MenuTrigger } from '@/components/ui/menu';
 import { LuChartBarBig, LuPlus, LuAppWindow, LuSearch } from 'react-icons/lu';
@@ -130,8 +131,9 @@ export function AccountNavbar() {
               <UserAvatar user={{ userId: user?.id as string, userEmail: user?.email as string }} size="xs" />
             </MenuTrigger>
             <MenuContent>
-              <MenuItemGroup title={user?.email as string}>
-                <MenuItem value="logout" onClick={handleSignOutClick}>
+              <MenuItemGroup>
+                <Menu.ItemGroupLabel>{user?.email as string}</Menu.ItemGroupLabel>
+                <MenuItem value="logout" onClick={handleSignOutClick} cursor="pointer">
                   Logout
                 </MenuItem>
               </MenuItemGroup>
