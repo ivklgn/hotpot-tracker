@@ -6,6 +6,8 @@ import { useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Toaster } from '../../components/ui/toaster';
 
+import s from './AccountLayout.module.css';
+
 interface AccountLayoutProps {
   children: React.ReactNode;
 }
@@ -27,7 +29,7 @@ export function AccountLayout({ children }: AccountLayoutProps) {
 
   return (
     <AccountContext.Provider value={{ currentTeamId, setCurrentTeamId }}>
-      <Flex direction="column" minH="100vh">
+      <Flex direction="column" minH="100vh" className={s.accountLayout}>
         {children}
       </Flex>
       <Toaster />

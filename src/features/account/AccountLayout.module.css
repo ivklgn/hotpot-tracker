@@ -1,0 +1,8 @@
+.accountLayout {
+  background-image: linear-gradient(0deg, var(--gradient));
+  --gradient-from: var(--chakra-colors-transparent);
+  --gradient-stops: var(--gradient-from), var(--gradient-to);
+  --gradient: var(--gradient-via-stops, var(--gradient-stops));
+  --mix---gradient-to: color-mix(in srgb, #ffffec 15%, transparent);
+  --gradient-to: var(--mix---gradient-to, #ffffec);
+}
