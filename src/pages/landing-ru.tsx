@@ -160,7 +160,7 @@ const AuthForm = () => {
       ) : (
         <Box>
           <Text textStyle="2xl" textAlign="center" mb={4}>
-            Войти/зарегистрироваться по email
+            Войти или зарегистрироваться по email
           </Text>
           <Auth />
         </Box>
@@ -188,13 +188,20 @@ export function Landing() {
               <Heading fontWeight={800} fontSize={{ base: '3xl', sm: '4xl', md: '6xl' }} lineHeight="110%">
                 Hotpot{' '}
                 <Text as="span" color="blue.400">
-                  Tracker 🍲
+                  Tracker 🥢
                 </Text>
               </Heading>
               <Text fontSize={{ base: 'lg', sm: 'xl' }} maxW="xl">
                 <strong>«Приготовь так, как считаешь нужным»</strong> <br />
-                Обычные agile-доски – это ресторан с шефом, где ты не влияешь на процесс. Hotpot – как хого:
-                собирай команду и готовь рабочий процесс по своему вкусу. 🥢
+                Обычные agile-доски – это ресторан с шефом, где ты не влияешь на процесс. Hotpot (
+                <ChakraLink
+                  href="https://ru.wikipedia.org/wiki/%D0%A5%D0%BE%D0%B3%D0%BE"
+                  target="_blank"
+                  variant="underline"
+                >
+                  хого
+                </ChakraLink>
+                ): готовь процесс по своему вкусу.
               </Text>
               <Stack direction={{ base: 'column', sm: 'row' }} gap={4} mt={2}>
                 <Button
@@ -212,7 +219,7 @@ export function Landing() {
                   Начать
                 </Button>
                 <Button rounded="full" size="lg" fontWeight="bold" px={6} variant="outline">
-                  Подробнее
+                  <ChakraLink href="#about">Подробнее</ChakraLink>
                 </Button>
               </Stack>
             </Stack>
@@ -228,8 +235,8 @@ export function Landing() {
               Еще один клон Trello?
             </Heading>
             <Text fontSize="xl" textAlign="center" maxW="3xl">
-              Почти... Но не совсем. Hotpot Tracker не только содержит привычные примитивы как
-              доски/колонки/задачи, но и добавляет несколько простых и интересных инструментов
+              Почти... Но не совсем. Кроме простых примитивов таких как доски, задачи - Hotpot предлагает
+              встроенные возможности для вовлечения команды в процесс.
             </Text>
           </VStack>
           <Image
@@ -240,13 +247,13 @@ export function Landing() {
         </Container>
       </Box>
 
-      <Box py={16}>
+      <Box py={16} id="about">
         <Container maxW="7xl">
           <Stack flex={1} gap={6} textAlign="center">
             <Heading fontSize={{ base: '3xl', md: '4xl' }}>С любовью от инженеров 🤓</Heading>
             <Text fontSize="xl" maxW="3xl" mx="auto">
-              При работе с открытым исходным кодом у разработчиков есть масса эффективных инструментов, про
-              которые коллеги из бизнеса никогда не слышали.
+              В разработке программного обеспечения существуют подходы и инструменты, полезные и для бизнеса.
+              Hotpot заимствует идеи из Github/Gitlab, чтобы принести новые идеи в командные процессы.
             </Text>
             <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} gap={10} textAlign="left">
               <FeatureCard
@@ -259,7 +266,7 @@ export function Landing() {
               />
               <FeatureCard
                 title="Простые атрибуты"
-                text="Вместо навязанных полей в задачах - произвольные ключ-значения для выражения любых смыслов"
+                text="Вместо предустановленных полей в задачах - произвольные ключ-значения для выражения любых смыслов"
               />
               <FeatureCard
                 title="Одобрения"
@@ -267,7 +274,7 @@ export function Landing() {
               />
               <FeatureCard
                 title="Комментарии - зло"
-                text="Вместо этого обсуждайте определенную деталь в самом документе"
+                text="Вместо этого обсуждайте конкретные идеи в самом документе"
               />
               <FeatureCard
                 title="AI"
@@ -292,9 +299,9 @@ export function Landing() {
               title="Атрибуты для досок и задач"
               description="Вместо навязанных полей в задачах - произвольные ключ-значения"
               features={[
-                'Срок? Исполнитель? Приоритет? Прогресс? - атрибут',
-                'Одинаково работает как в задачах, так и в досках',
+                'Срок? Исполнитель? Приоритет? Прогресс? - это атрибуты',
                 'Задачи автоматически наследуют параметры доски',
+                'Чем осмысленнее заданы параметры тем лучше AI помогает с отчетом',
               ]}
             />
 
@@ -342,7 +349,9 @@ export function Landing() {
                       <Avatar.Fallback name="Иван К., Автор" />
                       <Avatar.Image src="https://www.ivklgn.blog/assets/me.jpg" />
                     </Avatar.Root>
-                    <Span fontWeight="medium">Иван К., Создатель Hotpot Tracker</Span>
+                    <ChakraLink href="https://www.ivklgn.blog" target="_blank">
+                      <Span fontWeight="medium">Иван, Создатель Hotpot Tracker</Span>
+                    </ChakraLink>
                   </HStack>
                 </cite>
               </Blockquote.Caption>
@@ -426,9 +435,9 @@ export function Landing() {
               <Text>© 2025 Hotpot Tracker. Все права защищены.</Text>
             </Stack>
             <Stack direction={{ base: 'column', md: 'row' }} gap={8}>
-              {/* <ChakraLink>Blog</ChakraLink> */}
-              {/* <ChakraLink>Help Center</ChakraLink>
-              <ChakraLink>Community</ChakraLink> */}
+              <ChakraLink href="https://www.ivklgn.blog" target="_blank">
+                Блог
+              </ChakraLink>
             </Stack>
           </Stack>
         </Container>
