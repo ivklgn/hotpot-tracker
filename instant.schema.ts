@@ -99,6 +99,20 @@ const _schema = i.schema({
       createdAt: i.date().indexed(),
       updatedAt: i.date(),
     }),
+    issues: i.entity({
+      taskId: i.string(),
+      content: i.string(),
+      createdAt: i.date().indexed(),
+      creatorId: i.string(),
+      deletedAt: i.date().indexed(),
+    }),
+    replies: i.entity({
+      issueId: i.string(),
+      content: i.string(),
+      createdAt: i.date().indexed(),
+      userEmail: i.string(),
+      deletedAt: i.date().indexed(),
+    }),
   },
   links: {
     // events
@@ -383,6 +397,33 @@ const _schema = i.schema({
         on: '$users',
         has: 'many',
         label: 'teams',
+      },
+    },
+
+    issuesTasks: {
+      forward: {
+        on: 'issues',
+        has: 'one',
+        label: 'tasks',
+        onDelete: 'cascade',
+      },
+      reverse: {
+        on: 'tasks',
+        has: 'many',
+        label: 'issues',
+      },
+    },
+    repliesIssues: {
+      forward: {
+        on: 'replies',
+        has: 'one',
+        label: 'issues',
+        onDelete: 'cascade',
+      },
+      reverse: {
+        on: 'issues',
+        has: 'many',
+        label: 'replies',
       },
     },
   },

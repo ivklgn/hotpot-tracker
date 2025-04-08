@@ -12,6 +12,7 @@ import { JSONContent } from '@tiptap/react';
 import { ConfirmAction } from '../../components/ConfirmAction';
 import { TaskApprove } from './TaskApprove';
 import { runTransaction } from '../../core/instantdb-transaction';
+import { IssueList } from '@/features/issue/IssueList.tsx';
 
 interface TaskProps {
   task?: InstaQLEntity<AppSchema, 'tasks', { smartParams: {}; columns: {} }>;
@@ -56,7 +57,6 @@ export function Task({ task }: TaskProps) {
     <Box flex="1" pt={8} mx={6}>
       <Flex direction="row" justifyContent="space-between">
         <Editable.Root
-          maxW={480}
           value={name}
           onValueChange={(e) => setName(e.value)}
           placeholder="Click to edit"
@@ -96,7 +96,10 @@ export function Task({ task }: TaskProps) {
         taskBoardId={task.columns?.boardId}
       />
 
-      <Editor originalContent={task.content} onSaveClick={handleUpdateContent} />
+      <Flex gap="4">
+        <Editor originalContent={task.content} onSaveClick={handleUpdateContent} />
+        <IssueList />
+      </Flex>
     </Box>
   );
 }
