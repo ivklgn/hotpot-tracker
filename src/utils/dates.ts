@@ -3,6 +3,7 @@ export function timeAgo(date: Date | string): string {
   const pastDate = new Date(date);
   const elapsedMilliseconds = now.getTime() - pastDate.getTime();
 
+  // TODO: to english
   // Константы для преобразования миллисекунд в секунды, минуты, часы и дни
   const seconds = Math.floor(elapsedMilliseconds / 1000);
   const minutes = Math.floor(seconds / 60);
