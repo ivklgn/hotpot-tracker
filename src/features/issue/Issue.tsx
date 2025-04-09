@@ -7,7 +7,6 @@ import {
   IconButton,
   MenuPositioner,
   Portal,
-  Separator,
   Stack,
   Textarea,
 } from '@chakra-ui/react';
@@ -47,6 +46,7 @@ interface IIssueProps {
 export const Issue = ({ id, date, content }: IIssueProps) => {
   const [issueContent, setIssueContent] = useState(content);
   const [replyContent, setReplyContent] = useState('');
+  const [isActionBarVisible, setIsActionBarVisible] = useState(false);
 
   const { user } = db.useAuth();
   const { data: replies } = db.useQuery({
@@ -90,6 +90,14 @@ export const Issue = ({ id, date, content }: IIssueProps) => {
     );
   };
 
+  const handleMouseEnter = () => {
+    setIsActionBarVisible(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsActionBarVisible(false);
+  };
+
   const getIssueQuote = () => {
     const editorIssue = document.querySelector(`span[data-comment-id="${id}"]`);
 
@@ -99,17 +107,19 @@ export const Issue = ({ id, date, content }: IIssueProps) => {
   const editorIssueQuote = getIssueQuote();
 
   return (
-    <Box id={id} boxShadow="xs" width="full" onClick={handleClick}>
+    <Box
+      id={id}
+      boxShadow="sm"
+      width="full"
+      onClick={handleClick}
+      borderRadius="l3"
+      overflow="hidden"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       {editorIssueQuote && (
-        <Box
-          px="1.5"
-          borderTopRadius="l3"
-          borderWidth="1px"
-          borderColor="border.disabled"
-          borderBottomWidth={0}
-          bg="bg.muted"
-        >
-          <Button variant="plain" color="fg.subtle" size="2xs" _hover={{ color: 'white' }}>
+        <Box px="1.5" borderWidth="1px" borderColor="border.disabled" borderBottomWidth={0} bg="gray.800">
+          <Button variant="plain" color="fg.muted" size="2xs" _hover={{ color: 'white' }}>
             <Em
               textStyle="xs"
               fontWeight="medium"
@@ -135,7 +145,7 @@ export const Issue = ({ id, date, content }: IIssueProps) => {
               color="gray.solid"
               fontSize="sm"
               fontWeight="bold"
-              width={190}
+              width={isActionBarVisible ? 190 : 265}
               whiteSpace="nowrap"
               textOverflow="ellipsis"
               overflow="hidden"
@@ -148,50 +158,52 @@ export const Issue = ({ id, date, content }: IIssueProps) => {
             </Text>
           </Box>
 
-          <Box ml="auto">
-            <ButtonGroup size="2xs" variant="surface">
-              <ConfirmAction
-                opener={
-                  <IconButton>
-                    <LuBadgeCheck />
-                  </IconButton>
-                }
-                text="Are you sure you want to approve issue?"
-                onOk={() => {
-                  runTransaction(() => deleteIssue({ issueId: id }));
-                }}
-              />
+          {isActionBarVisible && (
+            <Box ml="auto">
+              <ButtonGroup size="2xs" variant="ghost">
+                <ConfirmAction
+                  opener={
+                    <IconButton colorPalette="green">
+                      <LuBadgeCheck />
+                    </IconButton>
+                  }
+                  text="Are you sure you want to approve issue?"
+                  onOk={() => {
+                    runTransaction(() => deleteIssue({ issueId: id }));
+                  }}
+                />
 
-              <MenuRoot positioning={{ placement: 'right-start' }}>
-                <MenuTrigger asChild>
-                  <IconButton>
-                    <LuEllipsisVertical />
-                  </IconButton>
-                </MenuTrigger>
+                <MenuRoot positioning={{ placement: 'right-start' }}>
+                  <MenuTrigger asChild>
+                    <IconButton>
+                      <LuEllipsisVertical />
+                    </IconButton>
+                  </MenuTrigger>
 
-                <Portal>
-                  <MenuPositioner>
-                    <MenuContent>
-                      <ConfirmAction
-                        opener={
-                          <MenuItem value="approve">
-                            <LuBadgeCheck /> Approve
-                          </MenuItem>
-                        }
-                        text="Are you sure you want to delete issue?"
-                        onOk={() => {
-                          runTransaction(() => deleteIssue({ issueId: id }));
-                        }}
-                      />
-                      <MenuItem value="reply">
-                        <LuReply /> Reply
-                      </MenuItem>
-                    </MenuContent>
-                  </MenuPositioner>
-                </Portal>
-              </MenuRoot>
-            </ButtonGroup>
-          </Box>
+                  <Portal>
+                    <MenuPositioner>
+                      <MenuContent>
+                        <ConfirmAction
+                          opener={
+                            <MenuItem value="approve">
+                              <LuBadgeCheck /> Approve
+                            </MenuItem>
+                          }
+                          text="Are you sure you want to delete issue?"
+                          onOk={() => {
+                            runTransaction(() => deleteIssue({ issueId: id }));
+                          }}
+                        />
+                        <MenuItem value="reply">
+                          <LuReply /> Reply
+                        </MenuItem>
+                      </MenuContent>
+                    </MenuPositioner>
+                  </Portal>
+                </MenuRoot>
+              </ButtonGroup>
+            </Box>
+          )}
         </Flex>
 
         <Editable.Root
@@ -232,6 +244,7 @@ export const Issue = ({ id, date, content }: IIssueProps) => {
 
         <Box>
           <Textarea
+            borderColor="border.emphasized"
             height="40px"
             placeholder="Reply to issue..."
             value={replyContent}
@@ -250,17 +263,14 @@ export const Issue = ({ id, date, content }: IIssueProps) => {
           )}
         </Box>
 
-        <Separator mt="4" />
-
         <Stack>
           {replies?.replies &&
             replies.replies.map((reply) => (
-              <Box ml="4" mt="4">
+              <Box ml="6" mt="4" key={reply.id}>
                 <Reply
                   date={`${reply.createdAt}`}
                   id={reply.id}
                   userEmail={reply.userEmail}
-                  key={reply.id}
                   content={reply.content}
                 />
               </Box>
