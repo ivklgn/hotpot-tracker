@@ -41,6 +41,14 @@ export const focusCommentWithActiveId = (wrapperId: string, issueId: string) => 
   });
 };
 
+export const calculateHeight = (el: HTMLElement | null, indent: string) => {
+  if (!el) {
+    return 'unset';
+  }
+
+  return `calc(100vh - ${el.offsetTop}px - ${indent})`;
+};
+
 export interface MarkWithRange {
   mark: PMMark;
   range: Range;

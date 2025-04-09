@@ -54,7 +54,7 @@ export function Task({ task }: TaskProps) {
   }
 
   return (
-    <Box flex="1" py={8} mx={6}>
+    <Box flex="1" pt={8} mx={6}>
       <Flex direction="row" justifyContent="space-between">
         <Editable.Root
           value={name}
@@ -100,6 +100,7 @@ export function Task({ task }: TaskProps) {
         <Box flexGrow={1}>
           <Editor originalContent={task.content} onSaveClick={handleUpdateContent} />
         </Box>
+
         <IssueList />
       </Flex>
     </Box>

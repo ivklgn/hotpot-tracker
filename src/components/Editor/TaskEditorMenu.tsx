@@ -59,7 +59,7 @@ export function TaskEditorMenu() {
             taskId={params?.taskId as string}
             opener={
               <Box pl="3">
-                <Button size="xs" onClick={handleClickAddIssue}>
+                <Button size="xs" onClick={handleClickAddIssue} colorPalette="teal">
                   <LuListPlus /> Add issue
                 </Button>
               </Box>

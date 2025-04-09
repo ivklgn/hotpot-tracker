@@ -3,25 +3,24 @@ export function timeAgo(date: Date | string): string {
   const pastDate = new Date(date);
   const elapsedMilliseconds = now.getTime() - pastDate.getTime();
 
-  // TODO: to english
-  // Константы для преобразования миллисекунд в секунды, минуты, часы и дни
+  // Constants for converting milliseconds to seconds, minutes, hours, and days.
   const seconds = Math.floor(elapsedMilliseconds / 1000);
   const minutes = Math.floor(seconds / 60);
   const hours = Math.floor(minutes / 60);
   const days = Math.floor(hours / 24);
 
   if (days > 0) {
-    return `${days} ${pluralize(days, 'день', 'дня', 'дней')} назад`;
+    return `${days} ${pluralize(days, 'day', 'days', 'days')} ago`;
   } else if (hours > 0) {
-    return `${hours} ${pluralize(hours, 'час', 'часа', 'часов')} назад`;
+    return `${hours} ${pluralize(hours, 'hour', 'hours', 'hours')} ago`;
   } else if (minutes > 0) {
-    return `${minutes} ${pluralize(minutes, 'минуту', 'минуты', 'минут')} назад`;
+    return `${minutes} ${pluralize(minutes, 'minute', 'minutes', 'minutes')} ago`;
   } else {
     if (seconds === 0) {
-      return 'Только что';
+      return 'Just now';
     }
 
-    return `${seconds} ${pluralize(seconds, 'секунду', 'секунды', 'секунд')} назад`;
+    return `${seconds} ${pluralize(seconds, 'second', 'seconds', 'seconds')} ago`;
   }
 }
 
