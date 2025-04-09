@@ -118,8 +118,19 @@ export const Issue = ({ id, date, content }: IIssueProps) => {
       onMouseLeave={handleMouseLeave}
     >
       {editorIssueQuote && (
-        <Box px="1.5" borderWidth="1px" borderColor="border.disabled" borderBottomWidth={0} bg="gray.800">
-          <Button variant="plain" color="fg.muted" size="2xs" _hover={{ color: 'white' }}>
+        <Box
+          px="1.5"
+          borderWidth="1px"
+          borderColor="border.disabled"
+          borderBottomWidth={0}
+          bg={{ _light: 'gray.200', _dark: 'gray.800' }}
+        >
+          <Button
+            variant="plain"
+            color={{ _light: 'gray.500', _dark: 'gray.400' }}
+            size="2xs"
+            _hover={{ color: { _light: 'teal.800', _dark: 'white' } }}
+          >
             <Em
               textStyle="xs"
               fontWeight="medium"
