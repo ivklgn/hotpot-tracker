@@ -123,7 +123,7 @@ export const Issue = ({ id, date, content }: IIssueProps) => {
           borderWidth="1px"
           borderColor="border.disabled"
           borderBottomWidth={0}
-          bg={{ _light: 'gray.200', _dark: 'gray.800' }}
+          bg={{ _light: 'gray.100', _dark: 'gray.800' }}
         >
           <Button
             variant="plain"
