@@ -11,27 +11,22 @@ import {
   Icon,
   RadioCard,
 } from '@chakra-ui/react';
-import { LuArrowRight, LuCircleOff, LuLock, LuWand } from 'react-icons/lu';
+import { LuInfo, LuUsersRound, LuWand } from 'react-icons/lu';
 import { db } from '../../instantdb';
+import { useState } from 'react';
 
 const items = [
   {
-    icon: <LuArrowRight />,
-    value: 'allow',
-    title: 'Allow',
-    description: 'This user can access the system',
+    icon: <LuInfo />,
+    value: 'basic',
+    title: 'Basic',
+    description: 'Basic overview of the board.',
   },
   {
-    icon: <LuCircleOff />,
-    value: 'deny',
-    title: 'Deny',
-    description: 'This user will be denied access to the system',
-  },
-  {
-    icon: <LuLock />,
-    value: 'lock',
-    title: 'Lock',
-    description: 'This user will be locked out of the system',
+    icon: <LuUsersRound />,
+    value: 'team',
+    title: 'Team',
+    description: 'Detailed report of the team members and their contributions to the board.',
   },
 ];
 
@@ -40,15 +35,17 @@ interface AIReport {
 }
 
 export function AIReport({ boardId }: AIReport) {
+  const [preset, setPreset] = useState('basic');
   const { user } = db.useAuth();
-  const { completion, handleSubmit, isLoading, stop } = useCompletion({
-    initialInput: '123',
+  const { completion, handleSubmit, isLoading, setCompletion } = useCompletion({
+    initialInput: '1',
     api: `${import.meta.env.VITE_AI_BACKEND_API_URL}/api/ai-report`,
     headers: {
       refresh_token: user?.refresh_token as string,
     },
     body: {
       boardId,
+      preset,
     },
   });
 
@@ -73,11 +70,17 @@ export function AIReport({ boardId }: AIReport) {
               <form onSubmit={handleSubmit}>
                 {!completion && (
                   <>
-                    <RadioCard.Root defaultValue="allow" mb={4}>
+                    <RadioCard.Root defaultValue={preset} mb={4} value={preset}>
                       <RadioCard.Label>Select preset:</RadioCard.Label>
                       <HStack align="stretch">
                         {items.map((item) => (
-                          <RadioCard.Item key={item.value} value={item.value}>
+                          <RadioCard.Item
+                            key={item.value}
+                            value={item.value}
+                            onClick={() => {
+                              setPreset(item.value);
+                            }}
+                          >
                             <RadioCard.ItemHiddenInput />
                             <RadioCard.ItemControl>
                               <RadioCard.ItemContent>
@@ -109,10 +112,10 @@ export function AIReport({ boardId }: AIReport) {
                     mb="4"
                     colorScheme="blue"
                     onClick={() => {
-                      stop();
+                      setCompletion('');
                     }}
                   >
-                    <LuWand /> rr
+                    <LuWand /> Reset
                   </Button>
                   <Box whiteSpace="pre-wrap">
                     <Text fontWeight="light">{completion}</Text>
