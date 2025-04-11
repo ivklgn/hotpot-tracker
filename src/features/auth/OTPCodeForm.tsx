@@ -13,12 +13,15 @@ interface OTPCodeFormProps {
 export function OTPCodeForm({ email }: OTPCodeFormProps) {
   const [otp, setOTP] = useState<string[] | undefined>();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
 
     if (!otp) {
       setErrorMessage('Invalid code format');
+      setIsLoading(false);
       return;
     }
 
@@ -26,6 +29,7 @@ export function OTPCodeForm({ email }: OTPCodeFormProps) {
 
     db.auth.signInWithMagicCode({ email, code: otp.join('') }).catch(() => {
       setErrorMessage('Invalid code or unknown error');
+      setIsLoading(false);
     });
   };
 
@@ -43,11 +47,12 @@ export function OTPCodeForm({ email }: OTPCodeFormProps) {
               onValueComplete={(value) => {
                 setOTP(value.value);
               }}
+              disabled={isLoading}
             />
           </Field>
         </Fieldset.Content>
 
-        <Button className="p-mt-2" type="submit" colorScheme="brand" /*disabled={isLoadingSignIn}*/>
+        <Button className="p-mt-2" type="submit" colorScheme="brand" disabled={isLoading} loading={isLoading}>
           Verify code
         </Button>
       </Fieldset.Root>
