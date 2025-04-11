@@ -11,6 +11,7 @@ import { NotFoundPage } from './pages/404';
 import { Landing } from './pages/landing';
 import { Landing as LandingRu } from './pages/landing-ru';
 import { SearchPage } from './pages/search';
+import { SettingsPage } from './pages/settings';
 import { GlobalErrorBoundary } from './components/GlobalErrorBoundary';
 
 export default function App() {
@@ -31,6 +32,7 @@ export default function App() {
             <Route path="/board/:boardId" component={() => <BoardPage />} />
             <Route path="/task/:taskId" component={() => <TaskPage />} />
             <Route path="/search" component={() => <SearchPage />} />
+            <Route path="/settings" component={() => <SettingsPage />} />
             <Route path="/" component={() => <Landing />} />
             <Route path="/ru" component={() => <LandingRu />} />
             <Route path="/404" component={() => <NotFoundPage />} />
