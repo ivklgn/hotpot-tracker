@@ -18,12 +18,6 @@ import {
   Span,
   SimpleGrid,
 } from '@chakra-ui/react';
-import boardScreenshotLight from '../assets/board-screenshot-light.png';
-import boardScreenshotDark from '../assets/board-screenshot-dark.png';
-import columnScreenshotLight from '../assets/column-screenshot-light.png';
-import columnScreenshotDark from '../assets/column-screenshot-dark.png';
-import smartparamsScreenshotLight from '../assets/smartparams-screenshot-light.png';
-import smartparamsScreenshotDark from '../assets/smartparams-screenshot-dark.png';
 import { Auth } from '../features/auth';
 import { db } from '../instantdb';
 import { UserAvatar } from '../components/Avatars';
@@ -31,6 +25,15 @@ import { Link, useLocation } from 'wouter';
 import tariffLimits from '../../tariff-limits.json';
 import { useColorMode } from '../components/ui/color-mode';
 import { LuUserPlus, LuUsers, LuSquareMenu, LuSquareKanban } from 'react-icons/lu';
+
+import boardScreenshotLight from '../assets/board-screenshot-light.png';
+import boardScreenshotDark from '../assets/board-screenshot-dark.png';
+import boardColumnEditLight from '../assets/board-column-edit-light.png';
+import boardColumnEditDark from '../assets/board-column-edit-dark.png';
+import boardAILight from '../assets/board-ai-light.png';
+import boardAIDark from '../assets/board-ai-dark.png';
+import taskIssuesLight from '../assets/task-issues-light.png';
+import taskIssuesDark from '../assets/task-issues-dark.png';
 
 import s from './landing.module.css';
 
@@ -285,49 +288,62 @@ export function Landing() {
         </Container>
       </Box>
 
+      <Box>
+        <Heading fontSize={{ base: '3xl', md: '4xl' }} textAlign="center">
+          Интересные возможности
+        </Heading>
+      </Box>
+
       <Box py={16}>
         <Container maxW="7xl">
           <VStack gap={8} mb={12}>
-            <Heading fontSize={{ base: '3xl', md: '4xl' }} textAlign="center">
-              Интересные возможности
+            <Heading fontSize={{ base: '2xl', md: '3xl' }} textAlign="center">
+              Атрибуты для досок и задач
             </Heading>
+            <Text fontSize="xl" textAlign="center" maxW="3xl">
+              Задачи автоматически наследуют атрибуты доски — такие как срок, исполнитель, приоритет и
+              прогресс — и чем осмысленнее заданы эти параметры, тем эффективнее ИИ помогает с отчетностью
+            </Text>
           </VStack>
+          <Image src={colorMode === 'light' ? boardAILight : boardAIDark} borderRadius="md" shadow="lg" />
+        </Container>
+      </Box>
 
-          <VStack gap={20}>
-            <FeatureShowcase
-              image={colorMode === 'light' ? smartparamsScreenshotLight : smartparamsScreenshotDark}
-              title="Атрибуты для досок и задач"
-              description="Вместо навязанных полей в задачах - произвольные ключ-значения"
-              features={[
-                'Срок? Исполнитель? Приоритет? Прогресс? - это атрибуты',
-                'Задачи автоматически наследуют параметры доски',
-                'Чем осмысленнее заданы параметры тем лучше AI помогает с отчетом',
-              ]}
-            />
-
-            <FeatureShowcase
-              image={colorMode === 'light' ? columnScreenshotLight : columnScreenshotDark}
-              title="Проверки и одобрения"
-              description="Возможность указать проверяющих пользователей"
-              features={[
-                'Колонка - этап работы, в котором задача может быть проверена нужными людьми',
-                'Выбирайте пользователя, которым нужно одобрить задачу',
-                'Правила одобрения блокируют движения задачи по этапам',
-              ]}
-              isReversed={true}
-            />
-
-            <FeatureShowcase
-              // image={colorMode === 'light' ? smartparamsScreenshotLight : smartparamsScreenshotDark}
-              title="Обсуждения прямо в задачах"
-              description="Управляйте хаосом комментариев привязываясь к обсуждению чего то конкретного в задаче"
-              features={[
-                'Возможность создать обсуждение в задаче',
-                'В процессе общения обсуждение должно быть завершено и закрыто',
-                'Процесс обсуждения связан с одобрениями и проверками',
-              ]}
-            />
+      <Box py={16}>
+        <Container maxW="7xl">
+          <VStack gap={8} mb={12}>
+            <Heading fontSize={{ base: '2xl', md: '3xl' }} textAlign="center">
+              Возможность указать проверяющих пользователей
+            </Heading>
+            <Text fontSize="xl" textAlign="center" maxW="3xl">
+              Колонка — это этап работы, на котором задачу проверяют назначенные пользователи, и пока не
+              выполнены правила одобрения, продвижение задачи по этапам блокируется.
+            </Text>
           </VStack>
+          <Image
+            src={colorMode === 'light' ? boardColumnEditLight : boardColumnEditDark}
+            borderRadius="md"
+            shadow="lg"
+          />
+        </Container>
+      </Box>
+
+      <Box py={16}>
+        <Container maxW="7xl">
+          <VStack gap={8} mb={12}>
+            <Heading fontSize={{ base: '2xl', md: '3xl' }} textAlign="center">
+              Обсуждения в задачах
+            </Heading>
+            <Text fontSize="xl" textAlign="center" maxW="3xl">
+              В задаче можно создать обсуждение, которое должно быть завершено и закрыто в процессе общения, а
+              сам процесс интегрирован в систему одобрений и проверок.
+            </Text>
+          </VStack>
+          <Image
+            src={colorMode === 'light' ? taskIssuesLight : taskIssuesDark}
+            borderRadius="md"
+            shadow="lg"
+          />
         </Container>
       </Box>
 
@@ -339,8 +355,8 @@ export function Landing() {
                 <Blockquote.Icon opacity="0.4" boxSize="10" rotate="180deg" />
               </Float>
               <Blockquote.Content>
-                Иногда важно отбросить лишнее. Наша система убирает навязанные правила, помогая выстроить
-                процесс, исходя из реальных вызовов.
+                Иногда важно отбросить лишнее. Hotpot Tracker оставляет пользователю привычный интерфейс, но
+                убирает малоэффективные методы организации работы.
               </Blockquote.Content>
               <Blockquote.Caption>
                 <cite>
@@ -350,7 +366,7 @@ export function Landing() {
                       <Avatar.Image src="https://www.ivklgn.blog/assets/me.jpg" />
                     </Avatar.Root>
                     <ChakraLink href="https://www.ivklgn.blog" target="_blank">
-                      <Span fontWeight="medium">Иван, Создатель Hotpot Tracker</Span>
+                      <Span fontWeight="medium">Иван К., Автор</Span>
                     </ChakraLink>
                   </HStack>
                 </cite>
