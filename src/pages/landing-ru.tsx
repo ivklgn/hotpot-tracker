@@ -65,62 +65,6 @@ const FeatureCard = ({ title, text }: FeatureCardProps) => {
   );
 };
 
-interface FeatureShowcaseProps {
-  image?: string;
-  title: string;
-  description: string;
-  features: string[];
-  isReversed?: boolean;
-}
-
-const FeatureShowcase = ({
-  image,
-  title,
-  description,
-  features,
-  isReversed = false,
-}: FeatureShowcaseProps) => {
-  return (
-    <Stack
-      direction={{ base: 'column', lg: isReversed ? 'row-reverse' : 'row' }}
-      gap={{ base: 8, md: 10 }}
-      py={10}
-      align="center"
-    >
-      <Flex flex={1} justify="center">
-        <Image
-          rounded="md"
-          alt={`${title} screenshot`}
-          src={image}
-          objectFit="contain"
-          boxShadow="2xl"
-          width={{ base: '100%', md: '90%' }}
-          height="auto"
-          maxH="700px"
-          transition="transform 0.3s ease-in-out"
-          _hover={{ transform: 'scale(1.02)' }}
-        />
-      </Flex>
-      <Stack flex={1} gap={5}>
-        <Heading fontSize={{ base: '2xl', sm: '3xl' }}>{title}</Heading>
-        <Text fontSize={{ base: 'md', md: 'lg' }} color="gray.600">
-          {description}
-        </Text>
-        <VStack align="start" gap={3}>
-          {features.map((feature, index) => (
-            <HStack key={index} align="start" gap={2}>
-              <Box color="green.400" px={2}>
-                •
-              </Box>
-              <Text fontSize={{ base: 'md', md: 'lg' }}>{feature}</Text>
-            </HStack>
-          ))}
-        </VStack>
-      </Stack>
-    </Stack>
-  );
-};
-
 const AuthForm = () => {
   const { user } = db.useAuth();
   const handleSignOutClick = (e: React.MouseEvent) => {
