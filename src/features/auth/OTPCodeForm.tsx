@@ -5,6 +5,7 @@ import { Fieldset } from '@chakra-ui/react';
 import { useState } from 'react';
 import { db } from '../../instantdb';
 import { PinInput } from '@/components/ui/pin-input';
+import { authError } from './errors';
 
 interface OTPCodeFormProps {
   email: string;
@@ -27,7 +28,10 @@ export function OTPCodeForm({ email }: OTPCodeFormProps) {
 
     if (!email) return;
 
-    db.auth.signInWithMagicCode({ email, code: otp.join('') }).catch(() => {
+    db.auth.signInWithMagicCode({ email, code: otp.join('') }).catch((err) => {
+      if (err.status !== 400) {
+        authError('BackendInteractionError', 'SignIn error', { originalError: err }).emit();
+      }
       setErrorMessage('Invalid code or unknown error');
       setIsLoading(false);
     });

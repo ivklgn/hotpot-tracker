@@ -2,6 +2,10 @@ import { Box, Button, Table } from '@chakra-ui/react';
 import Helm from '../../components/Helm';
 import { ConfirmAction } from '../../components/ConfirmAction';
 import { db } from '../../instantdb';
+import { errorContext } from '../../core/errors';
+
+const settingsErrorContext = errorContext.subcontext('Settings');
+const accountError = settingsErrorContext.feature('Account');
 
 export function SettingsPage() {
   const { user } = db.useAuth();
@@ -16,7 +20,9 @@ export function SettingsPage() {
         window.location.href = '/';
       })
       .catch((error) => {
-        console.error(error);
+        accountError('BackendInteractionError', 'Error deleting account', {
+          originalError: error,
+        }).emit();
       });
   };
 

@@ -1,3 +1,5 @@
+import { webStorageError } from './errors';
+
 export class PersistentStorage {
   storage?: Storage;
 
@@ -5,7 +7,9 @@ export class PersistentStorage {
     try {
       this.storage = type === 'local' ? localStorage : sessionStorage;
     } catch (error) {
-      console.error('local storage is disabled', error);
+      webStorageError('ExpectedError', 'Error initializing storage', {
+        originalError: error,
+      }).emit();
     }
   }
 
@@ -25,7 +29,9 @@ export class PersistentStorage {
 
       return value;
     } catch (error) {
-      console.error(error);
+      webStorageError('ExpectedError', 'Error getting value', {
+        originalError: error,
+      }).emit();
       return;
     }
   }
@@ -39,7 +45,9 @@ export class PersistentStorage {
       const stringifiedValue = JSON.stringify(value);
       this.storage.setItem(key, stringifiedValue);
     } catch (error) {
-      console.error(error);
+      webStorageError('ExpectedError', 'Error setting value', {
+        originalError: error,
+      }).emit();
       return;
     }
   }
