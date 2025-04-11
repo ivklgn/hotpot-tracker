@@ -21,7 +21,7 @@ import {
 import { Auth } from '../features/auth';
 import { db } from '../instantdb';
 import { UserAvatar } from '../components/Avatars';
-import { Link, useLocation } from 'wouter';
+import { Link } from 'wouter';
 import tariffLimits from '../../tariff-limits.json';
 import { useColorMode } from '../components/ui/color-mode';
 import { LuUserPlus, LuUsers, LuSquareMenu, LuSquareKanban } from 'react-icons/lu';
@@ -117,7 +117,6 @@ const AuthForm = () => {
 };
 
 export function Landing() {
-  const [, navigate] = useLocation();
   const { colorMode } = useColorMode();
 
   return (
@@ -160,7 +159,7 @@ export function Landing() {
                   bg="blue.400"
                   _hover={{ bg: 'blue.500' }}
                   onClick={() => {
-                    navigate('/auth');
+                    window.location.href = '/auth';
                   }}
                 >
                   Начать
@@ -358,7 +357,7 @@ export function Landing() {
                   <Text alignSelf="end">/ месяц</Text>
                 </HStack>
                 <Text>Идеально подходит небольших команд</Text>
-                <Link to="/workspace">
+                <Link href="/workspace">
                   <Button colorScheme="blue" size="lg" w="full">
                     Начать
                   </Button>
