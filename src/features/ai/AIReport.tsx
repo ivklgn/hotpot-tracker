@@ -39,7 +39,7 @@ export function AIReport({ boardId }: AIReport) {
   const { user } = db.useAuth();
   const { completion, handleSubmit, isLoading, setCompletion } = useCompletion({
     initialInput: '1',
-    api: `${import.meta.env.VITE_AI_BACKEND_API_URL}/api/ai-report`,
+    api: `${import.meta.env.VITE_BACKEND_API_URL}/api/ai-report`,
     headers: {
       refresh_token: user?.refresh_token as string,
     },

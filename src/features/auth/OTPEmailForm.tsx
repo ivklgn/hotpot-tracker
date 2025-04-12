@@ -12,9 +12,11 @@ interface OTPEmailFormProps {
 export function OTPEmailForm({ onCodeSendComplete }: OTPEmailFormProps) {
   const [email, setEmail] = useState('');
   const [error, setError] = useState<Error | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
 
     if (!email) return;
 
@@ -24,6 +26,7 @@ export function OTPEmailForm({ onCodeSendComplete }: OTPEmailFormProps) {
         onCodeSendComplete(email);
       })
       .catch((err) => {
+        setIsLoading(false);
         setError(err);
       });
   };
@@ -34,7 +37,7 @@ export function OTPEmailForm({ onCodeSendComplete }: OTPEmailFormProps) {
         <Fieldset.Content>
           <Field invalid={!!error} errorText={error ? 'Error sending code' : undefined}>
             <Input
-              // autoFocus
+              disabled={isLoading}
               placeholder="Enter your email"
               type="email"
               value={email as string}
@@ -45,7 +48,7 @@ export function OTPEmailForm({ onCodeSendComplete }: OTPEmailFormProps) {
           </Field>
         </Fieldset.Content>
 
-        <Button className="p-mt-2" type="submit" colorScheme="brand" /*disabled={isLoadingSendCode}*/>
+        <Button className="p-mt-2" type="submit" colorScheme="brand" disabled={isLoading} loading={isLoading}>
           Send code
         </Button>
       </Fieldset.Root>
