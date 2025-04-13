@@ -4,6 +4,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import { getOriginalErrorStringifiedInfo } from './utils/sentry.ts';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 Sentry.init({
   dsn: import.meta.env.VITE_SENTRY_DSN,
@@ -42,5 +43,6 @@ createRoot(document.getElementById('root')!).render(
     <Provider>
       <App />
     </Provider>
+    <SpeedInsights />
   </StrictMode>
 );

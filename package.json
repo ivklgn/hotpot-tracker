@@ -26,6 +26,7 @@
     "@tiptap/pm": "^2.11.5",
     "@tiptap/react": "^2.11.5",
     "@tiptap/starter-kit": "^2.11.5",
+    "@vercel/speed-insights": "^1.2.0",
     "chakra-react-select": "^6.0.1",
     "conway-errors": "^3.1.2",
     "next-themes": "^0.4.6",
