@@ -16,6 +16,8 @@ import { useCurrentEditor } from '@tiptap/react';
 import { id } from '@instantdb/react';
 import { db } from '@/instantdb.ts';
 import { runTransaction } from '@/core/instantdb-transaction.ts';
+import { updateTaskContent } from '@/features/task/Task.tsx';
+import { useParams } from 'wouter';
 
 interface IProps {
   taskId: string;
@@ -27,10 +29,10 @@ export function CreateIssueDialog({ taskId, opener }: IProps) {
 
   const [isOpen, setIsOpen] = useState(false);
   const [content, setContent] = useState('');
+
   const { editor } = useCurrentEditor();
   const { user } = db.useAuth();
-
-  const handleSubmit = () => {};
+  const params = useParams();
 
   const handleReset = () => {
     setContent('');
@@ -46,8 +48,9 @@ export function CreateIssueDialog({ taskId, opener }: IProps) {
     runTransaction(
       () => createNewIssue({ issueId: newIssueId, taskId, content, creatorId: user?.id }),
       (result) => {
-        if (result.isOk()) {
-          editor?.commands.setComment(newIssueId);
+        if (result.isOk() && editor) {
+          editor.commands.setComment(newIssueId);
+          handleSubmit();
         }
 
         // TODO: perms + tariffLimits
@@ -63,8 +66,23 @@ export function CreateIssueDialog({ taskId, opener }: IProps) {
 
   const handleSaveIssue = () => {
     setIssue();
-    handleClose();
-    handleReset();
+  };
+
+  const handleSubmit = () => {
+    if (!editor || !params.taskId) {
+      return;
+    }
+
+    runTransaction(
+      () =>
+        updateTaskContent({ taskId: params.taskId as string, newContent: JSON.stringify(editor.getJSON()) }),
+      (result) => {
+        if (result.isOk()) {
+          handleClose();
+          handleReset();
+        }
+      }
+    );
   };
 
   return (
@@ -85,7 +103,7 @@ export function CreateIssueDialog({ taskId, opener }: IProps) {
           <DialogTitle>Enter the text of the issue</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit}>
+        <form>
           <DialogBody pb="4">
             <Field.Root>
               <Textarea

@@ -12,7 +12,6 @@ import { JSONContent } from '@tiptap/react';
 import { ConfirmAction } from '../../components/ConfirmAction';
 import { TaskApprove } from './TaskApprove';
 import { runTransaction } from '../../core/instantdb-transaction';
-import { IssueList } from '@/features/issue/IssueList.tsx';
 
 interface TaskProps {
   task?: InstaQLEntity<AppSchema, 'tasks', { smartParams: {}; columns: {} }>;
@@ -96,13 +95,7 @@ export function Task({ task }: TaskProps) {
         taskBoardId={task.columns?.boardId}
       />
 
-      <Flex gap="4">
-        <Box flexGrow={1}>
-          <Editor originalContent={task.content} onSaveClick={handleUpdateContent} />
-        </Box>
-
-        <IssueList />
-      </Flex>
+      <Editor originalContent={task.content} onSaveClick={handleUpdateContent} />
     </Box>
   );
 }
@@ -168,7 +161,7 @@ async function renameTask({ newTitle, taskId }: { taskId: string; newTitle: stri
   return await db.transact([db.tx.tasks[taskId].merge({ updatedAt: new Date().toJSON(), title: newTitle })]);
 }
 
-async function updateTaskContent({ newContent, taskId }: { taskId: string; newContent: string }) {
+export async function updateTaskContent({ newContent, taskId }: { taskId: string; newContent: string }) {
   return await db.transact([
     db.tx.tasks[taskId].merge({ updatedAt: new Date().toJSON(), content: newContent }),
   ]);

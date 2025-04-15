@@ -16,10 +16,6 @@ export function TaskEditorMenu() {
     return null;
   }
 
-  const handleClickAddIssue = () => {
-    // close bubble menu
-  };
-
   return (
     <BubbleMenu className="bubble-menu" tippyOptions={{ duration: 100 }} editor={editor}>
       <Box boxShadow="sm" bg="bg.muted" py="2" px="3" rounded="md">
@@ -59,7 +55,7 @@ export function TaskEditorMenu() {
             taskId={params?.taskId as string}
             opener={
               <Box pl="3">
-                <Button size="xs" onClick={handleClickAddIssue} colorPalette="teal">
+                <Button size="xs" colorPalette="teal">
                   <LuListPlus /> Add issue
                 </Button>
               </Box>

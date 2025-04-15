@@ -25,25 +25,14 @@ import { UserAvatar } from '@/components/Avatars.tsx';
 import { id } from '@instantdb/react';
 import { Reply } from '@/features/issue/Reply.tsx';
 
-// interface IIssuesContext {
-//   issues: IIssue[];
-//   activeIssueId: string | null;
-// }
-//
-// export const { Provider: IssuesProvider, useAppContext: useIssuesContext } = createAppContext<IIssuesContext>(
-//   {
-//     issues: [],
-//     activeIssueId: null,
-//   }
-// );
-
 interface IIssueProps {
   id: string;
   date: Date | string;
   content: string;
+  onApprove(id: string): void;
 }
 
-export const Issue = ({ id, date, content }: IIssueProps) => {
+export const Issue = ({ id, date, content, onApprove }: IIssueProps) => {
   const [issueContent, setIssueContent] = useState(content);
   const [replyContent, setReplyContent] = useState('');
   const [isActionBarVisible, setIsActionBarVisible] = useState(false);
@@ -96,6 +85,17 @@ export const Issue = ({ id, date, content }: IIssueProps) => {
 
   const handleMouseLeave = () => {
     setIsActionBarVisible(false);
+  };
+
+  const handleApproveIssue = () => {
+    runTransaction(
+      () => deleteIssue({ issueId: id }),
+      (result) => {
+        if (result.isOk()) {
+          onApprove(id);
+        }
+      }
+    );
   };
 
   const getIssueQuote = () => {
@@ -179,9 +179,7 @@ export const Issue = ({ id, date, content }: IIssueProps) => {
                     </IconButton>
                   }
                   text="Are you sure you want to approve issue?"
-                  onOk={() => {
-                    runTransaction(() => deleteIssue({ issueId: id }));
-                  }}
+                  onOk={handleApproveIssue}
                 />
 
                 <MenuRoot positioning={{ placement: 'right-start' }}>
@@ -201,9 +199,7 @@ export const Issue = ({ id, date, content }: IIssueProps) => {
                             </MenuItem>
                           }
                           text="Are you sure you want to delete issue?"
-                          onOk={() => {
-                            runTransaction(() => deleteIssue({ issueId: id }));
-                          }}
+                          onOk={handleApproveIssue}
                         />
                         <MenuItem value="reply">
                           <LuReply /> Reply
