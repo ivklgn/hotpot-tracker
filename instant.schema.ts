@@ -102,6 +102,7 @@ const _schema = i.schema({
     issues: i.entity({
       taskId: i.string(),
       content: i.string(),
+      teamId: i.string(),
       createdAt: i.date().indexed(),
       creatorId: i.string(),
       deletedAt: i.date().indexed(),
@@ -110,8 +111,10 @@ const _schema = i.schema({
       issueId: i.string(),
       content: i.string(),
       createdAt: i.date().indexed(),
+      teamId: i.string(),
       userEmail: i.string(),
       deletedAt: i.date().indexed(),
+      creatorId: i.string(),
     }),
   },
   links: {
@@ -413,6 +416,20 @@ const _schema = i.schema({
         label: 'issues',
       },
     },
+    issuesTeams: {
+      forward: {
+        on: 'issues',
+        has: 'one',
+        label: 'teams',
+        onDelete: 'cascade',
+      },
+      reverse: {
+        on: 'teams',
+        has: 'many',
+        label: 'issues',
+      },
+    },
+
     repliesIssues: {
       forward: {
         on: 'replies',
@@ -422,6 +439,19 @@ const _schema = i.schema({
       },
       reverse: {
         on: 'issues',
+        has: 'many',
+        label: 'replies',
+      },
+    },
+    repliesTeams: {
+      forward: {
+        on: 'replies',
+        has: 'one',
+        label: 'teams',
+        onDelete: 'cascade',
+      },
+      reverse: {
+        on: 'teams',
         has: 'many',
         label: 'replies',
       },

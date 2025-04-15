@@ -47,12 +47,13 @@ export const IssueList = () => {
     return null;
   }
 
-  const handleApproveIssue = (id: string) => {
+  const handleApproveIssue = (issueId: string) => {
     if (!editor) {
       return;
     }
 
-    editor.commands.unsetComment(id);
+    editor.commands.unsetComment(issueId);
+    // TODO: need to accept array of transactions
     runTransaction(() =>
       updateTaskContent({ taskId: params.taskId as string, newContent: JSON.stringify(editor.getJSON()) })
     );

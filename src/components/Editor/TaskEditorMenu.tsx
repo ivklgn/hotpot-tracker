@@ -1,12 +1,12 @@
 import { BubbleMenu, useCurrentEditor } from '@tiptap/react';
 import { LuBold, LuItalic, LuListPlus, LuStrikethrough } from 'react-icons/lu';
 import { EditorButton } from '@/components/Editor/EditorButton.tsx';
-
-import './Editor.css';
 import { Box, Flex, Separator } from '@chakra-ui/react';
 import { Button } from '@/components/ui/button.tsx';
 import { CreateIssueDialog } from '@/features/issue/CreateIssueDialog.tsx';
 import { useParams } from 'wouter';
+
+import './Editor.css';
 
 export function TaskEditorMenu() {
   const { editor } = useCurrentEditor();

@@ -18,6 +18,9 @@ import { db } from '@/instantdb.ts';
 import { runTransaction } from '@/core/instantdb-transaction.ts';
 import { updateTaskContent } from '@/features/task/Task.tsx';
 import { useParams } from 'wouter';
+import { toaster } from '../../components/ui/toaster';
+import tariffLimits from '../../../tariff-limits.json';
+import { useAccount } from '../account/AccountContext';
 
 interface IProps {
   taskId: string;
@@ -26,13 +29,12 @@ interface IProps {
 
 export function CreateIssueDialog({ taskId, opener }: IProps) {
   const openerRef = useRef(null);
-
   const [isOpen, setIsOpen] = useState(false);
   const [content, setContent] = useState('');
-
   const { editor } = useCurrentEditor();
   const { user } = db.useAuth();
   const params = useParams();
+  const { currentTeamId } = useAccount();
 
   const handleReset = () => {
     setContent('');
@@ -43,23 +45,24 @@ export function CreateIssueDialog({ taskId, opener }: IProps) {
   };
 
   const setIssue = () => {
-    const newIssueId = id();
-
     runTransaction(
-      () => createNewIssue({ issueId: newIssueId, taskId, content, creatorId: user?.id }),
+      () =>
+        createNewIssue({ taskId, content, creatorId: user?.id as string, teamId: currentTeamId as string }),
       (result) => {
         if (result.isOk() && editor) {
-          editor.commands.setComment(newIssueId);
+          editor.commands.setComment(result.value);
           handleSubmit();
+          return;
         }
 
-        // TODO: perms + tariffLimits
-        // if (result.isErr() && result.error.originalError?.hint?.expected === 'perms-pass?') {
-        //   toaster.create({
-        //     title: `Maximum ${tariffLimits.free.max_issues_per_tasks} issues allowed`,
-        //     type: 'error',
-        //   });
-        // }
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        if (result.isErr() && result.error.originalError?.hint?.expected === 'perms-pass?') {
+          toaster.create({
+            title: `Maximum ${tariffLimits.free.max_issues_per_tasks} issues allowed`,
+            type: 'error',
+          });
+        }
       }
     );
   };
@@ -134,23 +137,29 @@ export function CreateIssueDialog({ taskId, opener }: IProps) {
 }
 
 async function createNewIssue({
-  issueId,
   taskId,
   content,
   creatorId,
+  teamId,
 }: {
-  issueId: string;
   content: string;
   taskId: string;
-  creatorId?: string;
+  creatorId: string;
+  teamId: string;
 }) {
-  return await db.transact([
-    db.tx.issues[issueId].update({
+  const newIssueId = id();
+
+  await db.transact([
+    db.tx.issues[newIssueId].update({
       taskId,
       content,
       creatorId,
       createdAt: new Date().toJSON(),
+      teamId,
     }),
-    db.tx.issues[issueId].link({ tasks: taskId }),
+    db.tx.issues[newIssueId].link({ tasks: taskId }),
+    db.tx.issues[newIssueId].link({ teams: teamId }),
   ]);
+
+  return newIssueId;
 }

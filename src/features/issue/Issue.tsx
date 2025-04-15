@@ -16,14 +16,17 @@ import { useState } from 'react';
 import { timeAgo } from '@/utils/dates.ts';
 import { LuBadgeCheck, LuCheck, LuEllipsisVertical, LuReply, LuX } from 'react-icons/lu';
 import { MenuContent, MenuItem, MenuRoot, MenuTrigger } from '@/components/ui/menu.tsx';
-
-import './Issue.css';
+import tariffLimits from '../../../tariff-limits.json';
 import { runTransaction } from '@/core/instantdb-transaction.ts';
 import { ConfirmAction } from '@/components/ConfirmAction.tsx';
 import { db } from '@/instantdb.ts';
 import { UserAvatar } from '@/components/Avatars.tsx';
 import { id } from '@instantdb/react';
 import { Reply } from '@/features/issue/Reply.tsx';
+import { toaster } from '../../components/ui/toaster';
+import { useAccount } from '../account/AccountContext';
+
+import './Issue.css';
 
 interface IIssueProps {
   id: string;
@@ -36,6 +39,7 @@ export const Issue = ({ id, date, content, onApprove }: IIssueProps) => {
   const [issueContent, setIssueContent] = useState(content);
   const [replyContent, setReplyContent] = useState('');
   const [isActionBarVisible, setIsActionBarVisible] = useState(false);
+  const { currentTeamId } = useAccount();
 
   const { user } = db.useAuth();
   const { data: replies } = db.useQuery({
@@ -70,10 +74,27 @@ export const Issue = ({ id, date, content, onApprove }: IIssueProps) => {
 
   const handleReplySubmit = () => {
     runTransaction(
-      () => createNewReply({ issueId: id, content: replyContent, userEmail: user?.email }),
+      () =>
+        createNewReply({
+          issueId: id,
+          content: replyContent,
+          userEmail: user?.email as string,
+          teamId: currentTeamId as string,
+          creatorId: user?.id as string,
+        }),
       (result) => {
         if (result.isOk()) {
           setReplyContent('');
+          return;
+        }
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        if (result.isErr() && result.error.originalError?.hint?.expected === 'perms-pass?') {
+          toaster.create({
+            title: `Maximum ${tariffLimits.free.max_replies_per_issue} replies allowed`,
+            type: 'error',
+          });
         }
       }
     );
@@ -93,6 +114,7 @@ export const Issue = ({ id, date, content, onApprove }: IIssueProps) => {
       (result) => {
         if (result.isOk()) {
           onApprove(id);
+          return;
         }
       }
     );
@@ -289,7 +311,7 @@ export const Issue = ({ id, date, content, onApprove }: IIssueProps) => {
 };
 
 async function deleteIssue({ issueId }: { issueId: string }) {
-  return await db.transact([db.tx.issues[issueId].update({ deletedAt: new Date().toJSON() })]);
+  return await db.transact([db.tx.issues[issueId].delete()]);
 }
 
 async function updateIssueContent({ newContent, issueId }: { newContent: string; issueId: string }) {
@@ -300,10 +322,14 @@ async function createNewReply({
   issueId,
   content,
   userEmail,
+  teamId,
+  creatorId,
 }: {
   issueId: string;
   content: string;
-  userEmail?: string;
+  userEmail: string;
+  teamId: string;
+  creatorId: string;
 }) {
   const newReplyId = id();
 
@@ -313,7 +339,10 @@ async function createNewReply({
       content,
       userEmail,
       createdAt: new Date().toJSON(),
+      teamId,
+      creatorId,
     }),
-    db.tx.replies[newReplyId].link({ issues: newReplyId }),
+    db.tx.replies[newReplyId].link({ issues: issueId }),
+    db.tx.replies[newReplyId].link({ teams: teamId }),
   ]);
 }

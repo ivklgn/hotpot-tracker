@@ -116,4 +116,32 @@ export default {
       update: 'isMember',
     },
   },
+  issues: {
+    bind: [
+      'isMember',
+      "auth.id in data.ref('teams.memberships.userId')",
+      'isCreator',
+      'auth.id == data.creatorId',
+    ],
+    allow: {
+      view: 'isMember',
+      create: `isMember && size(data.ref('tasks.issues.id')) <= ${tariffLimits.free.max_issues_per_tasks}`,
+      delete: 'isCreator',
+      update: 'isCreator',
+    },
+  },
+  replies: {
+    bind: [
+      'isMember',
+      "auth.id in data.ref('teams.memberships.userId')",
+      'isCreator',
+      'auth.id == data.creatorId',
+    ],
+    allow: {
+      view: 'isMember',
+      create: `isMember && size(data.ref('issues.replies.id')) <= ${tariffLimits.free.max_replies_per_issue}`,
+      delete: 'isCreator',
+      update: 'isCreator',
+    },
+  },
 };

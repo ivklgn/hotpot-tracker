@@ -99,9 +99,9 @@ export const Reply = ({ id, date, userEmail, content }: IProps) => {
   );
 };
 
-async function deleteReply({ replyId }: { replyId: string }) {
-  return await db.transact([db.tx.replies[replyId].delete()]);
-}
+// async function deleteReply({ replyId }: { replyId: string }) {
+//   return await db.transact([db.tx.replies[replyId].delete()]);
+// }
 
 // async function updateReplyContent({ newContent, replyId }: { newContent: string; replyId: string }) {
 //   return await db.transact([db.tx.replies[replyId].merge({ content: newContent })]);
