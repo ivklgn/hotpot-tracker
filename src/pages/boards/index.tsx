@@ -77,7 +77,7 @@ export function BoardsPage() {
               { label: 'Archived', value: 'archived' },
             ]}
             onValueChange={(value) => {
-              setBoardFilter(value.value);
+              setBoardFilter(value.value || 'all');
             }}
           />
         </VStack>

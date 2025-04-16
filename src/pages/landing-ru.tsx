@@ -18,19 +18,22 @@ import {
   Span,
   SimpleGrid,
 } from '@chakra-ui/react';
-import boardScreenshotLight from '../assets/board-screenshot-light.png';
-import boardScreenshotDark from '../assets/board-screenshot-dark.png';
-import columnScreenshotLight from '../assets/column-screenshot-light.png';
-import columnScreenshotDark from '../assets/column-screenshot-dark.png';
-import smartparamsScreenshotLight from '../assets/smartparams-screenshot-light.png';
-import smartparamsScreenshotDark from '../assets/smartparams-screenshot-dark.png';
 import { Auth } from '../features/auth';
 import { db } from '../instantdb';
 import { UserAvatar } from '../components/Avatars';
-import { Link, useLocation } from 'wouter';
+import { Link } from 'wouter';
 import tariffLimits from '../../tariff-limits.json';
 import { useColorMode } from '../components/ui/color-mode';
 import { LuUserPlus, LuUsers, LuSquareMenu, LuSquareKanban } from 'react-icons/lu';
+
+import boardScreenshotLight from '../assets/board-screenshot-light.png';
+import boardScreenshotDark from '../assets/board-screenshot-dark.png';
+import boardColumnEditLight from '../assets/board-column-edit-light.png';
+import boardColumnEditDark from '../assets/board-column-edit-dark.png';
+import boardAILight from '../assets/board-ai-light.png';
+import boardAIDark from '../assets/board-ai-dark.png';
+import taskIssuesLight from '../assets/task-issues-light.png';
+import taskIssuesDark from '../assets/task-issues-dark.png';
 
 import s from './landing.module.css';
 
@@ -59,62 +62,6 @@ const FeatureCard = ({ title, text }: FeatureCardProps) => {
       <Heading fontSize="xl">{title}</Heading>
       <Text color="gray.600">{text}</Text>
     </VStack>
-  );
-};
-
-interface FeatureShowcaseProps {
-  image?: string;
-  title: string;
-  description: string;
-  features: string[];
-  isReversed?: boolean;
-}
-
-const FeatureShowcase = ({
-  image,
-  title,
-  description,
-  features,
-  isReversed = false,
-}: FeatureShowcaseProps) => {
-  return (
-    <Stack
-      direction={{ base: 'column', lg: isReversed ? 'row-reverse' : 'row' }}
-      gap={{ base: 8, md: 10 }}
-      py={10}
-      align="center"
-    >
-      <Flex flex={1} justify="center">
-        <Image
-          rounded="md"
-          alt={`${title} screenshot`}
-          src={image}
-          objectFit="contain"
-          boxShadow="2xl"
-          width={{ base: '100%', md: '90%' }}
-          height="auto"
-          maxH="700px"
-          transition="transform 0.3s ease-in-out"
-          _hover={{ transform: 'scale(1.02)' }}
-        />
-      </Flex>
-      <Stack flex={1} gap={5}>
-        <Heading fontSize={{ base: '2xl', sm: '3xl' }}>{title}</Heading>
-        <Text fontSize={{ base: 'md', md: 'lg' }} color="gray.600">
-          {description}
-        </Text>
-        <VStack align="start" gap={3}>
-          {features.map((feature, index) => (
-            <HStack key={index} align="start" gap={2}>
-              <Box color="green.400" px={2}>
-                •
-              </Box>
-              <Text fontSize={{ base: 'md', md: 'lg' }}>{feature}</Text>
-            </HStack>
-          ))}
-        </VStack>
-      </Stack>
-    </Stack>
   );
 };
 
@@ -170,7 +117,6 @@ const AuthForm = () => {
 };
 
 export function Landing() {
-  const [, navigate] = useLocation();
   const { colorMode } = useColorMode();
 
   return (
@@ -213,7 +159,7 @@ export function Landing() {
                   bg="blue.400"
                   _hover={{ bg: 'blue.500' }}
                   onClick={() => {
-                    navigate('/auth');
+                    window.location.href = '/auth';
                   }}
                 >
                   Начать
@@ -285,49 +231,62 @@ export function Landing() {
         </Container>
       </Box>
 
+      <Box>
+        <Heading fontSize={{ base: '3xl', md: '4xl' }} textAlign="center">
+          Интересные возможности
+        </Heading>
+      </Box>
+
       <Box py={16}>
         <Container maxW="7xl">
           <VStack gap={8} mb={12}>
-            <Heading fontSize={{ base: '3xl', md: '4xl' }} textAlign="center">
-              Интересные возможности
+            <Heading fontSize={{ base: '2xl', md: '3xl' }} textAlign="center">
+              Атрибуты для досок и задач
             </Heading>
+            <Text fontSize="xl" textAlign="center" maxW="3xl">
+              Задачи автоматически наследуют атрибуты доски — такие как срок, исполнитель, приоритет и
+              прогресс — и чем осмысленнее заданы эти параметры, тем эффективнее ИИ помогает с отчетностью
+            </Text>
           </VStack>
+          <Image src={colorMode === 'light' ? boardAILight : boardAIDark} borderRadius="md" shadow="lg" />
+        </Container>
+      </Box>
 
-          <VStack gap={20}>
-            <FeatureShowcase
-              image={colorMode === 'light' ? smartparamsScreenshotLight : smartparamsScreenshotDark}
-              title="Атрибуты для досок и задач"
-              description="Вместо навязанных полей в задачах - произвольные ключ-значения"
-              features={[
-                'Срок? Исполнитель? Приоритет? Прогресс? - это атрибуты',
-                'Задачи автоматически наследуют параметры доски',
-                'Чем осмысленнее заданы параметры тем лучше AI помогает с отчетом',
-              ]}
-            />
-
-            <FeatureShowcase
-              image={colorMode === 'light' ? columnScreenshotLight : columnScreenshotDark}
-              title="Проверки и одобрения"
-              description="Возможность указать проверяющих пользователей"
-              features={[
-                'Колонка - этап работы, в котором задача может быть проверена нужными людьми',
-                'Выбирайте пользователя, которым нужно одобрить задачу',
-                'Правила одобрения блокируют движения задачи по этапам',
-              ]}
-              isReversed={true}
-            />
-
-            <FeatureShowcase
-              // image={colorMode === 'light' ? smartparamsScreenshotLight : smartparamsScreenshotDark}
-              title="Обсуждения прямо в задачах"
-              description="Управляйте хаосом комментариев привязываясь к обсуждению чего то конкретного в задаче"
-              features={[
-                'Возможность создать обсуждение в задаче',
-                'В процессе общения обсуждение должно быть завершено и закрыто',
-                'Процесс обсуждения связан с одобрениями и проверками',
-              ]}
-            />
+      <Box py={16}>
+        <Container maxW="7xl">
+          <VStack gap={8} mb={12}>
+            <Heading fontSize={{ base: '2xl', md: '3xl' }} textAlign="center">
+              Возможность указать проверяющих пользователей
+            </Heading>
+            <Text fontSize="xl" textAlign="center" maxW="3xl">
+              Колонка — это этап работы, на котором задачу проверяют назначенные пользователи, и пока не
+              выполнены правила одобрения, продвижение задачи по этапам блокируется.
+            </Text>
           </VStack>
+          <Image
+            src={colorMode === 'light' ? boardColumnEditLight : boardColumnEditDark}
+            borderRadius="md"
+            shadow="lg"
+          />
+        </Container>
+      </Box>
+
+      <Box py={16}>
+        <Container maxW="7xl">
+          <VStack gap={8} mb={12}>
+            <Heading fontSize={{ base: '2xl', md: '3xl' }} textAlign="center">
+              Обсуждения в задачах
+            </Heading>
+            <Text fontSize="xl" textAlign="center" maxW="3xl">
+              В задаче можно создать обсуждение, которое должно быть завершено и закрыто в процессе общения, а
+              сам процесс интегрирован в систему одобрений и проверок.
+            </Text>
+          </VStack>
+          <Image
+            src={colorMode === 'light' ? taskIssuesLight : taskIssuesDark}
+            borderRadius="md"
+            shadow="lg"
+          />
         </Container>
       </Box>
 
@@ -339,8 +298,8 @@ export function Landing() {
                 <Blockquote.Icon opacity="0.4" boxSize="10" rotate="180deg" />
               </Float>
               <Blockquote.Content>
-                Иногда важно отбросить лишнее. Наша система убирает навязанные правила, помогая выстроить
-                процесс, исходя из реальных вызовов.
+                Иногда важно отбросить лишнее. Hotpot Tracker оставляет пользователю привычный интерфейс, но
+                убирает малоэффективные методы организации работы.
               </Blockquote.Content>
               <Blockquote.Caption>
                 <cite>
@@ -350,7 +309,7 @@ export function Landing() {
                       <Avatar.Image src="https://www.ivklgn.blog/assets/me.jpg" />
                     </Avatar.Root>
                     <ChakraLink href="https://www.ivklgn.blog" target="_blank">
-                      <Span fontWeight="medium">Иван, Создатель Hotpot Tracker</Span>
+                      <Span fontWeight="medium">Иван К., Автор</Span>
                     </ChakraLink>
                   </HStack>
                 </cite>
@@ -398,7 +357,7 @@ export function Landing() {
                   <Text alignSelf="end">/ месяц</Text>
                 </HStack>
                 <Text>Идеально подходит небольших команд</Text>
-                <Link to="/workspace">
+                <Link href="/workspace">
                   <Button colorScheme="blue" size="lg" w="full">
                     Начать
                   </Button>

@@ -5,6 +5,7 @@ import { Fieldset } from '@chakra-ui/react';
 import { useState } from 'react';
 import { db } from '../../instantdb';
 import { PinInput } from '@/components/ui/pin-input';
+import { authError } from './errors';
 
 interface OTPCodeFormProps {
   email: string;
@@ -13,19 +14,26 @@ interface OTPCodeFormProps {
 export function OTPCodeForm({ email }: OTPCodeFormProps) {
   const [otp, setOTP] = useState<string[] | undefined>();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
 
     if (!otp) {
       setErrorMessage('Invalid code format');
+      setIsLoading(false);
       return;
     }
 
     if (!email) return;
 
-    db.auth.signInWithMagicCode({ email, code: otp.join('') }).catch(() => {
+    db.auth.signInWithMagicCode({ email, code: otp.join('') }).catch((err) => {
+      if (err.status !== 400) {
+        authError('BackendInteractionError', 'SignIn error', { originalError: err }).emit();
+      }
       setErrorMessage('Invalid code or unknown error');
+      setIsLoading(false);
     });
   };
 
@@ -43,11 +51,12 @@ export function OTPCodeForm({ email }: OTPCodeFormProps) {
               onValueComplete={(value) => {
                 setOTP(value.value);
               }}
+              disabled={isLoading}
             />
           </Field>
         </Fieldset.Content>
 
-        <Button className="p-mt-2" type="submit" colorScheme="brand" /*disabled={isLoadingSignIn}*/>
+        <Button className="p-mt-2" type="submit" colorScheme="brand" disabled={isLoading} loading={isLoading}>
           Verify code
         </Button>
       </Fieldset.Root>

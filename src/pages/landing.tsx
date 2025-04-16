@@ -18,19 +18,22 @@ import {
   Span,
   SimpleGrid,
 } from '@chakra-ui/react';
-import boardScreenshotLight from '../assets/board-screenshot-light.png';
-import boardScreenshotDark from '../assets/board-screenshot-dark.png';
-import columnScreenshotLight from '../assets/column-screenshot-light.png';
-import columnScreenshotDark from '../assets/column-screenshot-dark.png';
-import smartparamsScreenshotLight from '../assets/smartparams-screenshot-light.png';
-import smartparamsScreenshotDark from '../assets/smartparams-screenshot-dark.png';
 import { Auth } from '../features/auth';
 import { db } from '../instantdb';
 import { UserAvatar } from '../components/Avatars';
-import { Link, useLocation } from 'wouter';
+import { Link } from 'wouter';
 import tariffLimits from '../../tariff-limits.json';
 import { useColorMode } from '../components/ui/color-mode';
 import { LuUserPlus, LuUsers, LuSquareMenu, LuSquareKanban } from 'react-icons/lu';
+
+import boardScreenshotLight from '../assets/board-screenshot-light.png';
+import boardScreenshotDark from '../assets/board-screenshot-dark.png';
+import boardColumnEditLight from '../assets/board-column-edit-light.png';
+import boardColumnEditDark from '../assets/board-column-edit-dark.png';
+import boardAILight from '../assets/board-ai-light.png';
+import boardAIDark from '../assets/board-ai-dark.png';
+import taskIssuesLight from '../assets/task-issues-light.png';
+import taskIssuesDark from '../assets/task-issues-dark.png';
 
 import s from './landing.module.css';
 
@@ -57,64 +60,8 @@ const FeatureCard = ({ title, text }: FeatureCardProps) => {
       }}
     >
       <Heading fontSize="xl">{title}</Heading>
-      <Text color="gray.600">{text}</Text>
+      <Text>{text}</Text>
     </VStack>
-  );
-};
-
-interface FeatureShowcaseProps {
-  image?: string;
-  title: string;
-  description: string;
-  features: string[];
-  isReversed?: boolean;
-}
-
-const FeatureShowcase = ({
-  image,
-  title,
-  description,
-  features,
-  isReversed = false,
-}: FeatureShowcaseProps) => {
-  return (
-    <Stack
-      direction={{ base: 'column', lg: isReversed ? 'row-reverse' : 'row' }}
-      gap={{ base: 8, md: 10 }}
-      py={10}
-      align="center"
-    >
-      <Flex flex={1} justify="center">
-        <Image
-          rounded="md"
-          alt={`${title} screenshot`}
-          src={image}
-          objectFit="contain"
-          boxShadow="2xl"
-          width={{ base: '100%', md: '90%' }}
-          height="auto"
-          maxH="700px"
-          transition="transform 0.3s ease-in-out"
-          _hover={{ transform: 'scale(1.02)' }}
-        />
-      </Flex>
-      <Stack flex={1} gap={5}>
-        <Heading fontSize={{ base: '2xl', sm: '3xl' }}>{title}</Heading>
-        <Text fontSize={{ base: 'md', md: 'lg' }} color="gray.600">
-          {description}
-        </Text>
-        <VStack align="start" gap={3}>
-          {features.map((feature, index) => (
-            <HStack key={index} align="start" gap={2}>
-              <Box color="green.400" px={2}>
-                •
-              </Box>
-              <Text fontSize={{ base: 'md', md: 'lg' }}>{feature}</Text>
-            </HStack>
-          ))}
-        </VStack>
-      </Stack>
-    </Stack>
   );
 };
 
@@ -170,7 +117,6 @@ const AuthForm = () => {
 };
 
 export function Landing() {
-  const [, navigate] = useLocation();
   const { colorMode } = useColorMode();
 
   return (
@@ -210,7 +156,7 @@ export function Landing() {
                   bg="blue.400"
                   _hover={{ bg: 'blue.500' }}
                   onClick={() => {
-                    navigate('/auth');
+                    window.location.href = '/auth';
                   }}
                 >
                   Get started
@@ -282,48 +228,62 @@ export function Landing() {
         </Container>
       </Box>
 
+      <Box>
+        <Heading fontSize={{ base: '3xl', md: '4xl' }} textAlign="center">
+          Cool features
+        </Heading>
+      </Box>
+
       <Box py={16}>
         <Container maxW="7xl">
           <VStack gap={8} mb={12}>
-            <Heading fontSize={{ base: '3xl', md: '4xl' }} textAlign="center">
-              Cool features
+            <Heading fontSize={{ base: '2xl', md: '3xl' }} textAlign="center">
+              Instead of forced fields—define custom key-value pairs
             </Heading>
+            <Text fontSize="xl" textAlign="center" maxW="3xl">
+              Due date, assignee, priority, and progress are task attributes inherited from the board, and
+              using meaningful parameters ensures better AI reporting.
+            </Text>
           </VStack>
+          <Image src={colorMode === 'light' ? boardAILight : boardAIDark} borderRadius="md" shadow="lg" />
+        </Container>
+      </Box>
 
-          <VStack gap={20}>
-            <FeatureShowcase
-              image={colorMode === 'light' ? smartparamsScreenshotLight : smartparamsScreenshotDark}
-              title="Attributes for boards and tasks"
-              description="Instead of forced fields—define custom key-value pairs"
-              features={[
-                'Due date? Assignee? Priority? Progress? - all are attributes',
-                'Tasks inherit parameters from the board',
-                'Meaningful parameters lead to better AI reporting',
-              ]}
-            />
-
-            <FeatureShowcase
-              image={colorMode === 'light' ? columnScreenshotLight : columnScreenshotDark}
-              title="Reviews and approvals"
-              description="Assign reviewers to verify tasks"
-              features={[
-                'Columns are workflow stages where a task can be reviewed',
-                'Choose users whose approval is required',
-                'Approval rules block stage movement',
-              ]}
-              isReversed={true}
-            />
-
-            <FeatureShowcase
-              title="Task-level discussions"
-              description="Manage comment chaos by linking discussions to specific ideas"
-              features={[
-                'Create discussions inside a task',
-                'Discussions must be resolved and closed',
-                'Discussion process integrates with approvals and reviews',
-              ]}
-            />
+      <Box py={16}>
+        <Container maxW="7xl">
+          <VStack gap={8} mb={12}>
+            <Heading fontSize={{ base: '2xl', md: '3xl' }} textAlign="center">
+              Assign reviewers to verify tasks
+            </Heading>
+            <Text fontSize="xl" textAlign="center" maxW="3xl">
+              Columns represent workflow stages where tasks can be reviewed, with designated users required
+              for approval and rules that block stage movement until approvals are granted.
+            </Text>
           </VStack>
+          <Image
+            src={colorMode === 'light' ? boardColumnEditLight : boardColumnEditDark}
+            borderRadius="md"
+            shadow="lg"
+          />
+        </Container>
+      </Box>
+
+      <Box py={16}>
+        <Container maxW="7xl">
+          <VStack gap={8} mb={12}>
+            <Heading fontSize={{ base: '2xl', md: '3xl' }} textAlign="center">
+              Task-level discussions
+            </Heading>
+            <Text fontSize="xl" textAlign="center" maxW="3xl">
+              Create discussions within a task that must be resolved and closed, with the process integrated
+              into approvals and reviews.
+            </Text>
+          </VStack>
+          <Image
+            src={colorMode === 'light' ? taskIssuesLight : taskIssuesDark}
+            borderRadius="md"
+            shadow="lg"
+          />
         </Container>
       </Box>
 
@@ -335,8 +295,8 @@ export function Landing() {
                 <Blockquote.Icon opacity="0.4" boxSize="10" rotate="180deg" />
               </Float>
               <Blockquote.Content>
-                Sometimes it’s important to remove the noise. Our system removes imposed rules, helping you
-                build processes based on real-world challenges.
+                Sometimes it’s important to let go of the unnecessary. Hotpot Tracker keeps the familiar
+                interface for the user but removes inefficient work organization methods.
               </Blockquote.Content>
               <Blockquote.Caption>
                 <cite>
@@ -346,7 +306,7 @@ export function Landing() {
                       <Avatar.Image src="https://www.ivklgn.blog/assets/me.jpg" />
                     </Avatar.Root>
                     <ChakraLink href="https://www.ivklgn.blog" target="_blank">
-                      <Span fontWeight="medium">Ivan, Creator of Hotpot Tracker</Span>
+                      <Span fontWeight="medium">Ivan K., Creator</Span>
                     </ChakraLink>
                   </HStack>
                 </cite>
@@ -393,7 +353,7 @@ export function Landing() {
                   <Text alignSelf="end">/ month</Text>
                 </HStack>
                 <Text>Perfect for small teams</Text>
-                <Link to="/workspace">
+                <Link href="/workspace">
                   <Button colorScheme="blue" size="lg" w="full">
                     Get started
                   </Button>

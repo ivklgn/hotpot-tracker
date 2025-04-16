@@ -8,6 +8,9 @@ import { Tooltip } from '../../components/ui/tooltip';
 import { useAccount } from '../account/AccountContext';
 import { useCallback, useMemo } from 'react';
 import { runTransaction } from '../../core/instantdb-transaction';
+import { taskErrorContext } from './errors';
+
+const taskApproveError = taskErrorContext.feature('TaskApprove');
 
 interface TaskApproveProps {
   task?: InstaQLEntity<AppSchema, 'tasks'>;
@@ -64,14 +67,14 @@ export function TaskApprove({ task }: TaskApproveProps) {
 
   const handleToggleApproveClick = useCallback(() => {
     if (!currentContributorId) {
-      console.error('Contributor not found');
+      taskApproveError('UnexpectedError', 'Contributor not found').emit();
       return;
     }
 
     if (isApproved) {
       const approveId = approvesData?.approves?.find((a) => a.contributorId === currentContributorId)?.id;
       if (!approveId) {
-        console.error('Approval record not found');
+        taskApproveError('UnexpectedError', 'Approve not found').emit();
         return;
       }
       runTransaction(() => deleteApprove(approveId));

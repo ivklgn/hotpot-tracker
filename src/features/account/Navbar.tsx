@@ -57,6 +57,10 @@ export function AccountNavbar() {
     }
   }, [currentTeamId, teams?.teams]);
 
+  const handleGoToSettings = () => {
+    navigate('/settings');
+  };
+
   const handleSignOutClick = () => {
     db.auth.signOut().then(() => {
       navigate('/');
@@ -127,12 +131,15 @@ export function AccountNavbar() {
         <Spacer />
         <HStack>
           <MenuRoot size="md">
-            <MenuTrigger>
+            <MenuTrigger cursor="pointer">
               <UserAvatar user={{ userId: user?.id as string, userEmail: user?.email as string }} size="xs" />
             </MenuTrigger>
             <MenuContent>
               <MenuItemGroup>
                 <Menu.ItemGroupLabel>{user?.email as string}</Menu.ItemGroupLabel>
+                <MenuItem value="settings" onClick={handleGoToSettings} cursor="pointer">
+                  Settings
+                </MenuItem>
                 <MenuItem value="logout" onClick={handleSignOutClick} cursor="pointer">
                   Logout
                 </MenuItem>
