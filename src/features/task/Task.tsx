@@ -1,5 +1,5 @@
 import { Box, Button, ButtonGroup, Editable, EmptyState, Flex, IconButton, VStack } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { LuPencilLine, LuX, LuCheck } from 'react-icons/lu';
 import { db } from '../../instantdb';
 import { HiColorSwatch } from 'react-icons/hi';
@@ -7,11 +7,14 @@ import { AppSchema } from '../../../instant.schema';
 import { InstaQLEntity } from '@instantdb/react';
 import { useLocation } from 'wouter';
 import { SmartParams } from '../smart-params';
-import { Editor } from '@/components/Editor/Editor';
 import { JSONContent } from '@tiptap/react';
 import { ConfirmAction } from '../../components/ConfirmAction';
 import { TaskApprove } from './TaskApprove';
 import { runTransaction } from '../../core/instantdb-transaction';
+
+const Editor = lazy(() =>
+  import('@/components/Editor/Editor').then((module) => ({ default: module.Editor }))
+);
 
 interface TaskProps {
   task?: InstaQLEntity<AppSchema, 'tasks', { smartParams: {}; columns: {} }>;
@@ -96,7 +99,9 @@ export function Task({ task }: TaskProps) {
         taskBoardId={task.columns?.boardId}
       />
 
-      <Editor originalContent={task.content} onSaveClick={handleUpdateContent} />
+      <Suspense fallback={null}>
+        <Editor originalContent={task.content} onSaveClick={handleUpdateContent} />
+      </Suspense>
     </Box>
   );
 }
