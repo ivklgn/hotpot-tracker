@@ -220,7 +220,7 @@ export const Issue = ({ id, date, content, onApprove }: IIssueProps) => {
                               <LuBadgeCheck /> Approve
                             </MenuItem>
                           }
-                          text="Are you sure you want to delete issue?"
+                          text="Are you sure you want to resolve this issue?"
                           onOk={handleApproveIssue}
                         />
                         <MenuItem value="reply">
