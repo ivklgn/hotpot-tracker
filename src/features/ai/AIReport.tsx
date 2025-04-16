@@ -37,7 +37,7 @@ interface AIReport {
 export function AIReport({ boardId }: AIReport) {
   const [preset, setPreset] = useState('basic');
   const { user } = db.useAuth();
-  const { completion, handleSubmit, isLoading, setCompletion } = useCompletion({
+  const { completion, handleSubmit, isLoading, setCompletion, stop } = useCompletion({
     initialInput: '1',
     api: `${import.meta.env.VITE_BACKEND_API_URL}/api/ai-report`,
     headers: {
@@ -48,6 +48,11 @@ export function AIReport({ boardId }: AIReport) {
       preset,
     },
   });
+
+  const handleResetClick = () => {
+    stop();
+    setCompletion('');
+  };
 
   return (
     <Drawer.Root size="lg">
@@ -107,14 +112,7 @@ export function AIReport({ boardId }: AIReport) {
               </form>
               {completion && (
                 <>
-                  <Button
-                    variant="solid"
-                    mb="4"
-                    colorScheme="blue"
-                    onClick={() => {
-                      setCompletion('');
-                    }}
-                  >
+                  <Button variant="solid" mb="4" colorScheme="blue" onClick={handleResetClick}>
                     <LuWand /> Reset
                   </Button>
                   <Box whiteSpace="pre-wrap">
