@@ -23,6 +23,18 @@ interface TaskProps {
 export function Task({ task }: TaskProps) {
   const [, navigate] = useLocation();
   const [name, setName] = useState<string>(task?.title || '');
+  const { user } = db.useAuth();
+  const { data: approvesData } = db.useQuery(
+    task?.id
+      ? {
+          approves: {
+            $: {
+              where: { taskId: task.id },
+            },
+          },
+        }
+      : null
+  );
 
   const handleRenameBoard = ({ value: newTitle }: { value: string }) => {
     if (!newTitle || !task) return;
@@ -32,6 +44,13 @@ export function Task({ task }: TaskProps) {
   const handleUpdateContent = (newContent: JSONContent) => {
     if (!newContent || !task) return;
     runTransaction(() => updateTaskContent({ taskId: task.id, newContent: JSON.stringify(newContent) }));
+  };
+
+  const handleCreateIssue = () => {
+    const approveId = approvesData?.approves.find((a) => a.creatorId === user?.id)?.id;
+    if (approveId) {
+      removeApprove({ approveId });
+    }
   };
 
   if (!task) {
@@ -99,7 +118,11 @@ export function Task({ task }: TaskProps) {
       />
 
       <Suspense fallback={null}>
-        <Editor originalContent={task.content} onSaveClick={handleUpdateContent} />
+        <Editor
+          originalContent={task.content}
+          onSaveClick={handleUpdateContent}
+          onCreateIssue={handleCreateIssue}
+        />
       </Suspense>
     </Box>
   );
@@ -186,4 +209,8 @@ async function undoArchiveTask({ taskId }: { taskId: string }) {
   return await db.transact([
     db.tx.tasks[taskId].update({ updatedAt: new Date().toJSON(), deletedAt: undefined }),
   ]);
+}
+
+async function removeApprove({ approveId }: { approveId: string }) {
+  return await db.transact(db.tx.approves[approveId].delete());
 }

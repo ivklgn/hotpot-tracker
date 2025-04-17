@@ -18,6 +18,7 @@ export function BoardsPage() {
     boards: {
       columns: {
         tasks: {
+          issues: {},
           smartParams: {},
           approves: {},
           $: {
@@ -60,6 +61,8 @@ export function BoardsPage() {
       },
     },
   });
+
+  console.log(boards);
 
   if (!boards) return null;
 

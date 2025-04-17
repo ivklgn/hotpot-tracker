@@ -25,9 +25,10 @@ import { useAccount } from '../account/AccountContext';
 interface IProps {
   taskId: string;
   opener: ReactElement;
+  onCreate?: () => void;
 }
 
-export function CreateIssueDialog({ taskId, opener }: IProps) {
+export function CreateIssueDialog({ taskId, opener, onCreate }: IProps) {
   const openerRef = useRef(null);
   const [isOpen, setIsOpen] = useState(false);
   const [content, setContent] = useState('');
@@ -58,6 +59,7 @@ export function CreateIssueDialog({ taskId, opener }: IProps) {
         if (result.isOk() && editor) {
           editor.commands.setComment(result.value);
           handleSubmit();
+          onCreate?.();
           return;
         }
 
