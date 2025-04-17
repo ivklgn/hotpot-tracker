@@ -62,8 +62,6 @@ export function BoardsPage() {
     },
   });
 
-  console.log(boards);
-
   if (!boards) return null;
 
   return (
