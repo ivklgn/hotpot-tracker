@@ -14,7 +14,6 @@ import {
   LuList,
   LuListOrdered,
   LuMessageSquareCode,
-  LuPilcrow,
   LuRedo2,
   LuSquareCode,
   LuStrikethrough,
@@ -68,13 +67,13 @@ export function EditorMenu() {
           <LuCode />
         </EditorButton>
 
-        <EditorButton
-          onClick={() => editor.chain().focus().setParagraph().run()}
-          isActive={editor.isActive('paragraph')}
-          title="Paragraph"
-        >
-          <LuPilcrow />
-        </EditorButton>
+        {/*<EditorButton*/}
+        {/*  onClick={() => editor.chain().focus().setParagraph().run()}*/}
+        {/*  isActive={editor.isActive('paragraph')}*/}
+        {/*  title="Paragraph"*/}
+        {/*>*/}
+        {/*  <LuPilcrow />*/}
+        {/*</EditorButton>*/}
 
         <EditorButton
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}

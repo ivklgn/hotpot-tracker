@@ -1,13 +1,29 @@
-import { Box } from '@chakra-ui/react';
+import { Box, Flex } from '@chakra-ui/react';
 import { Color } from '@tiptap/extension-color';
 import TextStyle from '@tiptap/extension-text-style';
 import ListItem from '@tiptap/extension-list-item';
 import StarterKit from '@tiptap/starter-kit';
-import { EditorProvider, JSONContent } from '@tiptap/react';
+import { EditorContent, EditorContext, JSONContent, useEditor } from '@tiptap/react';
 import { EditorMenu } from '@/components/Editor/EditorMenu.tsx';
 import { EditorFooter } from '@/components/Editor/EditorFooter.tsx';
+import {
+  calculateHeight,
+  CommentExtension,
+  focusCommentWithActiveId,
+  TASK_ISSUES_ID,
+} from '@/features/issue/utils.ts';
 
 import './Editor.css';
+import { TaskEditorMenu } from '@/components/Editor/TaskEditorMenu.tsx';
+import { Prose } from '@/components/ui/prose.tsx';
+import { useLayoutEffect, useRef, useState } from 'react';
+import { IssueList } from '@/features/issue/IssueList.tsx';
+import { isJSON } from '@/utils/json.ts';
+
+export interface IProps {
+  originalContent: JSONString;
+  onSaveClick(value: JSONContent): void;
+}
 
 const extensions = [
   Color.configure({ types: [TextStyle.name, ListItem.name] }),
@@ -22,31 +38,63 @@ const extensions = [
       keepAttributes: false,
     },
   }),
+
+  CommentExtension.configure({
+    HTMLAttributes: {
+      class: 'issue',
+    },
+    onCommentActivated: (issueId) => {
+      if (issueId) setTimeout(() => focusCommentWithActiveId(TASK_ISSUES_ID, issueId));
+    },
+  }),
 ];
 
-export interface IProps {
-  originalContent: JSONString;
-  onSaveClick(value: JSONContent): void;
-}
-
 export function Editor({ originalContent, onSaveClick }: IProps) {
-  const editorContent = originalContent ? JSON.parse(originalContent) : '';
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [rootHeight, setRootHeight] = useState('unset');
+  const editorContent = originalContent && isJSON(originalContent) ? JSON.parse(originalContent) : '';
+
+  const editor = useEditor({
+    extensions,
+    content: editorContent,
+  });
+
+  useLayoutEffect(() => {
+    setRootHeight(calculateHeight(rootRef.current, '1.5rem'));
+  }, []);
 
   return (
-    <Box
-      p="4"
-      borderWidth="1px"
-      borderColor="border.disabled"
-      color="fg.disabled"
-      className="tiptap"
-      borderRadius="md"
-    >
-      <EditorProvider
-        content={editorContent}
-        slotBefore={<EditorMenu />}
-        slotAfter={<EditorFooter originalContent={originalContent} onSaveClick={onSaveClick} />}
-        extensions={extensions}
-      />
-    </Box>
+    <EditorContext.Provider value={{ editor }}>
+      <Flex gap="4">
+        <Box
+          ref={rootRef}
+          data-editor-box
+          p="4"
+          borderWidth="1px"
+          borderColor="border.disabled"
+          color="fg.disabled"
+          className="tiptap"
+          borderRadius="md"
+          boxShadow="md"
+          h={rootHeight}
+          overflowY="auto"
+          flexGrow="1"
+        >
+          <Prose width="full" maxWidth="unset" fontSize="md" h="full">
+            <Flex direction="column" h="full">
+              <EditorMenu />
+              <Box h="full">
+                <EditorContent editor={editor}>
+                  <TaskEditorMenu />
+                </EditorContent>
+              </Box>
+              <EditorFooter originalContent={originalContent} onSaveClick={onSaveClick} />
+            </Flex>
+          </Prose>
+        </Box>
+
+        <IssueList />
+      </Flex>
+    </EditorContext.Provider>
   );
 }

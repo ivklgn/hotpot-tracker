@@ -59,7 +59,6 @@ export function Task({ task }: TaskProps) {
     <Box flex="1" pt={8} mx={6}>
       <Flex direction="row" justifyContent="space-between">
         <Editable.Root
-          maxW={480}
           value={name}
           onValueChange={(e) => setName(e.value)}
           placeholder="Click to edit"
@@ -167,7 +166,7 @@ async function renameTask({ newTitle, taskId }: { taskId: string; newTitle: stri
   return await db.transact([db.tx.tasks[taskId].merge({ updatedAt: new Date().toJSON(), title: newTitle })]);
 }
 
-async function updateTaskContent({ newContent, taskId }: { taskId: string; newContent: string }) {
+export async function updateTaskContent({ newContent, taskId }: { taskId: string; newContent: string }) {
   return await db.transact([
     db.tx.tasks[taskId].merge({ updatedAt: new Date().toJSON(), content: newContent }),
   ]);
