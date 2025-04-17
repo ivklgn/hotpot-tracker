@@ -105,6 +105,7 @@ const _schema = i.schema({
       teamId: i.string(),
       createdAt: i.date().indexed(),
       creatorId: i.string(),
+      userEmail: i.string(),
       deletedAt: i.date().indexed(),
     }),
     replies: i.entity({

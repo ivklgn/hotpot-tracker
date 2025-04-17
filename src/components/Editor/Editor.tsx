@@ -18,6 +18,7 @@ import { TaskEditorMenu } from '@/components/Editor/TaskEditorMenu.tsx';
 import { Prose } from '@/components/ui/prose.tsx';
 import { useLayoutEffect, useRef, useState } from 'react';
 import { IssueList } from '@/features/issue/IssueList.tsx';
+import { isJSON } from '@/utils/json.ts';
 
 export interface IProps {
   originalContent: JSONString;
@@ -51,7 +52,7 @@ const extensions = [
 export function Editor({ originalContent, onSaveClick }: IProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const [rootHeight, setRootHeight] = useState('unset');
-  const editorContent = originalContent ? JSON.parse(originalContent) : '';
+  const editorContent = originalContent && isJSON(originalContent) ? JSON.parse(originalContent) : '';
 
   const editor = useEditor({
     extensions,
@@ -75,15 +76,20 @@ export function Editor({ originalContent, onSaveClick }: IProps) {
           className="tiptap"
           borderRadius="md"
           boxShadow="md"
-          maxHeight={rootHeight}
+          h={rootHeight}
           overflowY="auto"
+          flexGrow="1"
         >
-          <Prose width="full" maxWidth="unset" fontSize="md">
-            <EditorMenu />
-            <EditorContent editor={editor}>
-              <TaskEditorMenu />
-            </EditorContent>
-            <EditorFooter originalContent={originalContent} onSaveClick={onSaveClick} />
+          <Prose width="full" maxWidth="unset" fontSize="md" h="full">
+            <Flex direction="column" h="full">
+              <EditorMenu />
+              <Box h="full">
+                <EditorContent editor={editor}>
+                  <TaskEditorMenu />
+                </EditorContent>
+              </Box>
+              <EditorFooter originalContent={originalContent} onSaveClick={onSaveClick} />
+            </Flex>
           </Prose>
         </Box>
 

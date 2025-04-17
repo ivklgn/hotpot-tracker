@@ -47,7 +47,13 @@ export function CreateIssueDialog({ taskId, opener }: IProps) {
   const setIssue = () => {
     runTransaction(
       () =>
-        createNewIssue({ taskId, content, creatorId: user?.id as string, teamId: currentTeamId as string }),
+        createNewIssue({
+          taskId,
+          content,
+          creatorId: user?.id as string,
+          teamId: currentTeamId as string,
+          userEmail: user?.email as string,
+        }),
       (result) => {
         if (result.isOk() && editor) {
           editor.commands.setComment(result.value);
@@ -141,11 +147,13 @@ async function createNewIssue({
   content,
   creatorId,
   teamId,
+  userEmail,
 }: {
   content: string;
   taskId: string;
   creatorId: string;
   teamId: string;
+  userEmail: string;
 }) {
   const newIssueId = id();
 
@@ -154,6 +162,7 @@ async function createNewIssue({
       taskId,
       content,
       creatorId,
+      userEmail,
       createdAt: new Date().toJSON(),
       teamId,
     }),

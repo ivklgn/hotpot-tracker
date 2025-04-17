@@ -27,14 +27,6 @@ export const IssueList = () => {
     },
   });
 
-  // useEffect(() => {
-  //   if (!state.activeIssueId) return;
-  //
-  //   if (state.activeIssueId) {
-  //     focusCommentWithActiveId(TASK_ISSUES_ID, state.activeIssueId as string);
-  //   }
-  // }, [state.activeIssueId]);
-
   useLayoutEffect(() => {
     if (isLoading) {
       return;
@@ -65,7 +57,7 @@ export const IssueList = () => {
       minWidth={340}
       maxWidth={360}
       width="full"
-      maxHeight={rootHeight}
+      height={rootHeight}
       overflowY="auto"
       ref={rootRef}
       position="relative"
@@ -73,6 +65,8 @@ export const IssueList = () => {
       <Flex gap="5" direction="column">
         {issues.issues.map((issue) => (
           <Issue
+            userEmail={issue.userEmail}
+            creatorId={issue.creatorId}
             onApprove={handleApproveIssue}
             id={issue.id}
             date={issue.createdAt.toString()}
@@ -84,14 +78,16 @@ export const IssueList = () => {
 
       <Box
         mx="-1px"
-        bg="gray.200"
         position="sticky"
         bottom="-8px"
         right="0"
         left="0"
         w="full"
         h="30px"
-        style={{ background: 'linear-gradient(0deg,#fff 39.58%,hsla(0,0%,100%,0))' }}
+        bgGradient={{
+          _light: 'linear-gradient(0deg, #fff 39.58%, hsla(0,0%,100%,0))',
+          _dark: 'none',
+        }}
       />
     </Box>
   );

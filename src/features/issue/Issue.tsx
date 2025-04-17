@@ -12,7 +12,7 @@ import {
 } from '@chakra-ui/react';
 import { Text } from '@chakra-ui/react';
 import { Button } from '@/components/ui/button.tsx';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { timeAgo } from '@/utils/dates.ts';
 import { LuBadgeCheck, LuCheck, LuEllipsisVertical, LuReply, LuX } from 'react-icons/lu';
 import { MenuContent, MenuItem, MenuRoot, MenuTrigger } from '@/components/ui/menu.tsx';
@@ -30,17 +30,21 @@ import './Issue.css';
 
 interface IIssueProps {
   id: string;
+  creatorId: string;
+  userEmail: string;
   date: Date | string;
   content: string;
   onApprove(id: string): void;
 }
 
-export const Issue = ({ id, date, content, onApprove }: IIssueProps) => {
+export const Issue = ({ id, creatorId, userEmail, date, content, onApprove }: IIssueProps) => {
+  const replyFieldRef = useRef<HTMLTextAreaElement>(null);
+
   const [issueContent, setIssueContent] = useState(content);
   const [replyContent, setReplyContent] = useState('');
   const [isActionBarVisible, setIsActionBarVisible] = useState(false);
-  const { currentTeamId } = useAccount();
 
+  const { currentTeamId } = useAccount();
   const { user } = db.useAuth();
   const { data: replies } = db.useQuery({
     replies: {
@@ -52,23 +56,23 @@ export const Issue = ({ id, date, content, onApprove }: IIssueProps) => {
     },
   });
 
+  const isCreator = creatorId === user?.id;
+
   const handleClick = () => {
     document.querySelectorAll('.highlight')?.forEach((el) => {
       el.classList.remove('highlight');
     });
 
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        const elementToHighlight = document.querySelector(`span[data-comment-id="${id}"]`);
+      const elementToHighlight = document.querySelector(`span[data-comment-id="${id}"]`);
 
-        if (elementToHighlight) {
-          elementToHighlight.classList.add('highlight');
-        }
-      });
+      if (elementToHighlight) {
+        elementToHighlight.classList.add('highlight');
+      }
     });
   };
 
-  const handleIssueContentChange = () => {
+  const handleIssueContentUpdate = () => {
     runTransaction(() => updateIssueContent({ issueId: id, newContent: issueContent }));
   };
 
@@ -170,7 +174,7 @@ export const Issue = ({ id, date, content, onApprove }: IIssueProps) => {
       <Box px="5" pt="3" pb="4" borderWidth="1px" borderColor="border.disabled" borderBottomRadius="l3">
         <Flex gap="3" alignItems="flex-start" mb="4">
           <Box mt="3px">
-            <UserAvatar size="sm" user={{ userId: user?.id as string, userEmail: user?.email as string }} />
+            <UserAvatar size="sm" user={{ userId: creatorId, userEmail }} />
           </Box>
 
           <Box>
@@ -183,7 +187,7 @@ export const Issue = ({ id, date, content, onApprove }: IIssueProps) => {
               textOverflow="ellipsis"
               overflow="hidden"
             >
-              {user?.email}
+              {userEmail}
             </Text>
 
             <Text color="fg.subtle" fontSize="sm">
@@ -204,7 +208,16 @@ export const Issue = ({ id, date, content, onApprove }: IIssueProps) => {
                   onOk={handleApproveIssue}
                 />
 
-                <MenuRoot positioning={{ placement: 'right-start' }}>
+                <MenuRoot
+                  positioning={{ placement: 'right-start' }}
+                  onSelect={(details) => {
+                    if (details.value === 'reply') {
+                      requestAnimationFrame(() => {
+                        replyFieldRef.current?.focus();
+                      });
+                    }
+                  }}
+                >
                   <MenuTrigger asChild>
                     <IconButton>
                       <LuEllipsisVertical />
@@ -241,11 +254,13 @@ export const Issue = ({ id, date, content, onApprove }: IIssueProps) => {
           value={issueContent}
           onValueChange={(e) => setIssueContent(e.value)}
           placeholder="Click to edit"
-          onValueCommit={handleIssueContentChange}
+          onValueCommit={handleIssueContentUpdate}
           mb="4"
           textAlign="start"
           width="full"
           maxLength={200}
+          disabled={!isCreator}
+          defaultValue="Click to edit"
         >
           <Editable.Preview
             flexShrink="0"
@@ -273,6 +288,7 @@ export const Issue = ({ id, date, content, onApprove }: IIssueProps) => {
 
         <Box>
           <Textarea
+            ref={replyFieldRef}
             borderColor="border.emphasized"
             height="40px"
             placeholder="Reply to issue..."
@@ -295,8 +311,9 @@ export const Issue = ({ id, date, content, onApprove }: IIssueProps) => {
         <Stack>
           {replies?.replies &&
             replies.replies.map((reply) => (
-              <Box ml="6" mt="4" key={reply.id}>
+              <Box ml="4" mt="4" key={reply.id}>
                 <Reply
+                  creatorId={reply.creatorId}
                   date={`${reply.createdAt}`}
                   id={reply.id}
                   userEmail={reply.userEmail}
