@@ -18,6 +18,7 @@ export function BoardsPage() {
     boards: {
       columns: {
         tasks: {
+          issues: {},
           smartParams: {},
           approves: {},
           $: {

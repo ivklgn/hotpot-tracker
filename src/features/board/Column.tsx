@@ -30,10 +30,10 @@ export type ColumnType = InstaQLResult<
   AppSchema,
   {
     columns: {
-      tasks: { smartParams: object; approves: object };
-      statuses: object;
+      tasks: { smartParams: {}; approves: {}; issues?: {} };
+      statuses: {};
       contributors: {
-        memberships: object;
+        memberships: {};
       };
     };
   }
@@ -199,6 +199,11 @@ function ColumnTask({ task, columnApproveRule, columnContributors }: ColumnTaskP
           </Box>
         )}
       </Box>
+      {task?.issues?.length ? (
+        <Box mt={2}>
+          <Text textStyle="xs">{task.issues.length} issue(-s)</Text>
+        </Box>
+      ) : null}
     </Box>
   );
 }

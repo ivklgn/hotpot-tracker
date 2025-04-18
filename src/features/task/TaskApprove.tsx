@@ -87,6 +87,7 @@ export function TaskApprove({ task }: TaskApproveProps) {
             taskId: task?.id as string,
             teamId: currentTeamId as string,
             contributorId: currentContributorId,
+            creatorId: user?.id as string,
             createdAt: new Date().toISOString(),
           }),
           db.tx.approves[approveId].link({

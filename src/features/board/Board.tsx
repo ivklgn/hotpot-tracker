@@ -40,6 +40,7 @@ interface BoardProps {
         tasks: {
           smartParams: {};
           approves: {};
+          issues: {};
         };
         statuses: {};
         contributors: {

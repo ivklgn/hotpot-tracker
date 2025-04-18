@@ -99,12 +99,17 @@ export default {
     },
   },
   approves: {
-    bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')"],
+    bind: [
+      'isMember',
+      "auth.id in data.ref('teams.memberships.userId')",
+      'isCreator',
+      'auth.id == data.creatorId',
+    ],
     allow: {
       view: 'isMember',
       create: 'isMember',
-      delete: 'isMember',
-      update: 'isMember',
+      delete: 'isCreator',
+      update: 'isCreator',
     },
   },
   logs: {

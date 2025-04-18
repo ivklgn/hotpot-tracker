@@ -77,6 +77,7 @@ const _schema = i.schema({
     approves: i.entity({
       taskId: i.string(),
       contributorId: i.string(),
+      creatorId: i.string(),
       teamId: i.string(),
       createdAt: i.date(),
       updatedAt: i.date(),

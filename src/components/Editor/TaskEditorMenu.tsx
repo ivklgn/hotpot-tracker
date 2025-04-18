@@ -8,7 +8,11 @@ import { useParams } from 'wouter';
 
 import './Editor.css';
 
-export function TaskEditorMenu() {
+interface TaskEditorMenu {
+  onCreateIssue?: () => void;
+}
+
+export function TaskEditorMenu({ onCreateIssue }: TaskEditorMenu) {
   const { editor } = useCurrentEditor();
   const params = useParams();
 
@@ -60,6 +64,7 @@ export function TaskEditorMenu() {
                 </Button>
               </Box>
             }
+            onCreate={onCreateIssue}
           />
         </Flex>
       </Box>

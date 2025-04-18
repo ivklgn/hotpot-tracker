@@ -12,17 +12,18 @@ import {
   focusCommentWithActiveId,
   TASK_ISSUES_ID,
 } from '@/features/issue/utils.ts';
-
-import './Editor.css';
 import { TaskEditorMenu } from '@/components/Editor/TaskEditorMenu.tsx';
 import { Prose } from '@/components/ui/prose.tsx';
 import { useLayoutEffect, useRef, useState } from 'react';
 import { IssueList } from '@/features/issue/IssueList.tsx';
 import { isJSON } from '@/utils/json.ts';
 
-export interface IProps {
+import './Editor.css';
+
+export interface IEditorProps {
   originalContent: JSONString;
   onSaveClick(value: JSONContent): void;
+  onCreateIssue?: () => void;
 }
 
 const extensions = [
@@ -49,7 +50,7 @@ const extensions = [
   }),
 ];
 
-export function Editor({ originalContent, onSaveClick }: IProps) {
+export function Editor({ originalContent, onSaveClick, onCreateIssue }: IEditorProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const [rootHeight, setRootHeight] = useState('unset');
   const editorContent = originalContent && isJSON(originalContent) ? JSON.parse(originalContent) : '';
@@ -85,7 +86,7 @@ export function Editor({ originalContent, onSaveClick }: IProps) {
               <EditorMenu />
               <Box h="full">
                 <EditorContent editor={editor}>
-                  <TaskEditorMenu />
+                  <TaskEditorMenu onCreateIssue={onCreateIssue} />
                 </EditorContent>
               </Box>
               <EditorFooter originalContent={originalContent} onSaveClick={onSaveClick} />
