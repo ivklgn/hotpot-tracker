@@ -108,7 +108,7 @@ export default {
     allow: {
       view: 'isMember',
       create: 'isMember',
-      delete: 'isCreator',
+      delete: 'isMember', // TODO: dont know what todo if change columns..
       update: 'isCreator',
     },
   },
