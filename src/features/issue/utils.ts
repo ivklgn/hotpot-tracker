@@ -56,7 +56,7 @@ export interface MarkWithRange {
 
 export interface CommentOptions {
   HTMLAttributes: Record<string, any>;
-  onCommentActivated: (commentId: string) => void;
+  onCommentActivated: (commentId: string | null) => void;
 }
 
 export interface CommentStorage {
@@ -122,6 +122,9 @@ export const CommentExtension = Mark.create<CommentOptions, CommentStorage>({
     };
   },
 
+  // TODO: types
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
   addCommands() {
     return {
       setComment:
