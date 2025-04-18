@@ -7,6 +7,7 @@
     "max_members_per_team": 5,
     "max_smart_params": 5,
     "max_issues_per_tasks": 10,
-    "max_replies_per_issue": 10
+    "max_replies_per_issue": 10,
+    "max_size_task_content": 50000
   }
 }

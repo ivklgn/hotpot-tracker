@@ -56,15 +56,14 @@ export const CreateTaskToColumnDialog: React.FC<CreateTaskToColumnDialogProps> =
             teamId: currentTeamId as string,
             creatorId: user?.id,
           }),
-        (result) => {
-          if (result.isOk()) {
-            setTitle('');
-            onClose?.();
-          }
-
+        () => {
+          setTitle('');
+          onClose?.();
+        },
+        (error) => {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-expect-error
-          if (result.isErr() && result.error.originalError?.hint?.expected === 'perms-pass?') {
+          if (error.originalError?.hint?.expected === 'perms-pass?') {
             onClose?.();
             toaster.create({
               title: `Maximum ${tariffLimits.free.max_columns_per_board} tasks allowed`,
@@ -81,11 +80,9 @@ export const CreateTaskToColumnDialog: React.FC<CreateTaskToColumnDialogProps> =
             columnId,
             approvesIds: taskApproveIds,
           }),
-        (result) => {
-          if (result.isOk()) {
-            setExistingTaskId(undefined);
-            onClose?.();
-          }
+        () => {
+          setExistingTaskId(undefined);
+          onClose?.();
         }
       );
     }

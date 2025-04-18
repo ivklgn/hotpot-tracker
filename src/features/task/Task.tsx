@@ -11,6 +11,8 @@ import { JSONContent } from '@tiptap/react';
 import { ConfirmAction } from '../../components/ConfirmAction';
 import { TaskApprove } from './TaskApprove';
 import { runTransaction } from '../../core/instantdb-transaction';
+import tariffLimits from '../../../tariff-limits.json';
+import { toaster } from '../../components/ui/toaster';
 
 const Editor = lazy(() =>
   import('@/components/Editor/Editor').then((module) => ({ default: module.Editor }))
@@ -43,7 +45,32 @@ export function Task({ task }: TaskProps) {
 
   const handleUpdateContent = (newContent: JSONContent) => {
     if (!newContent || !task) return;
-    runTransaction(() => updateTaskContent({ taskId: task.id, newContent: JSON.stringify(newContent) }));
+    const jsonString = JSON.stringify(newContent);
+    const byteLength = new TextEncoder().encode(jsonString).length;
+
+    if (byteLength > tariffLimits.free.max_size_task_content) {
+      toaster.create({
+        title: `Превышен лимит размера контента: ${tariffLimits.free.max_size_task_content} байт`,
+        type: 'error',
+      });
+      return;
+    }
+
+    runTransaction(
+      () => updateTaskContent({ taskId: task.id, newContent: jsonString }),
+      () => {
+        toaster.create({
+          title: 'Task saved',
+          type: 'success',
+        });
+      },
+      () => {
+        toaster.create({
+          title: 'Failed to save task',
+          type: 'error',
+        });
+      }
+    );
   };
 
   const handleCreateIssue = () => {
@@ -174,10 +201,8 @@ function DeleteTaskActions({ task }: { task?: InstaQLEntity<AppSchema, 'tasks'> 
       onOk={() => {
         runTransaction(
           () => deleteTask({ taskId: task.id }),
-          (result) => {
-            if (result.isOk()) {
-              navigate('/boards');
-            }
+          () => {
+            navigate('/boards');
           }
         );
       }}

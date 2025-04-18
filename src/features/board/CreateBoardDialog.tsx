@@ -40,13 +40,12 @@ export const CreateBoardDialog: React.FC<CreateTeamDialogProps> = ({ opener }) =
     runTransaction(
       () => createBoard({ name, teamId: currentTeamId as string, creatorId: user?.id }),
       (result) => {
-        if (result.isOk()) {
-          navigate(`/board/${result.value}`);
-        }
-
+        navigate(`/board/${result}`);
+      },
+      (error) => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
-        if (result.isErr() && result.error.originalError?.hint?.expected === 'perms-pass?') {
+        if (error.originalError?.hint?.expected === 'perms-pass?') {
           toaster.create({
             title: `Maximum ${tariffLimits.free.max_boards_per_team} boards allowed`,
             type: 'error',

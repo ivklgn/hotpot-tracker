@@ -56,16 +56,17 @@ export function CreateIssueDialog({ taskId, opener, onCreate }: IProps) {
           userEmail: user?.email as string,
         }),
       (result) => {
-        if (result.isOk() && editor) {
-          editor.commands.setComment(result.value);
+        if (editor) {
+          editor.commands.setComment(result);
           handleSubmit();
           onCreate?.();
           return;
         }
-
+      },
+      (error) => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
-        if (result.isErr() && result.error.originalError?.hint?.expected === 'perms-pass?') {
+        if (error.originalError?.hint?.expected === 'perms-pass?') {
           toaster.create({
             title: `Maximum ${tariffLimits.free.max_issues_per_tasks} issues allowed`,
             type: 'error',
@@ -87,11 +88,9 @@ export function CreateIssueDialog({ taskId, opener, onCreate }: IProps) {
     runTransaction(
       () =>
         updateTaskContent({ taskId: params.taskId as string, newContent: JSON.stringify(editor.getJSON()) }),
-      (result) => {
-        if (result.isOk()) {
-          handleClose();
-          handleReset();
-        }
+      () => {
+        handleClose();
+        handleReset();
       }
     );
   };

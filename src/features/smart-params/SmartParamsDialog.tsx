@@ -163,10 +163,8 @@ export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTask
 
     runTransaction(
       () => deleteSmartParam({ smartParamId: id }),
-      (result) => {
-        if (result.isOk()) {
-          setEditedParams((prev) => prev.filter((param) => param.id !== id));
-        }
+      () => {
+        setEditedParams((prev) => prev.filter((param) => param.id !== id));
       }
     );
   };

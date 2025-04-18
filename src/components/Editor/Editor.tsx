@@ -5,7 +5,6 @@ import ListItem from '@tiptap/extension-list-item';
 import StarterKit from '@tiptap/starter-kit';
 import { EditorContent, EditorContext, JSONContent, useEditor } from '@tiptap/react';
 import { EditorMenu } from '@/components/Editor/EditorMenu.tsx';
-import { EditorFooter } from '@/components/Editor/EditorFooter.tsx';
 import {
   calculateHeight,
   CommentExtension,
@@ -50,6 +49,8 @@ const extensions = [
   }),
 ];
 
+const MAX_BYTES = 100 * 1024;
+
 export function Editor({ originalContent, onSaveClick, onCreateIssue }: IEditorProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const [rootHeight, setRootHeight] = useState('unset');
@@ -58,6 +59,15 @@ export function Editor({ originalContent, onSaveClick, onCreateIssue }: IEditorP
   const editor = useEditor({
     extensions,
     content: editorContent,
+    onUpdate({ editor }) {
+      const json = editor.getJSON();
+      const jsonString = JSON.stringify(json);
+      const byteLength = new TextEncoder().encode(jsonString).length;
+
+      if (byteLength > MAX_BYTES) {
+        console.warn(`Превышен лимит размера контента: ${byteLength} байт`);
+      }
+    },
   });
 
   useLayoutEffect(() => {
@@ -81,19 +91,17 @@ export function Editor({ originalContent, onSaveClick, onCreateIssue }: IEditorP
           overflowY="auto"
           flexGrow="1"
         >
+          <EditorMenu onSaveClick={onSaveClick} />
           <Prose width="full" maxWidth="unset" fontSize="md" h="full">
             <Flex direction="column" h="full">
-              <EditorMenu />
               <Box h="full">
                 <EditorContent editor={editor}>
                   <TaskEditorMenu onCreateIssue={onCreateIssue} />
                 </EditorContent>
               </Box>
-              <EditorFooter originalContent={originalContent} onSaveClick={onSaveClick} />
             </Flex>
           </Prose>
         </Box>
-
         <IssueList />
       </Flex>
     </EditorContext.Provider>

@@ -1,6 +1,6 @@
 export type Result<T, E> = Ok<T, E> | Err<T, E>;
 
-class Ok<T, E> {
+export class Ok<T, E> {
   readonly ok = true as const;
   constructor(public readonly value: T) {}
 
@@ -22,7 +22,7 @@ class Ok<T, E> {
   }
 }
 
-class Err<T, E> {
+export class Err<T, E> {
   readonly ok = false as const;
   constructor(public readonly error: E) {}
 

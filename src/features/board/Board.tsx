@@ -339,10 +339,8 @@ function DeleteBoardActions({ board }: { board?: InstaQLEntity<AppSchema, 'board
       onOk={() => {
         runTransaction(
           () => deleteBoard({ boardId: board.id }),
-          (result) => {
-            if (result.isOk()) {
-              navigate('/boards');
-            }
+          () => {
+            navigate('/boards');
           }
         );
       }}

@@ -1,6 +1,6 @@
 import { IConwayError } from 'conway-errors';
 import { toaster } from '../components/ui/toaster';
-import { err, ok, Result } from '../utils/result';
+import { err, ok } from '../utils/result';
 import { errorContext } from './errors';
 
 export const instantTransactionError = errorContext.feature('InstantTransactionError');
@@ -12,14 +12,17 @@ export const instantTransactionError = errorContext.feature('InstantTransactionE
  */
 export function runTransaction<T>(
   transaction: () => Promise<T>,
-  handler?: (result: Result<T, IConwayError>) => void
+  onSuccess?: (result: T) => void,
+  onError?: (error: IConwayError) => void
 ) {
   transaction()
-    .then((result) => handler?.(ok(result)))
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    .then((result) => onSuccess?.(ok(result)))
     .catch((e) => {
       const error = instantTransactionError('BackendInteractionError', e.message, { originalError: e });
 
-      if (!handler) {
+      if (!onError) {
         toaster.create({
           title: 'Operation error, please try again',
           type: 'error',
@@ -27,7 +30,8 @@ export function runTransaction<T>(
         error.emit();
         return;
       }
-
-      handler(err(error));
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      onError(err(error));
     });
 }

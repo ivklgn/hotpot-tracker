@@ -1,4 +1,4 @@
-import { useCurrentEditor } from '@tiptap/react';
+import { JSONContent, useCurrentEditor } from '@tiptap/react';
 import './Editor.css';
 import { Flex, Box } from '@chakra-ui/react';
 import {
@@ -15,14 +15,24 @@ import {
   LuListOrdered,
   LuMessageSquareCode,
   LuRedo2,
+  LuSave,
   LuSquareCode,
   LuStrikethrough,
   LuUndo2,
 } from 'react-icons/lu';
 import { EditorButton } from './EditorButton';
 
-export function EditorMenu() {
+interface EditorMenuProps {
+  onSaveClick?: (value: JSONContent) => void;
+}
+
+export function EditorMenu({ onSaveClick }: EditorMenuProps) {
   const { editor } = useCurrentEditor();
+
+  const handleSaveSubmit = () => {
+    if (!editor) return;
+    onSaveClick?.(editor.getJSON());
+  };
 
   if (!editor) {
     return null;
@@ -31,6 +41,9 @@ export function EditorMenu() {
   return (
     <Box mb="4">
       <Flex gap="2">
+        <EditorButton onClick={handleSaveSubmit} title="Save">
+          <LuSave />
+        </EditorButton>
         <EditorButton
           onClick={() => editor.chain().focus().toggleBold().run()}
           disabled={!editor.can().chain().focus().toggleBold().run()}
