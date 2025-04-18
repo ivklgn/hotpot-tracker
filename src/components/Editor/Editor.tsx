@@ -49,8 +49,6 @@ const extensions = [
   }),
 ];
 
-const MAX_BYTES = 100 * 1024;
-
 export function Editor({ originalContent, onSaveClick, onCreateIssue }: IEditorProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const [rootHeight, setRootHeight] = useState('unset');
@@ -59,15 +57,6 @@ export function Editor({ originalContent, onSaveClick, onCreateIssue }: IEditorP
   const editor = useEditor({
     extensions,
     content: editorContent,
-    onUpdate({ editor }) {
-      const json = editor.getJSON();
-      const jsonString = JSON.stringify(json);
-      const byteLength = new TextEncoder().encode(jsonString).length;
-
-      if (byteLength > MAX_BYTES) {
-        console.warn(`Превышен лимит размера контента: ${byteLength} байт`);
-      }
-    },
   });
 
   useLayoutEffect(() => {
