@@ -17,6 +17,7 @@ import {
   Float,
   Span,
   SimpleGrid,
+  AvatarGroup,
 } from '@chakra-ui/react';
 import { Auth } from '../features/auth';
 import { db } from '../instantdb';
@@ -60,7 +61,7 @@ const FeatureCard = ({ title, text }: FeatureCardProps) => {
       }}
     >
       <Heading fontSize="xl">{title}</Heading>
-      <Text color="gray.600">{text}</Text>
+      <Text>{text}</Text>
     </VStack>
   );
 };
@@ -77,7 +78,7 @@ const AuthForm = () => {
       p={8}
       rounded="xl"
       shadow="xl"
-      w={{ base: 'full', md: '480px', sm: '100%' }}
+      minW="480px"
       direction="column"
       gap={4}
       justifyContent="center"
@@ -125,10 +126,10 @@ export function Landing() {
         <Container maxW="7xl" py={16}>
           <Stack
             direction={{ base: 'column', lg: 'row' }}
-            align="center"
+            align="flex-start"
             gap={{ base: 8, md: 10 }}
             justify="space-between"
-            alignItems={{ base: 'center', lg: 'flex-start' }}
+            alignItems="flex-start"
           >
             <Stack flex={1} gap={{ base: 5, md: 10 }}>
               <Heading fontWeight={800} fontSize={{ base: '3xl', sm: '4xl', md: '6xl' }} lineHeight="110%">
@@ -176,7 +177,7 @@ export function Landing() {
 
       <Box py={16}>
         <Container maxW="7xl">
-          <VStack gap={8} mb={12}>
+          <VStack gap={8} mb={12} px={{ base: 4, md: 0 }}>
             <Heading fontSize={{ base: '3xl', md: '4xl' }} textAlign="center">
               Еще один клон Trello?
             </Heading>
@@ -195,8 +196,22 @@ export function Landing() {
 
       <Box py={16} id="about">
         <Container maxW="7xl">
-          <Stack flex={1} gap={6} textAlign="center">
-            <Heading fontSize={{ base: '3xl', md: '4xl' }}>С любовью от инженеров 🤓</Heading>
+          <Stack flex={1} gap={6} textAlign="center" alignItems="center">
+            <Heading fontSize={{ base: '3xl', md: '4xl' }}>С любовью от инженеров</Heading>
+            <AvatarGroup size="xl">
+              <ChakraLink href="https://github.com/ivklgn" target="_blank">
+                <Avatar.Root>
+                  <Avatar.Fallback name="Ivan K." />
+                  <Avatar.Image src="https://avatars.githubusercontent.com/u/15219574?v=4" />
+                </Avatar.Root>
+              </ChakraLink>
+              <ChakraLink href="https://github.com/toxanski" target="_blank">
+                <Avatar.Root>
+                  <Avatar.Fallback name="Anton S." />
+                  <Avatar.Image src="https://avatars.githubusercontent.com/u/73133515?v=4" />
+                </Avatar.Root>
+              </ChakraLink>
+            </AvatarGroup>
             <Text fontSize="xl" maxW="3xl" mx="auto">
               В разработке программного обеспечения существуют подходы и инструменты, полезные и для бизнеса.
               Hotpot заимствует идеи из Github/Gitlab, чтобы принести новые идеи в командные процессы.
@@ -331,7 +346,7 @@ export function Landing() {
             </Text>
           </VStack>
 
-          <Flex justifyContent="center">
+          <Flex justify="center" px={{ base: 4, sm: 6, md: 0 }}>
             <Box
               borderWidth="1px"
               borderColor="gray.200"
@@ -344,7 +359,8 @@ export function Landing() {
                 transform: 'translateY(-5px)',
                 shadow: 'lg',
               }}
-              width="300px"
+              width={{ base: '100%', sm: '350px' }}
+              maxW="full"
             >
               <Box bg="blue.400" py={4} px={6}>
                 <Text fontWeight="bold" fontSize="xl">
@@ -352,7 +368,7 @@ export function Landing() {
                 </Text>
               </Box>
               <VStack p={6} align="stretch" gap={6}>
-                <HStack>
+                <HStack flexWrap="wrap">
                   <Heading fontSize="5xl">$0</Heading>
                   <Text alignSelf="end">/ месяц</Text>
                 </HStack>
@@ -362,7 +378,7 @@ export function Landing() {
                     Начать
                   </Button>
                 </Link>
-                <VStack align="start">
+                <VStack align="start" gap={3}>
                   <Heading size="sm">Ограничения:</Heading>
                   <HStack>
                     <Icon as={LuUserPlus} color="green.500" />
@@ -389,11 +405,23 @@ export function Landing() {
 
       <Box py={10}>
         <Container maxW="7xl">
-          <Stack direction={{ base: 'column', md: 'row' }} gap={8} justify="space-between">
-            <Stack gap={4} align={{ base: 'center', md: 'flex-start' }}>
-              <Text>© 2025 Hotpot Tracker. Все права защищены.</Text>
-            </Stack>
-            <Stack direction={{ base: 'column', md: 'row' }} gap={8}>
+          <Stack
+            direction={{ base: 'column', md: 'row' }}
+            gap={{ base: 6, md: 4 }}
+            justify="space-between"
+            align={{ base: 'center', md: 'flex-start' }}
+            textAlign={{ base: 'center', md: 'left' }}
+          >
+            <Text>© 2025 Hotpot Tracker. Все права защищены.</Text>
+
+            <Stack
+              direction={{ base: 'column', md: 'row' }}
+              gap={{ base: 2, md: 4 }}
+              align={{ base: 'center', md: 'center' }}
+            >
+              <ChakraLink href="https://forms.gle/aCK2VbQ9pEAWfWSHA" target="_blank">
+                Сообщить о проблеме
+              </ChakraLink>
               <ChakraLink href="https://www.ivklgn.blog" target="_blank">
                 Блог
               </ChakraLink>

@@ -61,6 +61,10 @@ export function AccountNavbar() {
     navigate('/settings');
   };
 
+  const handleReportClick = () => {
+    window.open('https://forms.gle/aCK2VbQ9pEAWfWSHA', '_blank');
+  };
+
   const handleSignOutClick = () => {
     db.auth.signOut().then(() => {
       navigate('/');
@@ -137,6 +141,9 @@ export function AccountNavbar() {
             <MenuContent>
               <MenuItemGroup>
                 <Menu.ItemGroupLabel>{user?.email as string}</Menu.ItemGroupLabel>
+                <MenuItem value="report" onClick={handleReportClick} cursor="pointer">
+                  Report problem
+                </MenuItem>
                 <MenuItem value="settings" onClick={handleGoToSettings} cursor="pointer">
                   Settings
                 </MenuItem>
