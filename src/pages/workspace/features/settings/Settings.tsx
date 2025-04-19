@@ -45,8 +45,8 @@ export function Settings() {
               placeholder="Click to edit"
               onValueCommit={handleRenameTeam}
             >
-              <Editable.Preview />
-              <Editable.Input />
+              <Editable.Preview fontSize="md" />
+              <Editable.Input fontSize="xs" />
               <Editable.Control>
                 <Editable.EditTrigger asChild>
                   <IconButton variant="ghost" size="xs">

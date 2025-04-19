@@ -164,7 +164,7 @@ export function Board({ board, mode = 'view' }: BoardProps) {
   }
 
   return (
-    <Box my="2" minHeight="320px" mt="4" key={board.id}>
+    <Box pt={8} mx={2} minHeight="320px" key={board.id}>
       <BoardHeader board={board} mode={mode} columns={board?.columns} />
       <Flex direction="row" scrollBehavior="smooth" overflowX="scroll" whiteSpace="none" w="100%">
         {board?.columns?.map((column) => (
@@ -220,23 +220,24 @@ function BoardHeader({ board, mode, columns }: BoardHeaderProps) {
   if (!board) return null;
 
   return (
-    <Flex direction="column" mx={4} gap="2">
-      <Flex direction="row" justifyContent="space-between">
+    <Flex direction="column" mx={4}>
+      <Flex direction="row" justifyContent="space-between" gap={4}>
         {mode === 'view' && (
-          <ChakraLink asChild colorPalette="teal" fontWeight="medium" fontSize="xl">
+          <ChakraLink asChild colorPalette="teal" fontWeight="medium" fontSize="xl" wordBreak="break-word">
             <Link to={`/board/${board.id}`}>{board.name}</Link>
           </ChakraLink>
         )}
         {mode === 'edit' && (
           <Editable.Root
-            maxW={480}
             value={name}
             onValueChange={(e) => setName(e.value)}
             placeholder="Click to edit"
+            wordBreak="break-word"
             onValueCommit={handleRenameBoard}
+            maxLength={120}
           >
-            <Editable.Preview />
-            <Editable.Input />
+            <Editable.Preview fontSize="md" fontWeight="bold" />
+            <Editable.Input fontSize="xs" fontWeight="bold" />
             <Editable.Control>
               <Editable.EditTrigger asChild>
                 <IconButton variant="ghost" size="xs">
@@ -288,6 +289,7 @@ function BoardHeader({ board, mode, columns }: BoardHeaderProps) {
           {mode === 'edit' && <DeleteBoardActions board={board} />}
         </ButtonGroup>
       </Flex>
+
       <SmartParams type="board" smartParams={board.smartParams || []} boardId={board.id} />
     </Flex>
   );

@@ -89,7 +89,9 @@ export function SmartParams({ mode = 'edit', ...props }: SmartParamsProps) {
           </Tag.Label>
         </Tag.Root>
       ))}
-      {mode === 'edit' && props.smartParams.length === 0 && <Text>Click to add smart params</Text>}
+      {mode === 'edit' && props.smartParams.length === 0 && (
+        <Text textStyle="xs">Click to add smart params</Text>
+      )}
       {mode === 'edit' && props.type === 'board' && (
         <SmartParamsDialog
           isOpen={isDialogOpen}

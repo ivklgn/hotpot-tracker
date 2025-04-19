@@ -186,6 +186,7 @@ function ColumnTask({ task, columnApproveRule, columnContributors }: ColumnTaskP
           colorPalette={approved !== undefined ? (approved ? 'teal' : 'yellow') : 'teal'}
           fontWeight="medium"
           fontSize="md"
+          wordBreak="break-word"
         >
           <Link to={`/task/${task.id}`}>
             {task.title} {approved !== undefined ? approved ? <LuShieldCheck /> : <LuShieldQuestion /> : null}
