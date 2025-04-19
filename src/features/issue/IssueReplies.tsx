@@ -4,41 +4,32 @@ import { Ref, useState } from 'react';
 import { runTransaction } from '@/core/instantdb-transaction.ts';
 import { toaster } from '@/components/ui/toaster.tsx';
 import tariffLimits from '../../../tariff-limits.json';
-import { id } from '@instantdb/react';
+import { id, InstaQLResult } from '@instantdb/react';
 import { db } from '@/instantdb.ts';
 import { Reply } from '@/features/issue/Reply.tsx';
 import { useAccount } from '@/features/account/AccountContext.tsx';
+import { AppSchema } from '../../../instant.schema';
 
 interface IProps {
   issueId: string;
   fieldRef: Ref<HTMLTextAreaElement>;
+  replies?: InstaQLResult<AppSchema, { replies: { memberships: {} } }>['replies'];
 }
 
-export const IssueReplies = ({ issueId, fieldRef }: IProps) => {
+export const IssueReplies = ({ issueId, fieldRef, replies }: IProps) => {
   const [replyContent, setReplyContent] = useState('');
-
   const { user } = db.useAuth();
   const { currentTeamId } = useAccount();
-  const { data: replies } = db.useQuery({
-    replies: {
-      memberships: {},
-      $: {
-        where: {
-          issueId,
-        },
-      },
-    },
-  });
   const { data: memberships } = db.useQuery({
     memberships: {
       $: {
         where: {
           userId: user?.id as string,
+          teamId: currentTeamId as string,
         },
       },
     },
   });
-
   const currentMembershipId = memberships?.memberships[0]?.id;
 
   const handleReplySubmit = () => {
@@ -92,8 +83,8 @@ export const IssueReplies = ({ issueId, fieldRef }: IProps) => {
       </Box>
 
       <Stack>
-        {replies?.replies &&
-          replies.replies.map((reply) => (
+        {replies &&
+          replies.map((reply) => (
             <Box ml="4" mt="4" key={reply.id}>
               <Reply
                 userEmail={reply.memberships?.userEmail as string}

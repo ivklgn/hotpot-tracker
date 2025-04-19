@@ -9,9 +9,12 @@ import { runTransaction } from '@/core/instantdb-transaction.ts';
 import { ConfirmAction } from '@/components/ConfirmAction.tsx';
 import { db } from '@/instantdb.ts';
 import { UserAvatar } from '@/components/Avatars.tsx';
+import { IssueReplies } from '@/features/issue/IssueReplies.tsx';
+import { InstaQLResult } from '@instantdb/react';
+import { AppSchema } from '../../../instant.schema';
+import { toaster } from '../../components/ui/toaster';
 
 import './Issue.css';
-import { IssueReplies } from '@/features/issue/IssueReplies.tsx';
 
 interface IIssueProps {
   id: string;
@@ -19,10 +22,11 @@ interface IIssueProps {
   date: Date | string;
   content: string;
   userEmail: string;
+  replies?: InstaQLResult<AppSchema, { replies: { memberships: {} } }>['replies'];
   onApprove(id: string): void;
 }
 
-export const Issue = ({ id, creatorId, userEmail, date, content, onApprove }: IIssueProps) => {
+export const Issue = ({ id, creatorId, userEmail, date, content, replies, onApprove }: IIssueProps) => {
   const replyFieldRef = useRef<HTMLTextAreaElement>(null);
 
   const [issueContent, setIssueContent] = useState(content);
@@ -62,6 +66,10 @@ export const Issue = ({ id, creatorId, userEmail, date, content, onApprove }: II
       () => deleteIssue({ issueId: id }),
       () => {
         onApprove(id);
+        toaster.create({
+          title: 'Issue approved, all replies deleted',
+          type: 'success',
+        });
         return;
       }
     );
@@ -233,7 +241,7 @@ export const Issue = ({ id, creatorId, userEmail, date, content, onApprove }: II
           </Flex>
         </Editable.Root>
 
-        <IssueReplies issueId={id} fieldRef={replyFieldRef} />
+        <IssueReplies issueId={id} fieldRef={replyFieldRef} replies={replies} />
       </Box>
     </Box>
   );

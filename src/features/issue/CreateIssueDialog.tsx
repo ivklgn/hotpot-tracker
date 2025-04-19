@@ -78,7 +78,6 @@ export function CreateIssueDialog({ taskId, opener, onCreate }: IProps) {
           teamId: currentTeamId as string,
         }),
       (result) => {
-        console.log('success createNewIssue transaction', result);
         if (editor) {
           editor.commands.setComment(result);
           handleSubmit();
@@ -87,7 +86,6 @@ export function CreateIssueDialog({ taskId, opener, onCreate }: IProps) {
         }
       },
       (error) => {
-        console.error('>> error createNewIssue transaction', error);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
         if (error.originalError?.hint?.expected === 'perms-pass?') {
