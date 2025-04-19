@@ -1,39 +1,24 @@
-import {
-  Box,
-  ButtonGroup,
-  Editable,
-  Em,
-  Flex,
-  IconButton,
-  MenuPositioner,
-  Portal,
-  Stack,
-  Textarea,
-} from '@chakra-ui/react';
+import { Box, ButtonGroup, Editable, Em, Flex, IconButton, MenuPositioner, Portal } from '@chakra-ui/react';
 import { Text } from '@chakra-ui/react';
 import { Button } from '@/components/ui/button.tsx';
 import { useRef, useState } from 'react';
 import { timeAgo } from '@/utils/dates.ts';
 import { LuBadgeCheck, LuCheck, LuEllipsisVertical, LuReply, LuX } from 'react-icons/lu';
 import { MenuContent, MenuItem, MenuRoot, MenuTrigger } from '@/components/ui/menu.tsx';
-import tariffLimits from '../../../tariff-limits.json';
 import { runTransaction } from '@/core/instantdb-transaction.ts';
 import { ConfirmAction } from '@/components/ConfirmAction.tsx';
 import { db } from '@/instantdb.ts';
 import { UserAvatar } from '@/components/Avatars.tsx';
-import { id } from '@instantdb/react';
-import { Reply } from '@/features/issue/Reply.tsx';
-import { toaster } from '../../components/ui/toaster';
-import { useAccount } from '../account/AccountContext';
 
 import './Issue.css';
+import { IssueReplies } from '@/features/issue/IssueReplies.tsx';
 
 interface IIssueProps {
   id: string;
   creatorId: string;
-  userEmail: string;
   date: Date | string;
   content: string;
+  userEmail: string;
   onApprove(id: string): void;
 }
 
@@ -41,23 +26,11 @@ export const Issue = ({ id, creatorId, userEmail, date, content, onApprove }: II
   const replyFieldRef = useRef<HTMLTextAreaElement>(null);
 
   const [issueContent, setIssueContent] = useState(content);
-  const [replyContent, setReplyContent] = useState('');
   const [isActionBarVisible, setIsActionBarVisible] = useState(false);
 
-  const { currentTeamId } = useAccount();
   const { user } = db.useAuth();
-  const { data: replies } = db.useQuery({
-    replies: {
-      $: {
-        where: {
-          issueId: id,
-        },
-      },
-    },
-  });
 
   const isCreator = creatorId === user?.id;
-
   const handleClick = () => {
     document.querySelectorAll('.highlight')?.forEach((el) => {
       el.classList.remove('highlight');
@@ -74,32 +47,6 @@ export const Issue = ({ id, creatorId, userEmail, date, content, onApprove }: II
 
   const handleIssueContentUpdate = () => {
     runTransaction(() => updateIssueContent({ issueId: id, newContent: issueContent }));
-  };
-
-  const handleReplySubmit = () => {
-    runTransaction(
-      () =>
-        createNewReply({
-          issueId: id,
-          content: replyContent,
-          userEmail: user?.email as string,
-          teamId: currentTeamId as string,
-          creatorId: user?.id as string,
-        }),
-      () => {
-        setReplyContent('');
-      },
-      (error) => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        if (error.originalError?.hint?.expected === 'perms-pass?') {
-          toaster.create({
-            title: `Maximum ${tariffLimits.free.max_replies_per_issue} replies allowed`,
-            type: 'error',
-          });
-        }
-      }
-    );
   };
 
   const handleMouseEnter = () => {
@@ -125,8 +72,12 @@ export const Issue = ({ id, creatorId, userEmail, date, content, onApprove }: II
 
     return editorIssue?.textContent;
   };
-
   const editorIssueQuote = getIssueQuote();
+
+  if (!userEmail) {
+    console.log('userEmail undefined');
+    return null;
+  }
 
   return (
     <Box
@@ -282,42 +233,7 @@ export const Issue = ({ id, creatorId, userEmail, date, content, onApprove }: II
           </Flex>
         </Editable.Root>
 
-        <Box>
-          <Textarea
-            ref={replyFieldRef}
-            borderColor="border.emphasized"
-            height="40px"
-            placeholder="Reply to issue..."
-            value={replyContent}
-            onChange={(e) => setReplyContent(e.target.value)}
-            size="sm"
-          />
-
-          {!!replyContent.length && (
-            <Flex justifyContent="flex-end">
-              <ButtonGroup variant="outline" size="xs">
-                <IconButton onClick={handleReplySubmit}>
-                  <LuCheck />
-                </IconButton>
-              </ButtonGroup>
-            </Flex>
-          )}
-        </Box>
-
-        <Stack>
-          {replies?.replies &&
-            replies.replies.map((reply) => (
-              <Box ml="4" mt="4" key={reply.id}>
-                <Reply
-                  creatorId={reply.creatorId}
-                  date={`${reply.createdAt}`}
-                  id={reply.id}
-                  userEmail={reply.userEmail}
-                  content={reply.content}
-                />
-              </Box>
-            ))}
-        </Stack>
+        <IssueReplies issueId={id} fieldRef={replyFieldRef} />
       </Box>
     </Box>
   );
@@ -329,33 +245,4 @@ async function deleteIssue({ issueId }: { issueId: string }) {
 
 async function updateIssueContent({ newContent, issueId }: { newContent: string; issueId: string }) {
   return await db.transact([db.tx.issues[issueId].merge({ content: newContent })]);
-}
-
-async function createNewReply({
-  issueId,
-  content,
-  userEmail,
-  teamId,
-  creatorId,
-}: {
-  issueId: string;
-  content: string;
-  userEmail: string;
-  teamId: string;
-  creatorId: string;
-}) {
-  const newReplyId = id();
-
-  return await db.transact([
-    db.tx.replies[newReplyId].update({
-      issueId,
-      content,
-      userEmail,
-      createdAt: new Date().toJSON(),
-      teamId,
-      creatorId,
-    }),
-    db.tx.replies[newReplyId].link({ issues: issueId }),
-    db.tx.replies[newReplyId].link({ teams: teamId }),
-  ]);
 }

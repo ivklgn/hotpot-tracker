@@ -16,6 +16,7 @@ export const IssueList = () => {
   const params = useParams();
   const { data: issues, isLoading } = db.useQuery({
     issues: {
+      memberships: {},
       $: {
         where: {
           taskId: params?.taskId as string,
@@ -65,7 +66,7 @@ export const IssueList = () => {
       <Flex gap="5" direction="column">
         {issues.issues.map((issue) => (
           <Issue
-            userEmail={issue.userEmail}
+            userEmail={issue.memberships?.userEmail as string}
             creatorId={issue.creatorId}
             onApprove={handleApproveIssue}
             id={issue.id}

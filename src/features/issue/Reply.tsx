@@ -15,7 +15,7 @@ interface IProps {
   creatorId: string;
 }
 
-export const Reply = ({ id, creatorId, date, userEmail, content }: IProps) => {
+export const Reply = ({ id, creatorId, userEmail, date, content }: IProps) => {
   const [replyContent, setReplyContent] = useState(content);
   const [isActionBarVisible, setIsActionBarVisible] = useState(false);
 
@@ -48,7 +48,7 @@ export const Reply = ({ id, creatorId, date, userEmail, content }: IProps) => {
     <Box onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       <Flex gap="3" alignItems="flex-start" mb="2">
         <Box mt="3px">
-          <UserAvatar size="sm" user={{ userId: creatorId, userEmail: userEmail }} />
+          <UserAvatar size="sm" user={{ userId: creatorId, userEmail }} />
         </Box>
 
         <Box>
