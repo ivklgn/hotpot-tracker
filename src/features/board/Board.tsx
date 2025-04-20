@@ -23,9 +23,9 @@ import { AppSchema } from '../../../instant.schema';
 import { SmartParams } from '../smart-params';
 import { runTransaction } from '../../core/instantdb-transaction';
 import { createEvent } from '../events';
-import { toaster } from '../../components/ui/toaster';
 import tariffLimits from '../../../tariff-limits.json';
 import { AIReport } from '../ai/AIReport';
+import { toaster } from '@/utils/toaster';
 
 type BoardViewMode = 'view' | 'edit';
 

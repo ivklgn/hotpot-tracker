@@ -24,7 +24,6 @@ import { db } from '../instantdb';
 import { UserAvatar } from '../components/Avatars';
 import { Link } from 'wouter';
 import tariffLimits from '../../tariff-limits.json';
-import { useColorMode } from '../components/ui/color-mode';
 import { LuUserPlus, LuUsers, LuSquareMenu, LuSquareKanban } from 'react-icons/lu';
 
 import boardScreenshotLight from '../assets/board-screenshot-light.png';
@@ -37,6 +36,7 @@ import taskIssuesLight from '../assets/task-issues-light.png';
 import taskIssuesDark from '../assets/task-issues-dark.png';
 
 import s from './landing.module.css';
+import { useColorMode } from '@/hooks/useColorMode';
 
 interface FeatureCardProps {
   title: string;

@@ -18,9 +18,9 @@ import { db } from '@/instantdb.ts';
 import { runTransaction } from '@/core/instantdb-transaction.ts';
 import { updateTaskContent } from '@/features/task/Task.tsx';
 import { useParams } from 'wouter';
-import { toaster } from '../../components/ui/toaster';
 import tariffLimits from '../../../tariff-limits.json';
 import { useAccount } from '../account/AccountContext';
+import { toaster } from '@/utils/toaster';
 
 interface IProps {
   taskId: string;
@@ -49,10 +49,8 @@ export function CreateIssueDialog({ taskId, opener, onCreate }: IProps) {
       },
     },
   });
-  const currentMembershipId = memberships?.memberships[0]?.id;
 
-  console.log('CreateIssue/memberships', memberships);
-  console.log('CreateIssue/currentMembershipId', currentMembershipId);
+  const currentMembershipId = memberships?.memberships[0]?.id;
 
   const handleReset = () => {
     setContent('');
@@ -78,8 +76,8 @@ export function CreateIssueDialog({ taskId, opener, onCreate }: IProps) {
           teamId: currentTeamId as string,
         }),
       (result) => {
-        if (editor) {
-          editor.commands.setComment(result);
+        if (result.isOk() && editor) {
+          editor.commands.setComment(result.value);
           handleSubmit();
           onCreate?.();
           return;

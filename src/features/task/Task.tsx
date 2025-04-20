@@ -12,7 +12,7 @@ import { ConfirmAction } from '../../components/ConfirmAction';
 import { TaskApprove } from './TaskApprove';
 import { runTransaction } from '../../core/instantdb-transaction';
 import tariffLimits from '../../../tariff-limits.json';
-import { toaster } from '../../components/ui/toaster';
+import { toaster } from '@/utils/toaster';
 
 const Editor = lazy(() =>
   import('@/components/Editor/Editor').then((module) => ({ default: module.Editor }))

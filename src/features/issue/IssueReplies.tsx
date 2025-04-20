@@ -2,13 +2,13 @@ import { Box, ButtonGroup, Flex, IconButton, Stack, Textarea } from '@chakra-ui/
 import { LuCheck } from 'react-icons/lu';
 import { Ref, useState } from 'react';
 import { runTransaction } from '@/core/instantdb-transaction.ts';
-import { toaster } from '@/components/ui/toaster.tsx';
 import tariffLimits from '../../../tariff-limits.json';
 import { id, InstaQLResult } from '@instantdb/react';
 import { db } from '@/instantdb.ts';
 import { Reply } from '@/features/issue/Reply.tsx';
 import { useAccount } from '@/features/account/AccountContext.tsx';
 import { AppSchema } from '../../../instant.schema';
+import { toaster } from '@/utils/toaster';
 
 interface IProps {
   issueId: string;

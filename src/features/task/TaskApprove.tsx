@@ -98,6 +98,8 @@ export function TaskApprove({ task }: TaskApproveProps) {
         ])
       );
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [approvesData, currentContributorId, isApproved, task?.id, currentTeamId]);
 
   if (!task || !column) {

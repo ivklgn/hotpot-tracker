@@ -1,7 +1,7 @@
 import { IConwayError } from 'conway-errors';
-import { toaster } from '../components/ui/toaster';
-import { err, ok } from '../utils/result';
+import { err, ok, Result } from '../utils/result';
 import { errorContext } from './errors';
+import { toaster } from '@/utils/toaster';
 
 export const instantTransactionError = errorContext.feature('InstantTransactionError');
 
@@ -12,7 +12,7 @@ export const instantTransactionError = errorContext.feature('InstantTransactionE
  */
 export function runTransaction<T>(
   transaction: () => Promise<T>,
-  onSuccess?: (result: T) => void,
+  onSuccess?: (result: Result<T, IConwayError>) => void,
   onError?: (error: IConwayError) => void
 ) {
   transaction()

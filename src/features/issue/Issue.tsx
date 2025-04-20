@@ -12,9 +12,9 @@ import { UserAvatar } from '@/components/Avatars.tsx';
 import { IssueReplies } from '@/features/issue/IssueReplies.tsx';
 import { InstaQLResult } from '@instantdb/react';
 import { AppSchema } from '../../../instant.schema';
-import { toaster } from '../../components/ui/toaster';
 
 import './Issue.css';
+import { toaster } from '@/utils/toaster';
 
 interface IIssueProps {
   id: string;
@@ -81,11 +81,6 @@ export const Issue = ({ id, creatorId, userEmail, date, content, replies, onAppr
     return editorIssue?.textContent;
   };
   const editorIssueQuote = getIssueQuote();
-
-  if (!userEmail) {
-    console.log('userEmail undefined');
-    return null;
-  }
 
   return (
     <Box

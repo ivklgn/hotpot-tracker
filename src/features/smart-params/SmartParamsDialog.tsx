@@ -21,8 +21,8 @@ import { useAccount } from '../account/AccountContext';
 import { AppSchema } from '../../../instant.schema';
 import { isJSON } from '../../utils/json';
 import { runTransaction } from '../../core/instantdb-transaction';
-import { toaster } from '../../components/ui/toaster';
 import tariffLimits from '../../../tariff-limits.json';
+import { toaster } from '@/utils/toaster';
 
 const SMART_PARAMS_TYPES = [
   {
