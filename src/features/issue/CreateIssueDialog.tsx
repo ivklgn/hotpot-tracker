@@ -60,8 +60,7 @@ export function CreateIssueDialog({ taskId, opener, onCreate }: IProps) {
     setIsOpen(false);
   };
 
-  const setIssue = () => {
-    console.log('currentMembershipId in setIssue', currentMembershipId);
+  const handleSaveIssue = () => {
     if (!currentMembershipId) {
       return;
     }
@@ -94,10 +93,6 @@ export function CreateIssueDialog({ taskId, opener, onCreate }: IProps) {
         }
       }
     );
-  };
-
-  const handleSaveIssue = () => {
-    setIssue();
   };
 
   const handleSubmit = () => {

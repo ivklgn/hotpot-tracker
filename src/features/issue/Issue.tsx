@@ -28,13 +28,11 @@ interface IIssueProps {
 
 export const Issue = ({ id, creatorId, userEmail, date, content, replies, onApprove }: IIssueProps) => {
   const replyFieldRef = useRef<HTMLTextAreaElement>(null);
-
   const [issueContent, setIssueContent] = useState(content);
-  const [isActionBarVisible, setIsActionBarVisible] = useState(false);
-
   const { user } = db.useAuth();
 
   const isCreator = creatorId === user?.id;
+
   const handleClick = () => {
     document.querySelectorAll('.highlight')?.forEach((el) => {
       el.classList.remove('highlight');
@@ -51,14 +49,6 @@ export const Issue = ({ id, creatorId, userEmail, date, content, replies, onAppr
 
   const handleIssueContentUpdate = () => {
     runTransaction(() => updateIssueContent({ issueId: id, newContent: issueContent }));
-  };
-
-  const handleMouseEnter = () => {
-    setIsActionBarVisible(true);
-  };
-
-  const handleMouseLeave = () => {
-    setIsActionBarVisible(false);
   };
 
   const handleApproveIssue = () => {
@@ -83,16 +73,7 @@ export const Issue = ({ id, creatorId, userEmail, date, content, replies, onAppr
   const editorIssueQuote = getIssueQuote();
 
   return (
-    <Box
-      id={id}
-      boxShadow="sm"
-      width="full"
-      onClick={handleClick}
-      borderRadius="l3"
-      overflow="hidden"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
+    <Box id={id} boxShadow="sm" width="full" onClick={handleClick} borderRadius="l3" overflow="hidden">
       {editorIssueQuote && (
         <Box
           px="1.5"
@@ -132,7 +113,6 @@ export const Issue = ({ id, creatorId, userEmail, date, content, replies, onAppr
               color="gray.solid"
               fontSize="sm"
               fontWeight="bold"
-              width={isActionBarVisible ? 190 : 265}
               whiteSpace="nowrap"
               textOverflow="ellipsis"
               overflow="hidden"
@@ -145,55 +125,17 @@ export const Issue = ({ id, creatorId, userEmail, date, content, replies, onAppr
             </Text>
           </Box>
 
-          {isActionBarVisible && (
+          {isCreator && (
             <Box ml="auto">
-              <ButtonGroup size="2xs" variant="ghost">
-                <ConfirmAction
-                  opener={
-                    <IconButton colorPalette="green">
-                      <LuBadgeCheck />
-                    </IconButton>
-                  }
-                  text="Are you sure you want to approve issue?"
-                  onOk={handleApproveIssue}
-                />
-
-                <MenuRoot
-                  positioning={{ placement: 'right-start' }}
-                  onSelect={(details) => {
-                    if (details.value === 'reply') {
-                      requestAnimationFrame(() => {
-                        replyFieldRef.current?.focus();
-                      });
-                    }
-                  }}
-                >
-                  <MenuTrigger asChild>
-                    <IconButton>
-                      <LuEllipsisVertical />
-                    </IconButton>
-                  </MenuTrigger>
-
-                  <Portal>
-                    <MenuPositioner>
-                      <MenuContent>
-                        <ConfirmAction
-                          opener={
-                            <MenuItem value="approve">
-                              <LuBadgeCheck /> Approve
-                            </MenuItem>
-                          }
-                          text="Are you sure you want to resolve this issue?"
-                          onOk={handleApproveIssue}
-                        />
-                        <MenuItem value="reply">
-                          <LuReply /> Reply
-                        </MenuItem>
-                      </MenuContent>
-                    </MenuPositioner>
-                  </Portal>
-                </MenuRoot>
-              </ButtonGroup>
+              <ConfirmAction
+                opener={
+                  <IconButton colorPalette="green" variant="ghost">
+                    <LuBadgeCheck />
+                  </IconButton>
+                }
+                text="Are you sure you want to approve issue?"
+                onOk={handleApproveIssue}
+              />
             </Box>
           )}
         </Flex>

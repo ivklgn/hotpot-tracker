@@ -19,8 +19,6 @@ export function TeammateMembers() {
     },
   });
 
-  console.log(memberships, user?.id);
-
   return (
     <>
       <Table.Root size="md">
