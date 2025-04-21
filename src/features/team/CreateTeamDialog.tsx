@@ -42,10 +42,11 @@ export const CreateTeamDialog: React.FC<CreateTeamDialogProps> = ({ opener, isOp
           userId: user?.id as string,
           creatorId: user?.id,
         }),
-      (result) => {
+      () => {},
+      (error) => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
-        if (result.isErr() && result.error.originalError?.hint?.expected === 'perms-pass?') {
+        if (error.originalError?.hint?.expected === 'perms-pass?') {
           toaster.create({
             title: `Maximum ${tariffLimits.free.max_teams_per_account} teams allowed`,
             type: 'error',

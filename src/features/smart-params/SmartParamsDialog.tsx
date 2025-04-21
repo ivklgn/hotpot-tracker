@@ -123,10 +123,11 @@ export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTask
                   creatorId: user?.id,
                 }
           ),
-        (result) => {
+        () => {},
+        (error) => {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-expect-error
-          if (result.isErr() && result.error.originalError?.hint?.expected === 'perms-pass?') {
+          if (error.originalError?.hint?.expected === 'perms-pass?') {
             toaster.create({
               title: `Maximum ${tariffLimits.free.max_smart_params} smart params allowed for ${type}`,
               type: 'error',
