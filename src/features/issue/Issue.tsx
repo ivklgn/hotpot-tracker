@@ -1,10 +1,9 @@
-import { Box, ButtonGroup, Editable, Em, Flex, IconButton, MenuPositioner, Portal } from '@chakra-ui/react';
+import { Box, Editable, Em, Flex, IconButton } from '@chakra-ui/react';
 import { Text } from '@chakra-ui/react';
 import { Button } from '@/components/ui/button.tsx';
 import { useRef, useState } from 'react';
 import { timeAgo } from '@/utils/dates.ts';
-import { LuBadgeCheck, LuCheck, LuEllipsisVertical, LuReply, LuX } from 'react-icons/lu';
-import { MenuContent, MenuItem, MenuRoot, MenuTrigger } from '@/components/ui/menu.tsx';
+import { LuBadgeCheck, LuCheck, LuX } from 'react-icons/lu';
 import { runTransaction } from '@/core/instantdb-transaction.ts';
 import { ConfirmAction } from '@/components/ConfirmAction.tsx';
 import { db } from '@/instantdb.ts';
@@ -12,9 +11,9 @@ import { UserAvatar } from '@/components/Avatars.tsx';
 import { IssueReplies } from '@/features/issue/IssueReplies.tsx';
 import { InstaQLResult } from '@instantdb/react';
 import { AppSchema } from '../../../instant.schema';
+import { toaster } from '@/utils/toaster';
 
 import './Issue.css';
-import { toaster } from '@/utils/toaster';
 
 interface IIssueProps {
   id: string;

@@ -3,7 +3,6 @@ import { db } from '../../../../../instantdb';
 import { useAccount } from '../../../../../features/account/AccountContext';
 
 export function TeammateMembers() {
-  const { user } = db.useAuth();
   const { currentTeamId } = useAccount();
   const { data: memberships } = db.useQuery({
     memberships: {
