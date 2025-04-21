@@ -52,7 +52,7 @@ export function BoardsPage() {
         where: {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-expect-error
-          creatorId: boardFilter === 'all' ? undefined : (user?.id as string),
+          creatorId: boardFilter === 'my' ? (user?.id as string) : undefined,
           teamId: currentTeamId as string,
           deletedAt: {
             $isNull: boardFilter !== 'archived',
