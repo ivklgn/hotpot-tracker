@@ -75,9 +75,9 @@ export function CreateIssueDialog({ taskId, opener, onCreate }: IProps) {
           membershipId: currentMembershipId,
           teamId: currentTeamId as string,
         }),
-      (result) => {
-        if (result.isOk() && editor) {
-          editor.commands.setComment(result.value);
+      (newIssueId) => {
+        if (editor) {
+          editor.commands.setComment(newIssueId);
           handleSubmit();
           onCreate?.();
           return;

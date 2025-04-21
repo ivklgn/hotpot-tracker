@@ -1,5 +1,4 @@
 import { IConwayError } from 'conway-errors';
-import { err, ok, Result } from '../utils/result';
 import { errorContext } from './errors';
 import { toaster } from '@/utils/toaster';
 
@@ -12,13 +11,11 @@ export const instantTransactionError = errorContext.feature('InstantTransactionE
  */
 export function runTransaction<T>(
   transaction: () => Promise<T>,
-  onSuccess?: (result: Result<T, IConwayError>) => void,
+  onSuccess?: (result: T) => void,
   onError?: (error: IConwayError) => void
 ) {
   transaction()
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    .then((result) => onSuccess?.(ok(result)))
+    .then((result) => onSuccess?.(result))
     .catch((e) => {
       const error = instantTransactionError('BackendInteractionError', e.message, { originalError: e });
 
@@ -31,9 +28,6 @@ export function runTransaction<T>(
       }
 
       error.emit();
-
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      onError(err(error));
+      onError(error);
     });
 }
