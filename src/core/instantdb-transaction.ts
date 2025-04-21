@@ -27,9 +27,11 @@ export function runTransaction<T>(
           title: 'Operation error, please try again',
           type: 'error',
         });
-        error.emit();
         return;
       }
+
+      error.emit();
+
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       onError(err(error));

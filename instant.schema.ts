@@ -440,7 +440,7 @@ const _schema = i.schema({
       },
       reverse: {
         on: 'memberships',
-        has: 'one',
+        has: 'many',
         label: 'issues',
       },
     },
