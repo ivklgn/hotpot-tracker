@@ -73,6 +73,7 @@ export function AccountNavbar() {
     });
   };
 
+  console.log(teams?.teams);
   return (
     <Box px={4} py={3} shadow="md" key={currentTeamId}>
       <Flex alignItems="center">

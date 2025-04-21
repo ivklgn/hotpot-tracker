@@ -160,6 +160,6 @@ async function inviteMember({
       creatorId,
       createdAt: new Date().toJSON(),
     }),
-    db.tx.invites[inviteId].link({ teams: teamId }),
+    db.tx.invites[inviteId].link({ teams: teamId, memberships: membershipId }),
   ]);
 }

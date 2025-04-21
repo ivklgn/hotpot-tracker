@@ -3,13 +3,13 @@ import { InviteMemberDialog } from './InviteMemberDialog';
 import { ConfirmAction } from '../../../../../components/ConfirmAction';
 import { db } from '../../../../../instantdb';
 import { useAccount } from '../../../../../features/account/AccountContext';
-import { useMemo } from 'react';
 import { runTransaction } from '../../../../../core/instantdb-transaction';
 
 export function OwnerMembers() {
   const { currentTeamId } = useAccount();
   const { data: memberships } = db.useQuery({
     memberships: {
+      invites: {},
       $: {
         where: {
           'teams.id': currentTeamId as string,
@@ -17,33 +17,6 @@ export function OwnerMembers() {
       },
     },
   });
-  const { data: invites } = db.useQuery({
-    invites: {},
-  });
-
-  const members = useMemo(() => {
-    if (memberships && invites) {
-      const userEmailAsInviteStatus = invites.invites.reduce(
-        (acc, invite) => {
-          acc[invite.userEmail] = {
-            inviteId: invite.id,
-            status: invite.status as 'pending' | 'accepted' | 'declined',
-          } as const;
-          return acc;
-        },
-        {} as Record<string, { inviteId: string; status: 'pending' | 'accepted' | 'declined' }>
-      );
-
-      return memberships.memberships.map((membership) => ({
-        membershipId: membership.id,
-        userEmail: membership.userEmail,
-        userId: membership.userId,
-        invite: userEmailAsInviteStatus[membership.userEmail],
-      }));
-    }
-
-    return [];
-  }, [invites, memberships]);
 
   return (
     <>
@@ -56,14 +29,19 @@ export function OwnerMembers() {
           </Table.Row>
         </Table.Header>
         <Table.Body>
-          {members.map((member) => (
+          {memberships?.memberships.map((member) => (
             <Table.Row key={member.userEmail}>
-              <Table.Cell>{member.userEmail}</Table.Cell>
               <Table.Cell>
-                {member.invite ? <InviteStatus status={member?.invite?.status} /> : 'owner'}
+                {member.userEmail}{' '}
+                {member.invites.length && member.invites.length > 0 ? (
+                  <InviteStatus status={member.invites[0].status as 'pending' | 'accepted' | 'declined'} />
+                ) : null}
+              </Table.Cell>
+              <Table.Cell>
+                {!member.invites.length && member.creatorId === member.userId ? 'owner' : 'member'}
               </Table.Cell>
               <Table.Cell textAlign="end">
-                {member.invite && (
+                {member.invites.length || (!member.invites.length && member.creatorId !== member.userId) ? (
                   <ConfirmAction
                     opener={
                       <Button variant="solid" size="xs" colorPalette="red">
@@ -74,13 +52,12 @@ export function OwnerMembers() {
                     onOk={() => {
                       runTransaction(() =>
                         deleteMembership({
-                          membershipId: member.membershipId,
-                          inviteId: member?.invite?.inviteId as string,
+                          membershipId: member.id,
                         })
                       );
                     }}
                   />
-                )}
+                ) : null}
               </Table.Cell>
             </Table.Row>
           ))}
@@ -108,6 +85,6 @@ function InviteStatus({ status }: { status: 'pending' | 'accepted' | 'declined' 
   return <Badge colorPalette="red">declined</Badge>;
 }
 
-async function deleteMembership({ membershipId, inviteId }: { membershipId: string; inviteId: string }) {
-  return await db.transact([db.tx.invites[inviteId].delete(), db.tx.memberships[membershipId].delete()]);
+async function deleteMembership({ membershipId }: { membershipId: string }) {
+  return await db.transact([db.tx.memberships[membershipId].delete()]);
 }

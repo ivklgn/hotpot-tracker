@@ -120,6 +120,34 @@ const _schema = i.schema({
     }),
   },
   links: {
+    // invites
+    invitesTeams: {
+      forward: {
+        on: 'invites',
+        has: 'one',
+        label: 'teams',
+        onDelete: 'cascade',
+      },
+      reverse: {
+        on: 'teams',
+        has: 'many',
+        label: 'invites',
+      },
+    },
+    invitesMemberships: {
+      forward: {
+        on: 'invites',
+        has: 'one',
+        label: 'memberships',
+        onDelete: 'cascade',
+      },
+      reverse: {
+        on: 'memberships',
+        has: 'many',
+        label: 'invites',
+      },
+    },
+
     // events
 
     eventsTeams: {
@@ -365,19 +393,7 @@ const _schema = i.schema({
         label: 'boards',
       },
     },
-    invitesTeams: {
-      forward: {
-        on: 'invites',
-        has: 'one',
-        label: 'teams',
-        onDelete: 'cascade',
-      },
-      reverse: {
-        on: 'teams',
-        has: 'many',
-        label: 'invites',
-      },
-    },
+
     membershipsTeams: {
       forward: {
         on: 'memberships',
