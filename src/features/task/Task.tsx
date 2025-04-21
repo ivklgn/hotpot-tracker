@@ -12,7 +12,7 @@ import { ConfirmAction } from '../../components/ConfirmAction';
 import { TaskApprove } from './TaskApprove';
 import { runTransaction } from '../../core/instantdb-transaction';
 import tariffLimits from '../../../tariff-limits.json';
-import { toaster } from '../../components/ui/toaster';
+import { toaster } from '@/utils/toaster';
 
 const Editor = lazy(() =>
   import('@/components/Editor/Editor').then((module) => ({ default: module.Editor }))
@@ -103,16 +103,17 @@ export function Task({ task }: TaskProps) {
 
   return (
     <Box flex="1" pt={8} mx={6}>
-      <Flex direction="row" justifyContent="space-between">
+      <Flex direction="row" justifyContent="space-between" gap={4} mb={4}>
         <Editable.Root
           value={name}
           onValueChange={(e) => setName(e.value)}
           placeholder="Click to edit"
           onValueCommit={handleRenameBoard}
-          mb={8}
+          wordBreak="break-word"
+          maxLength={120}
         >
-          <Editable.Preview fontSize="3xl" fontWeight="bold" />
-          <Editable.Input fontSize="3xl" fontWeight="bold" />
+          <Editable.Preview fontSize="md" fontWeight="bold" />
+          <Editable.Input fontSize="xs" fontWeight="bold" />
           <Editable.Control>
             <Editable.EditTrigger asChild>
               <IconButton variant="ghost" size="xs">
@@ -137,12 +138,14 @@ export function Task({ task }: TaskProps) {
         </ButtonGroup>
       </Flex>
 
-      <SmartParams
-        type="task"
-        smartParams={task.smartParams || []}
-        taskId={task.id}
-        taskBoardId={task.columns?.boardId}
-      />
+      <Box mb={4}>
+        <SmartParams
+          type="task"
+          smartParams={task.smartParams || []}
+          taskId={task.id}
+          taskBoardId={task.columns?.boardId}
+        />
+      </Box>
 
       <Suspense fallback={null}>
         <Editor

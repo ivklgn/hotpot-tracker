@@ -55,6 +55,8 @@ export function AccountNavbar() {
         setCurrentTeamId(teams.teams[0].id);
       }
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTeamId, teams?.teams]);
 
   const handleGoToSettings = () => {

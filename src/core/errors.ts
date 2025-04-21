@@ -9,7 +9,11 @@ const createErrorContext = createError(
   ] as const,
   {
     handleEmit: (err) => {
-      Sentry.captureException(err);
+      if (import.meta.env.PROD) {
+        Sentry.captureException(err);
+      } else {
+        console.error(err, err.originalError);
+      }
     },
   }
 );

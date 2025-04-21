@@ -18,9 +18,9 @@ import { db } from '@/instantdb.ts';
 import { runTransaction } from '@/core/instantdb-transaction.ts';
 import { updateTaskContent } from '@/features/task/Task.tsx';
 import { useParams } from 'wouter';
-import { toaster } from '../../components/ui/toaster';
 import tariffLimits from '../../../tariff-limits.json';
 import { useAccount } from '../account/AccountContext';
+import { toaster } from '@/utils/toaster';
 
 interface IProps {
   taskId: string;
@@ -30,12 +30,27 @@ interface IProps {
 
 export function CreateIssueDialog({ taskId, opener, onCreate }: IProps) {
   const openerRef = useRef(null);
+
   const [isOpen, setIsOpen] = useState(false);
   const [content, setContent] = useState('');
+
   const { editor } = useCurrentEditor();
   const { user } = db.useAuth();
+  const userId = user?.id as string;
+
   const params = useParams();
   const { currentTeamId } = useAccount();
+  const { data: memberships } = db.useQuery({
+    memberships: {
+      $: {
+        where: {
+          userId,
+        },
+      },
+    },
+  });
+
+  const currentMembershipId = memberships?.memberships[0]?.id;
 
   const handleReset = () => {
     setContent('');
@@ -46,18 +61,23 @@ export function CreateIssueDialog({ taskId, opener, onCreate }: IProps) {
   };
 
   const setIssue = () => {
+    console.log('currentMembershipId in setIssue', currentMembershipId);
+    if (!currentMembershipId) {
+      return;
+    }
+
     runTransaction(
       () =>
         createNewIssue({
           taskId,
           content,
-          creatorId: user?.id as string,
+          creatorId: userId,
+          membershipId: currentMembershipId,
           teamId: currentTeamId as string,
-          userEmail: user?.email as string,
         }),
       (result) => {
-        if (editor) {
-          editor.commands.setComment(result);
+        if (result.isOk() && editor) {
+          editor.commands.setComment(result.value);
           handleSubmit();
           onCreate?.();
           return;
@@ -147,29 +167,31 @@ async function createNewIssue({
   taskId,
   content,
   creatorId,
+  membershipId,
   teamId,
-  userEmail,
 }: {
   content: string;
   taskId: string;
   creatorId: string;
+  membershipId: string;
   teamId: string;
-  userEmail: string;
 }) {
   const newIssueId = id();
 
-  await db.transact([
-    db.tx.issues[newIssueId].update({
-      taskId,
-      content,
-      creatorId,
-      userEmail,
-      createdAt: new Date().toJSON(),
-      teamId,
-    }),
-    db.tx.issues[newIssueId].link({ tasks: taskId }),
-    db.tx.issues[newIssueId].link({ teams: teamId }),
-  ]);
+  await db.transact(
+    db.tx.issues[newIssueId]
+      .update({
+        taskId,
+        content,
+        creatorId,
+        membershipId,
+        createdAt: new Date().toJSON(),
+        teamId,
+      })
+      .link({ tasks: taskId })
+      .link({ teams: teamId })
+      .link({ memberships: membershipId })
+  );
 
   return newIssueId;
 }

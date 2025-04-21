@@ -104,17 +104,17 @@ const _schema = i.schema({
       taskId: i.string(),
       content: i.string(),
       teamId: i.string(),
+      membershipId: i.string(),
       createdAt: i.date().indexed(),
       creatorId: i.string(),
-      userEmail: i.string(),
       deletedAt: i.date().indexed(),
     }),
     replies: i.entity({
       issueId: i.string(),
       content: i.string(),
       createdAt: i.date().indexed(),
+      membershipId: i.string(),
       teamId: i.string(),
-      userEmail: i.string(),
       deletedAt: i.date().indexed(),
       creatorId: i.string(),
     }),
@@ -431,6 +431,19 @@ const _schema = i.schema({
         label: 'issues',
       },
     },
+    issuesMemberships: {
+      forward: {
+        on: 'issues',
+        has: 'one',
+        label: 'memberships',
+        onDelete: 'cascade',
+      },
+      reverse: {
+        on: 'memberships',
+        has: 'one',
+        label: 'issues',
+      },
+    },
 
     repliesIssues: {
       forward: {
@@ -455,6 +468,19 @@ const _schema = i.schema({
       reverse: {
         on: 'teams',
         has: 'many',
+        label: 'replies',
+      },
+    },
+    repliesMemberships: {
+      forward: {
+        on: 'replies',
+        has: 'one',
+        label: 'memberships',
+        onDelete: 'cascade',
+      },
+      reverse: {
+        on: 'memberships',
+        has: 'one',
         label: 'replies',
       },
     },

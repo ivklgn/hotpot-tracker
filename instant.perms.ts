@@ -145,7 +145,7 @@ export default {
     allow: {
       view: 'isMember',
       create: `isMember && size(data.ref('issues.replies.id')) <= ${tariffLimits.free.max_replies_per_issue}`,
-      delete: 'isCreator',
+      delete: 'isMember', // because when we delete issue - we need delete all thread
       update: 'isCreator',
     },
   },

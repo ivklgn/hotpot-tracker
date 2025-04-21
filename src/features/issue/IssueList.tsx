@@ -12,10 +12,13 @@ export const IssueList = () => {
   const { editor } = useCurrentEditor();
   const rootRef = useRef<HTMLDivElement>(null);
   const [rootHeight, setRootHeight] = useState('unset');
-
   const params = useParams();
   const { data: issues, isLoading } = db.useQuery({
     issues: {
+      memberships: {},
+      replies: {
+        memberships: {},
+      },
       $: {
         where: {
           taskId: params?.taskId as string,
@@ -45,7 +48,6 @@ export const IssueList = () => {
     }
 
     editor.commands.unsetComment(issueId);
-    // TODO: need to accept array of transactions
     runTransaction(() =>
       updateTaskContent({ taskId: params.taskId as string, newContent: JSON.stringify(editor.getJSON()) })
     );
@@ -65,13 +67,14 @@ export const IssueList = () => {
       <Flex gap="5" direction="column">
         {issues.issues.map((issue) => (
           <Issue
-            userEmail={issue.userEmail}
+            userEmail={issue.memberships?.userEmail as string}
             creatorId={issue.creatorId}
             onApprove={handleApproveIssue}
             id={issue.id}
             date={issue.createdAt.toString()}
             key={issue.id}
             content={issue.content}
+            replies={issue?.replies}
           />
         ))}
       </Flex>

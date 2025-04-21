@@ -20,8 +20,8 @@ import { LuPlus, LuSearch } from 'react-icons/lu';
 import { useAccount } from '../account/AccountContext';
 import { Select } from 'chakra-react-select';
 import { useDebounce } from '../../hooks/useDebounce';
-import { toaster } from '../../components/ui/toaster';
 import tariffLimits from '../../../tariff-limits.json';
+import { toaster } from '@/utils/toaster';
 
 interface CreateTaskToColumnDialogProps {
   columnId: string;

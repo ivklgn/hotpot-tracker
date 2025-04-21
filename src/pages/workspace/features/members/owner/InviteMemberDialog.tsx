@@ -17,8 +17,8 @@ import { db } from '../../../../../instantdb';
 import { useAccount } from '../../../../../features/account/AccountContext';
 import { id } from '@instantdb/react';
 import { runTransaction } from '../../../../../core/instantdb-transaction';
-import { toaster } from '../../../../../components/ui/toaster';
 import tariffLimits from '../../../../../../tariff-limits.json';
+import { toaster } from '@/utils/toaster';
 
 interface CreateTeamDialogProps {
   opener: React.ReactElement;
