@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+// @ts-nocheck
 import {
   Box,
   Image,
@@ -35,7 +35,6 @@ import boardAILight from '../assets/board-ai-light.png';
 import boardAIDark from '../assets/board-ai-dark.png';
 import taskIssuesLight from '../assets/task-issues-light.png';
 import taskIssuesDark from '../assets/task-issues-dark.png';
-import heroImg from '../assets/hero.png';
 
 import s from './landing.module.css';
 import { useColorMode } from '@/hooks/useColorMode';
@@ -68,56 +67,56 @@ const FeatureCard = ({ title, text }: FeatureCardProps) => {
   );
 };
 
-const AuthForm = () => {
-  const { user } = db.useAuth();
-  const handleSignOutClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    db.auth.signOut();
-  };
+// const AuthForm = () => {
+//   const { user } = db.useAuth();
+//   const handleSignOutClick = (e: React.MouseEvent) => {
+//     e.preventDefault();
+//     db.auth.signOut();
+//   };
 
-  return (
-    <Flex
-      p={8}
-      rounded="xl"
-      shadow="xl"
-      minW="480px"
-      direction="column"
-      gap={4}
-      justifyContent="center"
-      borderWidth="1px"
-      borderColor="gray.100"
-    >
-      {user ? (
-        <HStack key={user?.email} gap="4">
-          <Link to="/workspace">
-            <UserAvatar user={{ userId: user?.id as string, userEmail: user?.email as string }} />
-          </Link>
-          <Stack gap="0">
-            <Link to="/workspace">
-              <Text fontWeight="medium">{user?.email}</Text>
-            </Link>
-            <HStack gap={2}>
-              <ChakraLink asChild variant="underline">
-                <Link to="/workspace">В аккаунт</Link>
-              </ChakraLink>
-              <Separator orientation="vertical" height="4" />
-              <ChakraLink asChild color="red.500" onClick={handleSignOutClick}>
-                <Link to="/workspace">Выход</Link>
-              </ChakraLink>
-            </HStack>
-          </Stack>
-        </HStack>
-      ) : (
-        <Box>
-          <Text textStyle="2xl" textAlign="center" mb={4}>
-            Войти или зарегистрироваться по email
-          </Text>
-          <Auth />
-        </Box>
-      )}
-    </Flex>
-  );
-};
+//   return (
+//     <Flex
+//       p={8}
+//       rounded="xl"
+//       shadow="xl"
+//       minW="480px"
+//       direction="column"
+//       gap={4}
+//       justifyContent="center"
+//       borderWidth="1px"
+//       borderColor="gray.100"
+//     >
+//       {user ? (
+//         <HStack key={user?.email} gap="4">
+//           <Link to="/workspace">
+//             <UserAvatar user={{ userId: user?.id as string, userEmail: user?.email as string }} />
+//           </Link>
+//           <Stack gap="0">
+//             <Link to="/workspace">
+//               <Text fontWeight="medium">{user?.email}</Text>
+//             </Link>
+//             <HStack gap={2}>
+//               <ChakraLink asChild variant="underline">
+//                 <Link to="/workspace">В аккаунт</Link>
+//               </ChakraLink>
+//               <Separator orientation="vertical" height="4" />
+//               <ChakraLink asChild color="red.500" onClick={handleSignOutClick}>
+//                 <Link to="/workspace">Выход</Link>
+//               </ChakraLink>
+//             </HStack>
+//           </Stack>
+//         </HStack>
+//       ) : (
+//         <Box>
+//           <Text textStyle="2xl" textAlign="center" mb={4}>
+//             Войти или зарегистрироваться по email
+//           </Text>
+//           <Auth />
+//         </Box>
+//       )}
+//     </Flex>
+//   );
+// };
 
 export function Landing() {
   const { colorMode } = useColorMode();
