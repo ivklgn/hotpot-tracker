@@ -80,7 +80,7 @@ export function Editor({ originalContent, onSaveClick, onCreateIssue }: IEditorP
         <Box
           ref={rootRef}
           data-editor-box
-          p="4"
+          px="4"
           borderWidth="1px"
           borderColor="border.disabled"
           color="fg.disabled"
@@ -91,7 +91,10 @@ export function Editor({ originalContent, onSaveClick, onCreateIssue }: IEditorP
           overflowY="auto"
           flexGrow="1"
         >
-          <EditorMenu onSaveClick={onSaveClick} />
+          <Box position="sticky" top="0px" zIndex={10}>
+            <EditorMenu originalContent={originalContent} onSaveClick={onSaveClick} />
+          </Box>
+
           <Prose width="full" maxWidth="unset" fontSize="md" h="full">
             <Flex direction="column" h="full">
               <Box h="full">
