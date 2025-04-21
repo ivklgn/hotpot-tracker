@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Box,
   Image,
@@ -148,7 +149,7 @@ export function Landing() {
                 ): cook your workflow your way.
               </Text>
               <Stack direction={{ base: 'column', sm: 'row' }} gap={4} mt={2}>
-                <Button
+                {/* <Button
                   rounded="full"
                   size="lg"
                   fontWeight="bold"
@@ -161,13 +162,13 @@ export function Landing() {
                   }}
                 >
                   Get started
-                </Button>
+                </Button> */}
                 <Button rounded="full" size="lg" fontWeight="bold" px={6} variant="outline">
                   <ChakraLink href="#about">Learn more</ChakraLink>
                 </Button>
               </Stack>
             </Stack>
-            <AuthForm />
+            {/* <AuthForm /> */}
           </Stack>
         </Container>
       </Box>
@@ -374,17 +375,21 @@ export function Landing() {
 
                 <Text>Perfect for small teams</Text>
 
-                <Link href="/workspace" style={{ width: '100%' }}>
+                <Button colorScheme="blue" size="lg" w="full" disabled>
+                  Coming soon
+                </Button>
+
+                {/* <Link href="/workspace" style={{ width: '100%' }}>
                   <Button colorScheme="blue" size="lg" w="full">
                     Get started
                   </Button>
-                </Link>
+                </Link> */}
 
                 <VStack align="start" gap={3}>
                   <Heading size="sm">Limits:</Heading>
                   <HStack>
                     <Icon as={LuUserPlus} color="green.500" />
-                    <Text>{tariffLimits.free.max_teams_per_account} teams per account</Text>
+                    <Text>{tariffLimits.free.max_teams_per_account} teams</Text>
                   </HStack>
                   <HStack>
                     <Icon as={LuUsers} color="green.500" />

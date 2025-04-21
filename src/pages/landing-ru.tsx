@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Box,
   Image,
@@ -34,6 +35,7 @@ import boardAILight from '../assets/board-ai-light.png';
 import boardAIDark from '../assets/board-ai-dark.png';
 import taskIssuesLight from '../assets/task-issues-light.png';
 import taskIssuesDark from '../assets/task-issues-dark.png';
+import heroImg from '../assets/hero.png';
 
 import s from './landing.module.css';
 import { useColorMode } from '@/hooks/useColorMode';
@@ -151,7 +153,7 @@ export function Landing() {
                 ): готовь процесс по своему вкусу.
               </Text>
               <Stack direction={{ base: 'column', sm: 'row' }} gap={4} mt={2}>
-                <Button
+                {/* <Button
                   rounded="full"
                   size="lg"
                   fontWeight="bold"
@@ -164,13 +166,13 @@ export function Landing() {
                   }}
                 >
                   Начать
-                </Button>
+                </Button> */}
                 <Button rounded="full" size="lg" fontWeight="bold" px={6} variant="outline">
                   <ChakraLink href="#about">Подробнее</ChakraLink>
                 </Button>
               </Stack>
             </Stack>
-            <AuthForm />
+            {/* <AuthForm /> */}
           </Stack>
         </Container>
       </Box>
@@ -373,16 +375,19 @@ export function Landing() {
                   <Text alignSelf="end">/ месяц</Text>
                 </HStack>
                 <Text>Идеально подходит небольших команд</Text>
-                <Link href="/workspace">
+                <Button colorScheme="blue" size="lg" w="full" disabled>
+                  Скоро
+                </Button>
+                {/* <Link href="/workspace">
                   <Button colorScheme="blue" size="lg" w="full">
                     Начать
                   </Button>
-                </Link>
+                </Link> */}
                 <VStack align="start" gap={3}>
                   <Heading size="sm">Ограничения:</Heading>
                   <HStack>
                     <Icon as={LuUserPlus} color="green.500" />
-                    <Text>{tariffLimits.free.max_teams_per_account} команд на аккаунт</Text>
+                    <Text>{tariffLimits.free.max_teams_per_account} команды</Text>
                   </HStack>
                   <HStack>
                     <Icon as={LuUsers} color="green.500" />
