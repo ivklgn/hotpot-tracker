@@ -91,3 +91,7 @@
 .tiptap .issue:hover {
     background-color: var(--chakra-colors-yellow-200);
 }
+
+.tiptap-content-area {
+    height: 100%;
+}

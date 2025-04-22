@@ -51,12 +51,18 @@ const extensions = [
 
 export function Editor({ originalContent, onSaveClick, onCreateIssue }: IEditorProps) {
   const rootRef = useRef<HTMLDivElement>(null);
+
   const [rootHeight, setRootHeight] = useState('unset');
   const editorContent = originalContent && isJSON(originalContent) ? JSON.parse(originalContent) : '';
 
   const editor = useEditor({
     extensions,
     content: editorContent,
+    editorProps: {
+      attributes: {
+        class: 'tiptap-content-area',
+      },
+    },
   });
 
   useLayoutEffect(() => {
@@ -87,7 +93,7 @@ export function Editor({ originalContent, onSaveClick, onCreateIssue }: IEditorP
           <Prose width="full" maxWidth="unset" fontSize="md" h="full">
             <Flex direction="column" h="full">
               <Box h="full">
-                <EditorContent editor={editor}>
+                <EditorContent className="tiptap-content-area" editor={editor}>
                   <TaskEditorMenu onCreateIssue={onCreateIssue} />
                 </EditorContent>
               </Box>
