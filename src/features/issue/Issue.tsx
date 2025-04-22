@@ -30,8 +30,6 @@ export const Issue = ({ id, creatorId, userEmail, date, content, replies, onAppr
   const [issueContent, setIssueContent] = useState(content);
   const { user } = db.useAuth();
 
-  console.log('debug user email', userEmail);
-
   const isCreator = creatorId === user?.id;
 
   const handleClick = () => {

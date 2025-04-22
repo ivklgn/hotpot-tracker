@@ -182,7 +182,7 @@ function DeleteTaskActions({ task }: { task?: InstaQLEntity<AppSchema, 'tasks'> 
 
   return [
     <ConfirmAction
-      key={`${task.id}_${task.deletedAt}`}
+      key={`archive_${task.id}_${task.deletedAt}`}
       opener={
         <Button variant="outline" colorPalette="red">
           Move from archive
@@ -194,7 +194,7 @@ function DeleteTaskActions({ task }: { task?: InstaQLEntity<AppSchema, 'tasks'> 
       }}
     />,
     <ConfirmAction
-      key={`${task.id}_${task.deletedAt}`}
+      key={`delete_${task.id}_${task.deletedAt}`}
       opener={
         <Button colorPalette="red" variant="solid">
           Delete

@@ -174,20 +174,19 @@ async function createNewIssue({
 }) {
   const newIssueId = id();
 
-  await db.transact(
-    db.tx.issues[newIssueId]
-      .update({
-        taskId,
-        content,
-        creatorId,
-        membershipId,
-        createdAt: new Date().toJSON(),
-        teamId,
-      })
-      .link({ tasks: taskId })
-      .link({ teams: teamId })
-      .link({ memberships: membershipId })
-  );
+  await db.transact([
+    db.tx.issues[newIssueId].update({
+      taskId,
+      content,
+      creatorId,
+      membershipId,
+      createdAt: new Date().toJSON(),
+      teamId,
+    }),
+    db.tx.issues[newIssueId].link({ tasks: taskId }),
+    db.tx.issues[newIssueId].link({ teams: teamId }),
+    db.tx.issues[newIssueId].link({ memberships: membershipId }),
+  ]);
 
   return newIssueId;
 }

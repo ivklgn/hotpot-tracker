@@ -131,7 +131,7 @@ export default {
     allow: {
       view: 'isMember',
       create: `isMember && size(data.ref('tasks.issues.id')) <= ${tariffLimits.free.max_issues_per_tasks}`,
-      delete: 'isCreator',
+      delete: 'isMember', // because when we delete issue - we need delete all thread
       update: 'isCreator',
     },
   },
