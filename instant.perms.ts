@@ -5,7 +5,8 @@ export default {
     bind: ['isCreator', 'auth.id == data.creatorId', 'isMember', "auth.id in data.ref('memberships.userId')"],
     allow: {
       view: 'isMember',
-      create: `isCreator && size(data.ref('users.teams.id')) <= ${tariffLimits.free.max_teams_per_account}`,
+      // create: `isCreator && size(data.ref('users.teams.id')) <= ${tariffLimits.free.max_teams_per_account}`,
+      create: `isCreator`, // TODO: need one more table like $user for users (profiles)
       delete: 'isCreator',
       update: 'isCreator',
     },

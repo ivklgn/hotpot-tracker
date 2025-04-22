@@ -407,19 +407,6 @@ const _schema = i.schema({
         label: 'memberships',
       },
     },
-    teamsUsers: {
-      forward: {
-        on: 'teams',
-        has: 'one',
-        label: 'users',
-        onDelete: 'cascade',
-      },
-      reverse: {
-        on: '$users',
-        has: 'many',
-        label: 'teams',
-      },
-    },
 
     issuesTasks: {
       forward: {

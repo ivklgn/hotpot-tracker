@@ -29,10 +29,22 @@ export const CreateTeamDialog: React.FC<CreateTeamDialogProps> = ({ opener, isOp
   const ref = useRef<HTMLInputElement>(null);
   const { user } = db.useAuth();
   const [teamName, setTeamName] = useState('');
+  // TODO: this is temp solution (see perms in teams TODO)
+  const { data: teams } = db.useQuery(
+    isOpen ? { teams: { $: { where: { creatorId: user?.id as string } } } } : null
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!teamName) return;
+
+    if (teams?.teams && teams?.teams.length === tariffLimits.free.max_teams_per_account) {
+      toaster.create({
+        title: `Maximum ${tariffLimits.free.max_teams_per_account} teams allowed`,
+        type: 'error',
+      });
+      return;
+    }
 
     runTransaction(
       () =>
@@ -128,7 +140,6 @@ async function createTeamWithMember({
       creatorId,
       createdAt: new Date().toJSON(),
     }),
-    db.tx.teams[teamId].link({ users: userId }),
     db.tx.memberships[membershipId].update({
       updatedAt: new Date().toJSON(),
       teamId,
