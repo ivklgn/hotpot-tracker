@@ -12,6 +12,9 @@ export default defineConfig({
       org: 'hotpot-mp',
       project: 'hotpot-tracker',
       telemetry: false,
+      sourcemaps: {
+        filesToDeleteAfterUpload: ['**/*.js.map'],
+      },
     }),
   ],
 
