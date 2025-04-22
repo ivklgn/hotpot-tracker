@@ -46,6 +46,7 @@ export function CreateIssueDialog({ taskId, opener, onCreate }: IProps) {
         where: {
           userId,
         },
+        limit: 1,
       },
     },
   });

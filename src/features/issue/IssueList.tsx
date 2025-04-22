@@ -53,6 +53,8 @@ export const IssueList = () => {
     );
   };
 
+  console.log('debug issues', issues);
+
   return (
     <Box
       id={TASK_ISSUES_ID}
