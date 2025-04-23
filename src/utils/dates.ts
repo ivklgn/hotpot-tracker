@@ -33,3 +33,10 @@ export function pluralize(count: number, one: string, few: string, many: string)
     return many;
   }
 }
+
+export function isLessThanSecondsOld(dateStr: string, targetSeconds: number): boolean {
+  const now = new Date();
+  const createdDate = new Date(dateStr);
+  const diffInSeconds = (now.getTime() - createdDate.getTime()) / 1000;
+  return diffInSeconds < targetSeconds;
+}

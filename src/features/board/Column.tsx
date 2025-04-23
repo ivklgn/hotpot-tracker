@@ -25,6 +25,7 @@ import { SmartParams } from '../smart-params';
 import { ToggleTip } from '../../components/ui/toggle-tip';
 import { runTransaction } from '../../core/instantdb-transaction';
 import { CreateTaskToColumnDialog } from './CreateTaskToColumnDialog';
+import { isLessThanSecondsOld } from '../../utils/dates';
 
 export type ColumnType = InstaQLResult<
   AppSchema,
@@ -361,7 +362,7 @@ function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
         <Field label="Danger zone" color="red">
           <ConfirmAction
             opener={
-              <Button variant="solid" colorPalette="red">
+              <Button variant="outline" colorPalette="red">
                 Delete column
               </Button>
             }
@@ -406,10 +407,10 @@ interface ColumnProps {
   ) => void;
 }
 
-export function Column({ column, defaultEditable = false, onDrag, onDragTask }: ColumnProps) {
+export function Column({ column, onDrag, onDragTask }: ColumnProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const [isEdit, setEditMode] = useState(defaultEditable);
-  const [isVisibleCreateTaskDialog, setCreateTaskDialogVisibility] = useState(defaultEditable);
+  const [isVisibleCreateTaskDialog, setCreateTaskDialogVisibility] = useState(false);
+  const [isEdit, setEditMode] = useState(isLessThanSecondsOld((column?.createdAt as string) || '', 5));
 
   const [, columnDrop] = useDrop({
     accept: 'column',
