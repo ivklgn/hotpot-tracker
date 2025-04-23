@@ -135,6 +135,7 @@ export const FontSizeSelector = () => {
           <MenuContent>
             {sizeList.map((s) => (
               <MenuItem
+                key={s.title}
                 onClick={s.onClick}
                 colorPalette={s.isActive ? 'teal' : 'gray'}
                 bg={s.isActive ? { _light: 'teal.100', _dark: 'teal.500' } : 'transparent'}
