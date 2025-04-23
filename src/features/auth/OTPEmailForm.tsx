@@ -4,6 +4,7 @@ import { Field } from '@/components/ui/field';
 import { Fieldset } from '@chakra-ui/react';
 import { useState } from 'react';
 import { db } from '../../instantdb';
+import { authError } from './errors';
 
 interface OTPEmailFormProps {
   onCodeSendComplete: (email: string) => void;
@@ -28,6 +29,7 @@ export function OTPEmailForm({ onCodeSendComplete }: OTPEmailFormProps) {
       .catch((err) => {
         setIsLoading(false);
         setError(err);
+        authError('BackendInteractionError', 'Send code error', { originalError: err }).emit();
       });
   };
 
