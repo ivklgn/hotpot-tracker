@@ -133,13 +133,6 @@ export function EditorMenu({ originalContent, onSaveClick }: EditorMenuProps) {
         >
           <LuRedo2 />
         </EditorButton>
-
-        <EditorButton
-          onClick={() => editor.chain().focus().setColor('#958DF1').run()}
-          className={editor.isActive('textStyle', { color: '#958DF1' }) ? 'is-active' : ''}
-        >
-          Purple
-        </EditorButton>
       </Flex>
     </Box>
   );
