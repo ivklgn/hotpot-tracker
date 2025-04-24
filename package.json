@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@ai-sdk/react": "^1.2.3",
-    "@chakra-ui/react": "^3.16.0",
+    "@chakra-ui/react": "^3.16.1",
     "@emotion/react": "^11.14.0",
     "@instantdb/react": "^0.18.9",
     "@sentry/react": "^9.13.0",
