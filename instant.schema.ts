@@ -298,7 +298,7 @@ const _schema = i.schema({
       },
       reverse: {
         on: 'boards',
-        has: 'one',
+        has: 'many',
         label: 'tasks',
       },
     },
