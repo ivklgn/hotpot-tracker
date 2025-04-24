@@ -294,7 +294,6 @@ const _schema = i.schema({
         on: 'tasks',
         has: 'one',
         label: 'boards',
-        onDelete: 'cascade',
       },
       reverse: {
         on: 'boards',
