@@ -25,7 +25,7 @@ export function TaskPage() {
   return (
     <>
       <Helm title={task.tasks?.[0]?.title ?? 'Task'} />
-      <Task task={task.tasks?.[0]} board={task?.tasks?.[0].boards} />
+      <Task task={task.tasks?.[0]} board={task?.tasks?.[0]?.boards} />
     </>
   );
 }
