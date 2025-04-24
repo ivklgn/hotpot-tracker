@@ -9,20 +9,10 @@ export function TaskPage() {
     tasks: {
       smartParams: {},
       columns: {},
+      boards: {},
       $: {
         where: {
           id: params?.taskId as string,
-        },
-      },
-    },
-  });
-
-  const currentBoardId = task?.tasks.find((t) => t.columns?.boardId)?.columns?.boardId ?? '';
-  const { data: board } = db.useQuery({
-    boards: {
-      $: {
-        where: {
-          id: currentBoardId as string,
         },
       },
     },
@@ -35,7 +25,7 @@ export function TaskPage() {
   return (
     <>
       <Helm title={task.tasks?.[0]?.title ?? 'Task'} />
-      <Task task={task.tasks?.[0]} board={board?.boards[0]} />
+      <Task task={task.tasks?.[0]} board={task?.tasks?.[0].boards} />
     </>
   );
 }

@@ -51,8 +51,6 @@ export function Task({ task, board }: TaskProps) {
       : null
   );
 
-  console.log('board', board);
-
   const handleRenameBoard = ({ value: newTitle }: { value: string }) => {
     if (!newTitle || !task) return;
     runTransaction(() => renameTask({ taskId: task.id, newTitle }));
