@@ -501,6 +501,7 @@ export function Column({ column, onDrag, onDragTask }: ColumnProps) {
         isOpen={isVisibleCreateTaskDialog}
         onClose={() => setCreateTaskDialogVisibility(false)}
         columnId={column?.id as string}
+        boardId={column?.boardId as string}
       />
     </Box>
   );

@@ -60,6 +60,7 @@ export function Board({ board, mode = 'view' }: BoardProps) {
     currentColumnId?: string
   ) => {
     runTransaction(() => changeTaskColumn({ taskId: task.id, columnId: targetColumn.id }));
+    runTransaction(() => changeTaskBoard({ taskId: task.id, boardId: targetColumn.boardId }));
 
     if (targetColumn.contributors && targetColumn.contributors.length > 0) {
       targetColumn.contributors.forEach((contributor) => {
@@ -380,6 +381,12 @@ async function changeTaskColumn({ taskId, columnId }: { taskId: string; columnId
     db.tx.tasks[taskId].merge({ updatedAt: new Date().toJSON(), columnId }),
     db.tx.tasks[taskId].link({ columns: columnId }),
   ]);
+}
+
+async function changeTaskBoard({ taskId, boardId }: { taskId: string; boardId: string }) {
+  return await db.transact(
+    db.tx.tasks[taskId].merge({ updatedAt: new Date().toJSON(), boardId }).link({ boards: boardId })
+  );
 }
 
 async function changeColumnPosition({

@@ -87,6 +87,7 @@ const _schema = i.schema({
       content: i.json(),
       teamId: i.string(),
       columnId: i.string(),
+      boardId: i.string(),
       creatorId: i.string(),
       createdAt: i.date().indexed(),
       deletedAt: i.date().indexed(),
@@ -284,6 +285,18 @@ const _schema = i.schema({
       },
       reverse: {
         on: 'teams',
+        has: 'many',
+        label: 'tasks',
+      },
+    },
+    tasksBoards: {
+      forward: {
+        on: 'tasks',
+        has: 'one',
+        label: 'boards',
+      },
+      reverse: {
+        on: 'boards',
         has: 'many',
         label: 'tasks',
       },

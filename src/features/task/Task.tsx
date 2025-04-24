@@ -1,17 +1,29 @@
-import { Box, Button, ButtonGroup, Editable, EmptyState, Flex, IconButton, VStack } from '@chakra-ui/react';
+import {
+  Badge,
+  Box,
+  Button,
+  ButtonGroup,
+  Editable,
+  EmptyState,
+  Flex,
+  Group,
+  IconButton,
+  VStack,
+} from '@chakra-ui/react';
 import { useState, lazy, Suspense } from 'react';
 import { LuPencilLine, LuX, LuCheck } from 'react-icons/lu';
 import { db } from '../../instantdb';
 import { HiColorSwatch } from 'react-icons/hi';
 import { AppSchema } from '../../../instant.schema';
 import { InstaQLEntity } from '@instantdb/react';
-import { useLocation } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { SmartParams } from '../smart-params';
 import { JSONContent } from '@tiptap/react';
 import { ConfirmAction } from '../../components/ConfirmAction';
 import { TaskApprove } from './TaskApprove';
 import { runTransaction } from '../../core/instantdb-transaction';
 import tariffLimits from '../../../tariff-limits.json';
+import { Link as ChakraLink } from '@chakra-ui/react';
 import { toaster } from '@/utils/toaster';
 
 const Editor = lazy(() =>
@@ -20,9 +32,10 @@ const Editor = lazy(() =>
 
 interface TaskProps {
   task?: InstaQLEntity<AppSchema, 'tasks', { smartParams: {}; columns: {} }>;
+  board?: InstaQLEntity<AppSchema, 'boards'>;
 }
 
-export function Task({ task }: TaskProps) {
+export function Task({ task, board }: TaskProps) {
   const [, navigate] = useLocation();
   const [name, setName] = useState<string>(task?.title || '');
   const { user } = db.useAuth();
@@ -133,6 +146,18 @@ export function Task({ task }: TaskProps) {
           </Editable.Control>
         </Editable.Root>
         <ButtonGroup size="xs">
+          {!!board?.name && (
+            <Group attached>
+              <Badge variant="outline" height="32px">
+                Board
+              </Badge>
+              <Badge variant="outline" height="32px">
+                <ChakraLink asChild colorPalette="teal" fontWeight="medium" wordBreak="break-word">
+                  <Link to={`/board/${board.id}`}>{board.name}</Link>
+                </ChakraLink>
+              </Badge>
+            </Group>
+          )}
           <TaskApprove task={task} />
           <DeleteTaskActions task={task} />
         </ButtonGroup>

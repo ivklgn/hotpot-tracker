@@ -9,6 +9,7 @@ export function TaskPage() {
     tasks: {
       smartParams: {},
       columns: {},
+      boards: {},
       $: {
         where: {
           id: params?.taskId as string,
@@ -24,7 +25,7 @@ export function TaskPage() {
   return (
     <>
       <Helm title={task.tasks?.[0]?.title ?? 'Task'} />
-      <Task task={task.tasks?.[0]} />
+      <Task task={task.tasks?.[0]} board={task?.tasks?.[0]?.boards} />
     </>
   );
 }

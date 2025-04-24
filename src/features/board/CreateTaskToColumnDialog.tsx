@@ -26,6 +26,7 @@ import { useLocation } from 'wouter';
 
 interface CreateTaskToColumnDialogProps {
   columnId: string;
+  boardId: string;
   opener?: React.ReactElement;
   isOpen?: boolean;
   onClose?: () => void;
@@ -33,6 +34,7 @@ interface CreateTaskToColumnDialogProps {
 
 export const CreateTaskToColumnDialog: React.FC<CreateTaskToColumnDialogProps> = ({
   columnId,
+  boardId,
   opener,
   isOpen,
   onClose,
@@ -56,6 +58,7 @@ export const CreateTaskToColumnDialog: React.FC<CreateTaskToColumnDialogProps> =
             title,
             columnId,
             teamId: currentTeamId as string,
+            boardId,
             creatorId: user?.id,
           }),
         (newTaskId) => {
@@ -268,11 +271,13 @@ async function createNewTask({
   columnId,
   teamId,
   creatorId,
+  boardId,
 }: {
   title: string;
   columnId: string;
   teamId: string;
   creatorId?: string;
+  boardId: string;
 }) {
   const newTaskId = id();
 
@@ -282,11 +287,13 @@ async function createNewTask({
       title,
       teamId,
       columnId,
+      boardId,
       createdAt: new Date().toJSON(),
       creatorId,
     }),
     db.tx.tasks[newTaskId].link({ columns: columnId }),
     db.tx.tasks[newTaskId].link({ teams: teamId }),
+    db.tx.tasks[newTaskId].link({ boards: boardId }),
   ]);
 
   return newTaskId;

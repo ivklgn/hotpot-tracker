@@ -19,6 +19,8 @@ export function runTransaction<T>(
     .catch((e) => {
       const error = instantTransactionError('BackendInteractionError', e.message, { originalError: e });
 
+      error.emit();
+
       if (!onError) {
         toaster.create({
           title: 'Operation error, please try again',
@@ -27,7 +29,6 @@ export function runTransaction<T>(
         return;
       }
 
-      error.emit();
       onError(error);
     });
 }
