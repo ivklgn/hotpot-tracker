@@ -22,6 +22,7 @@ import { Select } from 'chakra-react-select';
 import { useDebounce } from '../../hooks/useDebounce';
 import tariffLimits from '../../../tariff-limits.json';
 import { toaster } from '@/utils/toaster';
+import { useLocation } from 'wouter';
 
 interface CreateTaskToColumnDialogProps {
   columnId: string;
@@ -43,6 +44,7 @@ export const CreateTaskToColumnDialog: React.FC<CreateTaskToColumnDialogProps> =
   const [tab, setTab] = useState<'new' | 'existing'>('new');
   const [taskApproveIds, setTaskApproveIds] = useState<string[]>([]);
   const { currentTeamId } = useAccount();
+  const [, navigate] = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,7 +58,17 @@ export const CreateTaskToColumnDialog: React.FC<CreateTaskToColumnDialogProps> =
             teamId: currentTeamId as string,
             creatorId: user?.id,
           }),
-        () => {
+        (newTaskId) => {
+          toaster.create({
+            title: 'Task created',
+            type: 'success',
+            action: {
+              label: 'Go to task',
+              onClick: () => {
+                navigate(`/task/${newTaskId}`);
+              },
+            },
+          });
           setTitle('');
           onClose?.();
         },
@@ -264,7 +276,7 @@ async function createNewTask({
 }) {
   const newTaskId = id();
 
-  return await db.transact([
+  await db.transact([
     db.tx.tasks[newTaskId].update({
       updatedAt: new Date().toJSON(),
       title,
@@ -276,4 +288,6 @@ async function createNewTask({
     db.tx.tasks[newTaskId].link({ columns: columnId }),
     db.tx.tasks[newTaskId].link({ teams: teamId }),
   ]);
+
+  return newTaskId;
 }
