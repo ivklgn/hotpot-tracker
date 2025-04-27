@@ -36,10 +36,7 @@ export default function App() {
             <Route path="/" component={() => <Landing />} />
             <Route path="/ru" component={() => <LandingRu />} />
             <Route path="/404" component={() => <NotFoundPage />} />
-            <Route
-              path="/auth-demo-ad6e1b4c-6e36-4ba0-963d-3d9f4fbb9c92"
-              component={() => <Redirect to="/workspace" />}
-            />
+            <Route path="/auth" component={() => <Redirect to="/workspace" />} />
             <Route path="*" component={() => <NotFoundPage />} />
           </Switch>
         </AccountLayout>
@@ -53,7 +50,7 @@ export default function App() {
         <Route path="/" component={() => <Landing />} />
         <Route path="/ru" component={() => <LandingRu />} />
         <Route path="/404" component={() => <NotFoundPage />} />
-        <Route path="/auth-demo-ad6e1b4c-6e36-4ba0-963d-3d9f4fbb9c92" component={() => <AuthPage />} />
+        <Route path="/auth" component={() => <AuthPage />} />
         <Route path="/workspace" component={() => <Redirect to="/auth" />} />
         <Route path="*" component={() => <NotFoundPage />} />
       </Switch>
