@@ -78,7 +78,7 @@ const AuthForm = () => {
       p={8}
       rounded="xl"
       shadow="xl"
-      minW="480px"
+      minW={{ base: '100%', md: '480px' }}
       direction="column"
       gap={4}
       justifyContent="center"
@@ -174,7 +174,7 @@ export function Landing() {
 
       <Box py={16}>
         <Container maxW="7xl">
-          <VStack gap={8} mb={12}>
+          <VStack gap={8} mb={12} px={{ base: 4, md: 0 }}>
             <Heading fontSize={{ base: '3xl', md: '4xl' }} textAlign="center">
               Another Trello clone?
             </Heading>
