@@ -17,8 +17,8 @@ import './Issue.css';
 
 interface IIssueProps {
   id: string;
-  creatorId: string;
-  date: Date | string;
+  creatorId?: string;
+  date?: Date | string;
   content: string;
   userEmail: string;
   replies?: InstaQLResult<AppSchema, { replies: { memberships: {} } }>['replies'];
@@ -119,9 +119,11 @@ export const Issue = ({ id, creatorId, userEmail, date, content, replies, onAppr
               {userEmail}
             </Text>
 
-            <Text color="fg.subtle" fontSize="sm">
-              {timeAgo(date)}
-            </Text>
+            {date && (
+              <Text color="fg.subtle" fontSize="sm">
+                {timeAgo(date)}
+              </Text>
+            )}
           </Box>
 
           {isCreator && (

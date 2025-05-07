@@ -79,7 +79,7 @@ export const IssueList = () => {
             creatorId={issue.creatorId}
             onApprove={handleApproveIssue}
             id={issue.id}
-            date={issue.createdAt.toString()}
+            date={issue?.createdAt?.toString()}
             key={issue.id}
             content={issue.content}
             replies={issue?.replies}

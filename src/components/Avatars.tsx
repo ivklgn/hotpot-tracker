@@ -2,7 +2,7 @@ import { Avatar, AvatarGroupProps } from '@chakra-ui/react';
 import { AvatarGroup } from './ui/avatar';
 
 interface UserAvatarProps {
-  user: { userId: string; userEmail: string };
+  user: { userId?: string; userEmail: string };
   size?: AvatarGroupProps['size'];
 }
 

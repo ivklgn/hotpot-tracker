@@ -12,7 +12,7 @@ interface IProps {
   date: Date | string;
   content: string;
   userEmail: string;
-  creatorId: string;
+  creatorId?: string;
 }
 
 export const Reply = ({ id, creatorId, userEmail, date, content }: IProps) => {
