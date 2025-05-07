@@ -9,6 +9,7 @@ import { runTransaction } from '../../../../core/instantdb-transaction';
 import { useAccount } from '../../../../features/account/AccountContext';
 import { deleteEvent } from '../../../../features/events';
 import { Link } from 'wouter';
+import { toaster } from '../../../../utils/toaster';
 
 interface ToWorkItem {
   message: ReactNode;
@@ -96,12 +97,25 @@ export function ToWork() {
             size="xs"
             onClick={() => {
               if (user?.id) {
-                runTransaction(() =>
-                  acceptInvite({
-                    inviteId: invite.id,
-                    membershipId: invite.membershipId,
-                    userId: user.id,
-                  })
+                runTransaction(
+                  () =>
+                    acceptInvite({
+                      inviteId: invite.id,
+                      membershipId: invite.membershipId,
+                      userId: user.id,
+                    }),
+                  () => {
+                    toaster.create({
+                      title: 'Invite accepted',
+                      type: 'success',
+                      action: {
+                        label: 'Refresh page',
+                        onClick: () => {
+                          window.location.reload();
+                        },
+                      },
+                    });
+                  }
                 );
                 window.location.reload();
               }

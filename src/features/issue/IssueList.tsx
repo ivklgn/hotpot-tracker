@@ -7,6 +7,7 @@ import { useLayoutEffect, useRef, useState } from 'react';
 import { useCurrentEditor } from '@tiptap/react';
 import { runTransaction } from '@/core/instantdb-transaction.ts';
 import { updateTaskContent } from '@/features/task/Task.tsx';
+import { toaster } from '../../utils/toaster';
 
 export const IssueList = () => {
   const { editor } = useCurrentEditor();
@@ -48,12 +49,17 @@ export const IssueList = () => {
     }
 
     editor.commands.unsetComment(issueId);
-    runTransaction(() =>
-      updateTaskContent({ taskId: params.taskId as string, newContent: JSON.stringify(editor.getJSON()) })
+    runTransaction(
+      () =>
+        updateTaskContent({ taskId: params.taskId as string, newContent: JSON.stringify(editor.getJSON()) }),
+      () => {
+        toaster.create({
+          title: 'Task saved',
+          type: 'success',
+        });
+      }
     );
   };
-
-  console.log('debug issues', issues);
 
   return (
     <Box

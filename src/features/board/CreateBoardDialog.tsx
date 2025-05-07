@@ -40,6 +40,10 @@ export const CreateBoardDialog: React.FC<CreateTeamDialogProps> = ({ opener }) =
     runTransaction(
       () => createBoard({ name, teamId: currentTeamId as string, creatorId: user?.id }),
       (result) => {
+        toaster.create({
+          title: 'Board created',
+          type: 'success',
+        });
         navigate(`/board/${result}`);
       },
       (error) => {

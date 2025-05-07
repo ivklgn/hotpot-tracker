@@ -59,7 +59,12 @@ export const InviteMemberDialog: React.FC<CreateTeamDialogProps> = ({ opener }) 
           teamName: currentTeam?.teams?.[0]?.name as string,
           creatorId: user?.id as string,
         }),
-      () => {},
+      () => {
+        toaster.create({
+          title: 'Invite sent',
+          type: 'success',
+        });
+      },
       (error) => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error

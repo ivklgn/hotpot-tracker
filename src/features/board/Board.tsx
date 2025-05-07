@@ -143,14 +143,21 @@ export function Board({ board, mode = 'view' }: BoardProps) {
                 <Button
                   size="xs"
                   onClick={() => {
-                    runTransaction(() =>
-                      createColumn({
-                        boardId: board.id,
-                        teamId: currentTeamId as string,
-                        position:
-                          (board?.columns?.reduce((max, c) => (c.position > max ? c.position : max), 0) ||
-                            0) + 1,
-                      })
+                    runTransaction(
+                      () =>
+                        createColumn({
+                          boardId: board.id,
+                          teamId: currentTeamId as string,
+                          position:
+                            (board?.columns?.reduce((max, c) => (c.position > max ? c.position : max), 0) ||
+                              0) + 1,
+                        }),
+                      () => {
+                        toaster.create({
+                          title: 'Column created',
+                          type: 'success',
+                        });
+                      }
                     );
                   }}
                 >
@@ -215,7 +222,15 @@ function BoardHeader({ board, mode, columns }: BoardHeaderProps) {
 
   const handleRenameBoard = ({ value: newName }: { value: string }) => {
     if (!newName) return;
-    runTransaction(() => renameBoard({ boardId: board?.id as string, newName }));
+    runTransaction(
+      () => renameBoard({ boardId: board?.id as string, newName }),
+      () => {
+        toaster.create({
+          title: 'Board renamed',
+          type: 'success',
+        });
+      }
+    );
   };
 
   if (!board) return null;
@@ -272,7 +287,12 @@ function BoardHeader({ board, mode, columns }: BoardHeaderProps) {
                     position:
                       (columns?.reduce((max, c) => (c.position > max ? c.position : max), 0) || 0) + 1,
                   }),
-                () => {},
+                () => {
+                  toaster.create({
+                    title: 'Column created',
+                    type: 'success',
+                  });
+                },
                 (error) => {
                   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                   // @ts-expect-error
@@ -313,7 +333,15 @@ function DeleteBoardActions({ board }: { board?: InstaQLEntity<AppSchema, 'board
         }
         text="Are you sure you want to archive this board?"
         onOk={() => {
-          runTransaction(() => archiveBoard({ boardId: board.id }));
+          runTransaction(
+            () => archiveBoard({ boardId: board.id }),
+            () => {
+              toaster.create({
+                title: 'Board archived',
+                type: 'success',
+              });
+            }
+          );
         }}
       />
     );
@@ -345,6 +373,10 @@ function DeleteBoardActions({ board }: { board?: InstaQLEntity<AppSchema, 'board
           () => deleteBoard({ boardId: board.id }),
           () => {
             navigate('/boards');
+            toaster.create({
+              title: 'Board deleted',
+              type: 'success',
+            });
           }
         );
       }}

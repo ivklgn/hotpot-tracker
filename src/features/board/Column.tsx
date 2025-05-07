@@ -26,6 +26,7 @@ import { ToggleTip } from '../../components/ui/toggle-tip';
 import { runTransaction } from '../../core/instantdb-transaction';
 import { CreateTaskToColumnDialog } from './CreateTaskToColumnDialog';
 import { isLessThanSecondsOld } from '../../utils/dates';
+import { toaster } from '../../utils/toaster';
 
 export type ColumnType = InstaQLResult<
   AppSchema,
@@ -254,12 +255,19 @@ function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
             }))}
             placeholder="Select or create status"
             onChange={(value) => {
-              runTransaction(() =>
-                updateColumnStatus({
-                  statusId: value?.value as string,
-                  teamId: currentTeamId as string,
-                  columnId: column?.id as string,
-                })
+              runTransaction(
+                () =>
+                  updateColumnStatus({
+                    statusId: value?.value as string,
+                    teamId: currentTeamId as string,
+                    columnId: column?.id as string,
+                  }),
+                () => {
+                  toaster.create({
+                    title: 'Column status updated',
+                    type: 'success',
+                  });
+                }
               );
             }}
             value={
@@ -271,13 +279,20 @@ function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
                 : undefined
             }
             onCreateOption={(value) => {
-              runTransaction(() =>
-                createStatusAndUpdateColumn({
-                  name: value,
-                  teamId: currentTeamId as string,
-                  columnId: column?.id as string,
-                  creatorId: user?.id,
-                })
+              runTransaction(
+                () =>
+                  createStatusAndUpdateColumn({
+                    name: value,
+                    teamId: currentTeamId as string,
+                    columnId: column?.id as string,
+                    creatorId: user?.id,
+                  }),
+                () => {
+                  toaster.create({
+                    title: 'Status created',
+                    type: 'success',
+                  });
+                }
               );
             }}
           />
@@ -306,16 +321,23 @@ function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
                 return;
               }
 
-              runTransaction(() =>
-                updateContributors({
-                  userMemberships: changedContributors.map((v) => ({
-                    userId: v.value as string,
-                    membershipId: memberships?.memberships.find((m) => m.userId === v.value)?.id as string,
-                  })),
-                  columnId: column?.id as string,
-                  teamId: currentTeamId as string,
-                  creatorId: user?.id as string,
-                })
+              runTransaction(
+                () =>
+                  updateContributors({
+                    userMemberships: changedContributors.map((v) => ({
+                      userId: v.value as string,
+                      membershipId: memberships?.memberships.find((m) => m.userId === v.value)?.id as string,
+                    })),
+                    columnId: column?.id as string,
+                    teamId: currentTeamId as string,
+                    creatorId: user?.id as string,
+                  }),
+                () => {
+                  toaster.create({
+                    title: 'Contributors updated',
+                    type: 'success',
+                  });
+                }
               );
             }}
             options={memberships?.memberships.map((member) => ({
@@ -336,11 +358,18 @@ function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
         <Field label="Approve rules">
           <Select
             onChange={(value) => {
-              runTransaction(() =>
-                updateColumnApproveRule({
-                  approveRule: value?.value as 'one-of-contributors' | 'all-contributors',
-                  columnId: column?.id as string,
-                })
+              runTransaction(
+                () =>
+                  updateColumnApproveRule({
+                    approveRule: value?.value as 'one-of-contributors' | 'all-contributors',
+                    columnId: column?.id as string,
+                  }),
+                () => {
+                  toaster.create({
+                    title: 'Approve rules updated',
+                    type: 'success',
+                  });
+                }
               );
             }}
             options={[
@@ -375,6 +404,10 @@ function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
                     contributorsIds: column?.contributors?.map((c) => c.id),
                   }),
                 () => {
+                  toaster.create({
+                    title: 'Column deleted',
+                    type: 'success',
+                  });
                   onClose();
                 }
               );

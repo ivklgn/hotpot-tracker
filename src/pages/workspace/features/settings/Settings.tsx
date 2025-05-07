@@ -6,6 +6,7 @@ import { db } from '../../../../instantdb';
 import { useState } from 'react';
 import { useLocation } from 'wouter';
 import { runTransaction } from '../../../../core/instantdb-transaction';
+import { toaster } from '../../../../utils/toaster';
 
 export function Settings() {
   const { currentTeamId, setCurrentTeamId } = useAccount();
@@ -15,15 +16,28 @@ export function Settings() {
 
   const handleRenameTeam = ({ value: newName }: { value: string }) => {
     if (!newName) return;
-    runTransaction(() => renameTeam({ teamId: currentTeam?.teams?.[0]?.id as string, newName }));
+    runTransaction(
+      () => renameTeam({ teamId: currentTeam?.teams?.[0]?.id as string, newName }),
+      () => {
+        toaster.create({
+          title: 'Team renamed',
+          type: 'success',
+        });
+      }
+    );
   };
 
   const handleDeleteTeamClick = () => {
-    runTransaction(() =>
-      deleteTeam({ teamId: currentTeam?.teams?.[0]?.id as string }).then(() => {
+    runTransaction(
+      () => deleteTeam({ teamId: currentTeam?.teams?.[0]?.id as string }),
+      () => {
+        toaster.create({
+          title: 'Team deleted',
+          type: 'success',
+        });
         setCurrentTeamId(undefined);
         navigate('/workspace', { replace: true });
-      })
+      }
     );
   };
 

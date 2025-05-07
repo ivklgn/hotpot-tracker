@@ -77,6 +77,10 @@ export function CreateIssueDialog({ taskId, opener, onCreate }: IProps) {
         }),
       (newIssueId) => {
         if (editor) {
+          toaster.create({
+            title: 'Issue created',
+            type: 'success',
+          });
           editor.commands.setComment(newIssueId);
           handleSubmit();
           onCreate?.();
@@ -105,6 +109,10 @@ export function CreateIssueDialog({ taskId, opener, onCreate }: IProps) {
       () =>
         updateTaskContent({ taskId: params.taskId as string, newContent: JSON.stringify(editor.getJSON()) }),
       () => {
+        toaster.create({
+          title: 'Task saved',
+          type: 'success',
+        });
         handleClose();
         handleReset();
       }

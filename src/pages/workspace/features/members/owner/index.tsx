@@ -4,6 +4,7 @@ import { ConfirmAction } from '../../../../../components/ConfirmAction';
 import { db } from '../../../../../instantdb';
 import { useAccount } from '../../../../../features/account/AccountContext';
 import { runTransaction } from '../../../../../core/instantdb-transaction';
+import { toaster } from '../../../../../utils/toaster';
 
 export function OwnerMembers() {
   const { currentTeamId } = useAccount();
@@ -50,10 +51,17 @@ export function OwnerMembers() {
                     }
                     text="Are you sure you want to delete this user?"
                     onOk={() => {
-                      runTransaction(() =>
-                        deleteMembership({
-                          membershipId: member.id,
-                        })
+                      runTransaction(
+                        () =>
+                          deleteMembership({
+                            membershipId: member.id,
+                          }),
+                        () => {
+                          toaster.create({
+                            title: 'Team member deleted',
+                            type: 'success',
+                          });
+                        }
                       );
                     }}
                   />

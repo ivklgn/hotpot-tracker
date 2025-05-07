@@ -54,7 +54,12 @@ export const CreateTeamDialog: React.FC<CreateTeamDialogProps> = ({ opener, isOp
           userId: user?.id as string,
           creatorId: user?.id,
         }),
-      () => {},
+      () => {
+        toaster.create({
+          title: 'Team created',
+          type: 'success',
+        });
+      },
       (error) => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error

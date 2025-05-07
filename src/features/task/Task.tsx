@@ -53,7 +53,15 @@ export function Task({ task, board }: TaskProps) {
 
   const handleRenameBoard = ({ value: newTitle }: { value: string }) => {
     if (!newTitle || !task) return;
-    runTransaction(() => renameTask({ taskId: task.id, newTitle }));
+    runTransaction(
+      () => renameTask({ taskId: task.id, newTitle }),
+      () => {
+        toaster.create({
+          title: 'Task renamed',
+          type: 'success',
+        });
+      }
+    );
   };
 
   const handleUpdateContent = (newContent: JSONContent) => {
@@ -199,7 +207,15 @@ function DeleteTaskActions({ task }: { task?: InstaQLEntity<AppSchema, 'tasks'> 
         }
         text="Are you sure you want to archive this task?"
         onOk={() => {
-          runTransaction(() => archiveTask({ taskId: task.id }));
+          runTransaction(
+            () => archiveTask({ taskId: task.id }),
+            () => {
+              toaster.create({
+                title: 'Task archived',
+                type: 'success',
+              });
+            }
+          );
         }}
       />
     );
@@ -230,6 +246,10 @@ function DeleteTaskActions({ task }: { task?: InstaQLEntity<AppSchema, 'tasks'> 
         runTransaction(
           () => deleteTask({ taskId: task.id }),
           () => {
+            toaster.create({
+              title: 'Task deleted',
+              type: 'success',
+            });
             navigate('/boards');
           }
         );
