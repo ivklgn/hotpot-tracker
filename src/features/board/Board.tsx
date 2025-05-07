@@ -400,7 +400,7 @@ async function deleteBoard({ boardId }: { boardId: string }) {
 
 async function undoArchiveBoard({ boardId }: { boardId: string }) {
   return await db.transact([
-    db.tx.boards[boardId].update({ updatedAt: new Date().toJSON(), deletedAt: undefined }),
+    db.tx.boards[boardId].update({ updatedAt: new Date().toJSON(), deletedAt: null }),
   ]);
 }
 

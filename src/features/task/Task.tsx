@@ -279,9 +279,7 @@ async function deleteTask({ taskId }: { taskId: string }) {
 }
 
 async function undoArchiveTask({ taskId }: { taskId: string }) {
-  return await db.transact([
-    db.tx.tasks[taskId].update({ updatedAt: new Date().toJSON(), deletedAt: undefined }),
-  ]);
+  return await db.transact([db.tx.tasks[taskId].update({ updatedAt: new Date().toJSON(), deletedAt: null })]);
 }
 
 async function removeApprove({ approveId }: { approveId: string }) {
