@@ -18,9 +18,9 @@ const _schema = i.schema({
     memberships: i.entity({
       teamId: i.string(),
       userEmail: i.string(),
-      userId: i.string(),
-      creatorId: i.string(),
-      createdAt: i.date(),
+      userId: i.string().optional(), // TODO: required
+      creatorId: i.string().optional(), // TODO: required
+      createdAt: i.date().optional(), // TODO: required
       updatedAt: i.date(),
     }),
     teams: i.entity({
@@ -52,7 +52,7 @@ const _schema = i.schema({
       teamId: i.string(),
       creatorId: i.string(),
       createdAt: i.date().indexed(),
-      deletedAt: i.date().indexed(),
+      deletedAt: i.date().indexed().optional(), // TODO: required
       updatedAt: i.date(),
     }),
     smartParams: i.entity({
@@ -71,7 +71,7 @@ const _schema = i.schema({
       membershipId: i.string(),
       teamId: i.string(),
       creatorId: i.string(),
-      createdAt: i.date(),
+      createdAt: i.date().optional(), // TODO: required
       updatedAt: i.date(),
     }),
     approves: i.entity({

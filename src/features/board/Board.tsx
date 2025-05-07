@@ -355,7 +355,7 @@ function DeleteBoardActions({ board }: { board?: InstaQLEntity<AppSchema, 'board
           Move from archive
         </Button>
       }
-      text="Borad will return from archive"
+      text="Board will return from archive"
       onOk={() => {
         runTransaction(() => undoArchiveBoard({ boardId: board.id }));
       }}
