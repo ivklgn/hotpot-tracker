@@ -8,7 +8,7 @@ import { useLocation } from 'wouter';
 import { runTransaction } from '../../../../core/instantdb-transaction';
 import { toaster } from '../../../../utils/toaster';
 
-export function Settings() {
+export function OwnerSettings() {
   const { currentTeamId, setCurrentTeamId } = useAccount();
   const { data: currentTeam } = db.useQuery({ teams: { $: { where: { id: currentTeamId as string } } } });
   const [name, setName] = useState<string>(currentTeam?.teams?.[0]?.name || '');

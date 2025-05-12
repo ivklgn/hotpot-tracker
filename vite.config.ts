@@ -28,6 +28,6 @@ export default defineConfig({
   },
 
   build: {
-    sourcemap: 'hidden',
+    sourcemap: process.env.NODE_ENV === 'production' ? 'hidden' : true,
   },
 });

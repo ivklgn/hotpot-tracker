@@ -95,7 +95,7 @@ export default {
     allow: {
       view: 'isMember',
       create: `isCreator && size(data.ref('teams.memberships.id')) <= ${tariffLimits.free.max_members_per_team}`,
-      delete: 'isCreator',
+      delete: 'isInviteeOrCreator',
       update: 'isInvitee',
     },
   },
