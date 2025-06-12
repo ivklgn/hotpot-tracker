@@ -81,7 +81,7 @@ export const CreateTaskToColumnDialog: React.FC<CreateTaskToColumnDialogProps> =
           if (error.originalError?.hint?.expected === 'perms-pass?') {
             onClose?.();
             toaster.create({
-              title: `Maximum ${tariffLimits.free.max_columns_per_board} tasks allowed`,
+              title: `Maximum ${tariffLimits.free.max_columns_per_board} columns allowed`,
               type: 'error',
             });
           }

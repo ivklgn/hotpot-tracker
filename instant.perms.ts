@@ -38,7 +38,8 @@ export default {
     bind: ['isMember', "auth.id in data.ref('teams.memberships.userId')"],
     allow: {
       view: 'isMember',
-      create: `isMember && size(data.ref('boards.columns.id')) <= ${tariffLimits.free.max_columns_per_board}`,
+      create: 'isMember',
+      // create: `isMember && size(data.ref('boards.columns.id')) <= ${tariffLimits.free.max_columns_per_board}`,
       delete: 'isMember',
       update: 'isMember',
     },
