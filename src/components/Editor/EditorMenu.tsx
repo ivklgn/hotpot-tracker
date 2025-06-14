@@ -7,6 +7,7 @@ import {
   LuItalic,
   LuList,
   LuListOrdered,
+  LuMessageSquare,
   LuMessageSquareCode,
   LuRedo2,
   LuSave,
@@ -20,9 +21,10 @@ import { FontSizeSelector } from '@/components/Editor/FontSizeSelector.tsx';
 interface EditorMenuProps {
   originalContent: string;
   onSaveClick?: (value: JSONContent) => void;
+  onCreateCommentIssue?: () => void;
 }
 
-export function EditorMenu({ originalContent, onSaveClick }: EditorMenuProps) {
+export function EditorMenu({ originalContent, onSaveClick, onCreateCommentIssue }: EditorMenuProps) {
   const { editor } = useCurrentEditor();
 
   const handleSaveSubmit = () => {
@@ -44,36 +46,47 @@ export function EditorMenu({ originalContent, onSaveClick }: EditorMenuProps) {
       bg={{ _light: 'white', _dark: 'gray.800' }}
     >
       <Flex gap="2">
-        <EditorButton onClick={handleSaveSubmit} title="Save" colorPalette={isContentDirty ? 'teal' : 'gray'}>
-          <LuSave />
-        </EditorButton>
+        <Flex mr="4" gap="2">
+          <EditorButton
+            onClick={handleSaveSubmit}
+            title="Save"
+            colorPalette={isContentDirty ? 'teal' : 'gray'}
+          >
+            <LuSave />
+          </EditorButton>
+          <EditorButton onClick={onCreateCommentIssue} title="Issue">
+            <LuMessageSquare />
+          </EditorButton>
+        </Flex>
 
-        <EditorButton
-          onClick={() => editor.chain().focus().toggleBold().run()}
-          disabled={!editor.can().chain().focus().toggleBold().run()}
-          isActive={editor.isActive('bold')}
-          title="Bold"
-        >
-          <LuBold />
-        </EditorButton>
+        <Flex mr="4" gap="2">
+          <EditorButton
+            onClick={() => editor.chain().focus().toggleBold().run()}
+            disabled={!editor.can().chain().focus().toggleBold().run()}
+            isActive={editor.isActive('bold')}
+            title="Bold"
+          >
+            <LuBold />
+          </EditorButton>
 
-        <EditorButton
-          onClick={() => editor.chain().focus().toggleItalic().run()}
-          disabled={!editor.can().chain().focus().toggleItalic().run()}
-          isActive={editor.isActive('italic')}
-          title="Italic"
-        >
-          <LuItalic />
-        </EditorButton>
+          <EditorButton
+            onClick={() => editor.chain().focus().toggleItalic().run()}
+            disabled={!editor.can().chain().focus().toggleItalic().run()}
+            isActive={editor.isActive('italic')}
+            title="Italic"
+          >
+            <LuItalic />
+          </EditorButton>
 
-        <EditorButton
-          onClick={() => editor.chain().focus().toggleStrike().run()}
-          disabled={!editor.can().chain().focus().toggleStrike().run()}
-          isActive={editor.isActive('strike')}
-          title="Strike"
-        >
-          <LuStrikethrough />
-        </EditorButton>
+          <EditorButton
+            onClick={() => editor.chain().focus().toggleStrike().run()}
+            disabled={!editor.can().chain().focus().toggleStrike().run()}
+            isActive={editor.isActive('strike')}
+            title="Strike"
+          >
+            <LuStrikethrough />
+          </EditorButton>
+        </Flex>
 
         <EditorButton
           onClick={() => editor.chain().focus().toggleCode().run()}

@@ -167,7 +167,7 @@ export function CreateIssueDialog({ taskId, opener, onCreate }: IProps) {
   );
 }
 
-async function createNewIssue({
+export async function createNewIssue({
   taskId,
   content,
   creatorId,

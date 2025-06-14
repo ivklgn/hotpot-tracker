@@ -2,7 +2,7 @@ import { IConwayError } from 'conway-errors';
 import { errorContext } from './errors';
 import { toaster } from '@/utils/toaster';
 
-export const instantTransactionError = errorContext.feature('InstantTransactionError');
+export const instantTransactionError = errorContext.feature('InstantTransaction');
 
 /**
  * Runs a mutation and handles any error that occurs

@@ -25,6 +25,8 @@ import { runTransaction } from '../../core/instantdb-transaction';
 import tariffLimits from '../../../tariff-limits.json';
 import { Link as ChakraLink } from '@chakra-ui/react';
 import { toaster } from '@/utils/toaster';
+import { createNewIssue } from '../issue/CreateIssueDialog';
+import { useAccount } from '../account/AccountContext';
 
 const Editor = lazy(() =>
   import('@/components/Editor/Editor').then((module) => ({ default: module.Editor }))
@@ -50,6 +52,18 @@ export function Task({ task, board }: TaskProps) {
         }
       : null
   );
+  const { data: memberships } = db.useQuery({
+    memberships: {
+      $: {
+        where: {
+          userId: user?.id as string,
+        },
+        limit: 1,
+      },
+    },
+  });
+  const { currentTeamId } = useAccount();
+  const currentMembershipId = memberships?.memberships[0]?.id;
 
   const handleRenameBoard = ({ value: newTitle }: { value: string }) => {
     if (!newTitle || !task) return;
@@ -99,6 +113,35 @@ export function Task({ task, board }: TaskProps) {
     if (approveId) {
       removeApprove({ approveId });
     }
+  };
+
+  const handleCreateCommentIssue = () => {
+    runTransaction(
+      () =>
+        createNewIssue({
+          taskId: task?.id as string,
+          content: '',
+          creatorId: user?.id as string,
+          membershipId: currentMembershipId as string,
+          teamId: currentTeamId as string,
+        }),
+      () => {
+        toaster.create({
+          title: 'Issue created',
+          type: 'success',
+        });
+      },
+      (error) => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        if (error.originalError?.hint?.expected === 'perms-pass?') {
+          toaster.create({
+            title: `Maximum ${tariffLimits.free.max_issues_per_tasks} issues allowed`,
+            type: 'error',
+          });
+        }
+      }
+    );
   };
 
   if (!task) {
@@ -185,6 +228,7 @@ export function Task({ task, board }: TaskProps) {
           originalContent={task.content}
           onSaveClick={handleUpdateContent}
           onCreateIssue={handleCreateIssue}
+          onCreateCommentIssue={handleCreateCommentIssue}
         />
       </Suspense>
     </Box>

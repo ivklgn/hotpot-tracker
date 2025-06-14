@@ -23,6 +23,7 @@ export interface IEditorProps {
   originalContent: JSONString;
   onSaveClick(value: JSONContent): void;
   onCreateIssue?: () => void;
+  onCreateCommentIssue?: () => void;
 }
 
 const extensions = [
@@ -49,7 +50,7 @@ const extensions = [
   }),
 ];
 
-export function Editor({ originalContent, onSaveClick, onCreateIssue }: IEditorProps) {
+export function Editor({ originalContent, onSaveClick, onCreateIssue, onCreateCommentIssue }: IEditorProps) {
   const rootRef = useRef<HTMLDivElement>(null);
 
   const [rootHeight, setRootHeight] = useState('unset');
@@ -87,7 +88,11 @@ export function Editor({ originalContent, onSaveClick, onCreateIssue }: IEditorP
           flexGrow="1"
         >
           <Box position="sticky" top="0px" zIndex={10}>
-            <EditorMenu originalContent={originalContent} onSaveClick={onSaveClick} />
+            <EditorMenu
+              originalContent={originalContent}
+              onSaveClick={onSaveClick}
+              onCreateCommentIssue={onCreateCommentIssue}
+            />
           </Box>
 
           <Prose width="full" maxWidth="unset" fontSize="md" h="full">
