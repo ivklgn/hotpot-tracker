@@ -22,7 +22,7 @@ import './Editor.css';
 export interface IEditorProps {
   originalContent: JSONString;
   onSaveClick(value: JSONContent): void;
-  onCreateIssue?: () => void;
+  onCreateInlineIssue?: () => void;
   onCreateCommentIssue?: () => void;
 }
 
@@ -50,7 +50,12 @@ const extensions = [
   }),
 ];
 
-export function Editor({ originalContent, onSaveClick, onCreateIssue, onCreateCommentIssue }: IEditorProps) {
+export function Editor({
+  originalContent,
+  onSaveClick,
+  onCreateInlineIssue,
+  onCreateCommentIssue,
+}: IEditorProps) {
   const rootRef = useRef<HTMLDivElement>(null);
 
   const [rootHeight, setRootHeight] = useState('unset');
@@ -99,7 +104,7 @@ export function Editor({ originalContent, onSaveClick, onCreateIssue, onCreateCo
             <Flex direction="column" h="full">
               <Box h="full">
                 <EditorContent className="tiptap-content-area" editor={editor}>
-                  <TaskEditorMenu onCreateIssue={onCreateIssue} />
+                  <TaskEditorMenu onCreateInlineIssue={onCreateInlineIssue} />
                 </EditorContent>
               </Box>
             </Flex>
