@@ -81,7 +81,6 @@ export function CreateIssueDialog({ taskId, opener, visible = false, onCreate, o
       (newIssueId) => {
         if (editor) {
           editor.commands.setComment(newIssueId);
-          return;
         }
 
         toaster.create({
