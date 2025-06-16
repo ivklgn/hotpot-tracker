@@ -25,6 +25,7 @@ import { runTransaction } from '../../core/instantdb-transaction';
 import tariffLimits from '../../../tariff-limits.json';
 import { Link as ChakraLink } from '@chakra-ui/react';
 import { toaster } from '@/utils/toaster';
+import { CreateIssueDialog } from '../issue/CreateIssueDialog';
 
 const Editor = lazy(() =>
   import('@/components/Editor/Editor').then((module) => ({ default: module.Editor }))
@@ -50,6 +51,7 @@ export function Task({ task, board }: TaskProps) {
         }
       : null
   );
+  const [isCreateIssueVisible, setIsCreateIssueVisibility] = useState(false);
 
   const handleRenameBoard = ({ value: newTitle }: { value: string }) => {
     if (!newTitle || !task) return;
@@ -99,6 +101,10 @@ export function Task({ task, board }: TaskProps) {
     if (approveId) {
       removeApprove({ approveId });
     }
+  };
+
+  const handleCreateCommentIssue = () => {
+    setIsCreateIssueVisibility(true);
   };
 
   if (!task) {
@@ -184,9 +190,16 @@ export function Task({ task, board }: TaskProps) {
         <Editor
           originalContent={task.content}
           onSaveClick={handleUpdateContent}
-          onCreateIssue={handleCreateIssue}
+          onCreateInlineIssue={handleCreateIssue}
+          onCreateCommentIssue={handleCreateCommentIssue}
         />
       </Suspense>
+      <CreateIssueDialog
+        visible={isCreateIssueVisible}
+        taskId={task.id}
+        onCreate={handleCreateIssue}
+        onClose={() => setIsCreateIssueVisibility(false)}
+      />
     </Box>
   );
 }

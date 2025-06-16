@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog.tsx';
-import { cloneElement, ReactElement, useRef, useState } from 'react';
+import { cloneElement, ReactElement, useEffect, useRef, useState } from 'react';
 import { Field, HStack, Textarea } from '@chakra-ui/react';
 import { Button } from '@/components/ui/button.tsx';
 import { useCurrentEditor } from '@tiptap/react';
@@ -24,14 +24,16 @@ import { toaster } from '@/utils/toaster';
 
 interface IProps {
   taskId: string;
-  opener: ReactElement;
+  opener?: ReactElement;
+  visible?: boolean;
   onCreate?: () => void;
+  onClose?: () => void;
 }
 
-export function CreateIssueDialog({ taskId, opener, onCreate }: IProps) {
+export function CreateIssueDialog({ taskId, opener, visible = false, onCreate, onClose }: IProps) {
   const openerRef = useRef(null);
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(visible);
   const [content, setContent] = useState('');
 
   const { editor } = useCurrentEditor();
@@ -59,6 +61,7 @@ export function CreateIssueDialog({ taskId, opener, onCreate }: IProps) {
 
   const handleClose = () => {
     setIsOpen(false);
+    onClose?.();
   };
 
   const handleSaveIssue = () => {
@@ -77,15 +80,17 @@ export function CreateIssueDialog({ taskId, opener, onCreate }: IProps) {
         }),
       (newIssueId) => {
         if (editor) {
-          toaster.create({
-            title: 'Issue created',
-            type: 'success',
-          });
           editor.commands.setComment(newIssueId);
-          handleSubmit();
-          onCreate?.();
           return;
         }
+
+        toaster.create({
+          title: 'Issue created',
+          type: 'success',
+        });
+        handleSubmit();
+        onCreate?.();
+        onClose?.();
       },
       (error) => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -109,25 +114,26 @@ export function CreateIssueDialog({ taskId, opener, onCreate }: IProps) {
       () =>
         updateTaskContent({ taskId: params.taskId as string, newContent: JSON.stringify(editor.getJSON()) }),
       () => {
-        toaster.create({
-          title: 'Task saved',
-          type: 'success',
-        });
         handleClose();
         handleReset();
       }
     );
   };
 
+  useEffect(() => {
+    setIsOpen(visible);
+  }, [visible]);
+
   return (
     <DialogRoot initialFocusEl={() => openerRef.current} open={isOpen} size="lg">
       <DialogTrigger>
-        {cloneElement(opener, {
-          openerRef,
-          onClick() {
-            setIsOpen((prev) => !prev);
-          },
-        })}
+        {opener &&
+          cloneElement(opener, {
+            openerRef,
+            onClick() {
+              setIsOpen((prev) => !prev);
+            },
+          })}
       </DialogTrigger>
 
       <DialogContent>
@@ -167,7 +173,7 @@ export function CreateIssueDialog({ taskId, opener, onCreate }: IProps) {
   );
 }
 
-async function createNewIssue({
+export async function createNewIssue({
   taskId,
   content,
   creatorId,
