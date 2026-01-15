@@ -18,9 +18,9 @@ const _schema = i.schema({
     memberships: i.entity({
       teamId: i.string(),
       userEmail: i.string(),
-      userId: i.string().optional(), // TODO: required
-      creatorId: i.string().optional(), // TODO: required
-      createdAt: i.date().optional(), // TODO: required
+      userId: i.string().optional(),
+      creatorId: i.string().optional(),
+      createdAt: i.date().optional(),
       updatedAt: i.date().optional(),
     }),
     teams: i.entity({
@@ -71,7 +71,7 @@ const _schema = i.schema({
       membershipId: i.string(),
       teamId: i.string(),
       creatorId: i.string().optional(),
-      createdAt: i.date().optional(), // TODO: required
+      createdAt: i.date(),
       updatedAt: i.date().optional(),
     }),
     approves: i.entity({
@@ -169,7 +169,7 @@ const _schema = i.schema({
         on: 'events',
         has: 'one',
         label: 'memberships',
-        ondelete: 'cascade',
+        onDelete: 'cascade',
       },
       reverse: {
         on: 'memberships',

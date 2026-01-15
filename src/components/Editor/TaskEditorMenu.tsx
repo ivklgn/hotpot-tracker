@@ -1,4 +1,5 @@
-import { BubbleMenu, useCurrentEditor } from '@tiptap/react';
+import { BubbleMenu } from '@tiptap/react/menus';
+import { useCurrentEditor } from '@tiptap/react';
 import { LuBold, LuItalic, LuListPlus, LuStrikethrough } from 'react-icons/lu';
 import { EditorButton } from '@/components/Editor/EditorButton.tsx';
 import { Box, Flex, Separator } from '@chakra-ui/react';
@@ -21,7 +22,7 @@ export function TaskEditorMenu({ onCreateInlineIssue }: TaskEditorMenu) {
   }
 
   return (
-    <BubbleMenu className="bubble-menu" tippyOptions={{ duration: 100 }} editor={editor}>
+    <BubbleMenu editor={editor}>
       <Box boxShadow="sm" bg="bg.muted" py="2" px="3" rounded="md">
         <Flex>
           <Flex gap="1.5" mr="3">

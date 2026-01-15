@@ -23,6 +23,10 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       '@typescript-eslint/no-empty-object-type': ['off'],
+      // Enable React Compiler rules for better optimization
+      'react-hooks/preserve-manual-memoization': 'warn', // Changed from 'off'
+      'react-hooks/refs': 'warn', // Changed from 'off'
+      'react-hooks/set-state-in-effect': 'error', // Changed from 'off'
     },
   }
 );

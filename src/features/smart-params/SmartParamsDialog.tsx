@@ -23,6 +23,7 @@ import { isJSON } from '../../utils/json';
 import { runTransaction } from '../../core/instantdb-transaction';
 import tariffLimits from '../../../tariff-limits.json';
 import { toaster } from '@/utils/toaster';
+import { isInstantDBPermissionError } from '../../core/instantdb-errors';
 
 const SMART_PARAMS_TYPES = [
   {
@@ -54,7 +55,7 @@ interface EditableSmartParam extends Pick<SmartParam, 'id' | 'name' | 'type' | '
 }
 
 interface BaseProps {
-  opener: React.ReactElement;
+  opener: React.ReactElement<{ ref?: React.Ref<HTMLInputElement> }>;
   smartParams: InstaQLResult<AppSchema, { smartParams: {} }>['smartParams'];
   boardId?: string;
   taskId?: string;
@@ -85,6 +86,7 @@ export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTask
   const ref = useRef<HTMLInputElement>(null);
   const { currentTeamId } = useAccount();
   const contentRef = useRef<HTMLDivElement>(null);
+  const prevIsOpenRef = useRef(isOpen);
   const { user } = db.useAuth();
   const { data: memberships } = db.useQuery({
     memberships: {
@@ -125,9 +127,7 @@ export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTask
           ),
         () => {},
         (error) => {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-expect-error
-          if (error.originalError?.hint?.expected === 'perms-pass?') {
+          if (isInstantDBPermissionError(error)) {
             toaster.create({
               title: `Maximum ${tariffLimits.free.max_smart_params} smart params allowed for ${type}`,
               type: 'error',
@@ -181,24 +181,33 @@ export const SmartParamsDialog: React.FC<SmartParamsBoardProps | SmartParamsTask
     );
   };
 
+  // Only sync smartParams when dialog opens, not on every change
+  // Using queueMicrotask makes setState async, preventing cascading renders
   useEffect(() => {
-    if (smartParams) {
-      setEditedParams(() =>
-        smartParams.map((param) => ({
-          id: param.id,
-          name: param.name,
-          type: param.type,
-          value: param.value,
-          isNew: false,
-          creatorId: user?.id as string,
-        }))
-      );
+    const wasClosedNowOpen = !prevIsOpenRef.current && isOpen;
+    prevIsOpenRef.current = isOpen;
+
+    if (wasClosedNowOpen && smartParams) {
+      queueMicrotask(() => {
+        setEditedParams(() =>
+          smartParams.map((param) => ({
+            id: param.id,
+            name: param.name,
+            type: param.type,
+            value: param.value,
+            isNew: false,
+            creatorId: user?.id as string,
+          }))
+        );
+      });
     }
-  }, [smartParams, user?.id]);
+  }, [isOpen, smartParams, user?.id]);
 
   useEffect(() => {
     if (!isOpen) {
-      setEditedParams((prev) => prev.filter((param) => !param.isNew));
+      queueMicrotask(() => {
+        setEditedParams((prev) => prev.filter((param) => !param.isNew));
+      });
     }
   }, [isOpen]);
 
@@ -411,52 +420,45 @@ function isTaskSmartParams(
 
 async function createSmartParams(params: CreateBoardSmartParams | CreateTaskSmartParams) {
   const ids: string[] = [];
-  for (const sp of params.smartParams) {
+  const transactions = params.smartParams.flatMap((sp) => {
     const newSmartParam = id();
-    await db
-      .transact([
-        db.tx.smartParams[newSmartParam]
-          .update({
-            updatedAt: new Date().toJSON(),
-            name: sp.name,
-            type: sp.type,
-            value: sp.value,
-            boardId: isBoardSmartParams(params) ? params.boardId : undefined,
-            taskId: isTaskSmartParams(params) ? params.taskId : undefined,
-            teamId: params.teamId,
-            createdAt: new Date().toJSON(),
-            creatorId: params.creatorId,
-          })
-          .link({ teams: params.teamId }),
-        params.type === 'board'
-          ? db.tx.smartParams[newSmartParam].link({ boards: params.boardId })
-          : db.tx.smartParams[newSmartParam].link({ tasks: params.taskId }),
-      ])
-      .then(() => {
-        ids.push(newSmartParam);
-      });
-  }
+    ids.push(newSmartParam);
 
-  return ids;
-}
-
-async function updateSmartParams({ smartParams }: { smartParams: EditableSmartParam[] }) {
-  const ids: string[] = [];
-  for (const sp of smartParams) {
-    const newSmartParam = id();
-    await db
-      .transact([
-        db.tx.smartParams[sp.id].merge({
+    return [
+      db.tx.smartParams[newSmartParam]
+        .update({
           updatedAt: new Date().toJSON(),
           name: sp.name,
           type: sp.type,
           value: sp.value,
-        }),
-      ])
-      .then(() => {
-        ids.push(newSmartParam);
-      });
-  }
+          boardId: isBoardSmartParams(params) ? params.boardId : undefined,
+          taskId: isTaskSmartParams(params) ? params.taskId : undefined,
+          teamId: params.teamId,
+          createdAt: new Date().toJSON(),
+          creatorId: params.creatorId,
+        })
+        .link({ teams: params.teamId }),
+      params.type === 'board'
+        ? db.tx.smartParams[newSmartParam].link({ boards: params.boardId })
+        : db.tx.smartParams[newSmartParam].link({ tasks: params.taskId }),
+    ];
+  });
 
+  await db.transact(transactions);
+  return ids;
+}
+
+async function updateSmartParams({ smartParams }: { smartParams: EditableSmartParam[] }) {
+  const ids = smartParams.map((sp) => sp.id);
+  const transactions = smartParams.map((sp) =>
+    db.tx.smartParams[sp.id].merge({
+      updatedAt: new Date().toJSON(),
+      name: sp.name,
+      type: sp.type,
+      value: sp.value,
+    })
+  );
+
+  await db.transact(transactions);
   return ids;
 }

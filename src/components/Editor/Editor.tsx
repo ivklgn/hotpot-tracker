@@ -1,7 +1,7 @@
 import { Box, Flex } from '@chakra-ui/react';
 import { Color } from '@tiptap/extension-color';
-import TextStyle from '@tiptap/extension-text-style';
-import ListItem from '@tiptap/extension-list-item';
+import { TextStyle } from '@tiptap/extension-text-style';
+import { ListItem } from '@tiptap/extension-list-item';
 import StarterKit from '@tiptap/starter-kit';
 import { EditorContent, EditorContext, JSONContent, useEditor } from '@tiptap/react';
 import { EditorMenu } from '@/components/Editor/EditorMenu.tsx';

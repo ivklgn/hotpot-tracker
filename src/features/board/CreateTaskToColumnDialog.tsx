@@ -23,11 +23,12 @@ import { useDebounce } from '../../hooks/useDebounce';
 import tariffLimits from '../../../tariff-limits.json';
 import { toaster } from '@/utils/toaster';
 import { useLocation } from 'wouter';
+import { isInstantDBPermissionError } from '../../core/instantdb-errors';
 
 interface CreateTaskToColumnDialogProps {
   columnId: string;
   boardId: string;
-  opener?: React.ReactElement;
+  opener?: React.ReactElement<{ ref?: React.Ref<HTMLInputElement> }>;
   isOpen?: boolean;
   onClose?: () => void;
 }
@@ -76,9 +77,7 @@ export const CreateTaskToColumnDialog: React.FC<CreateTaskToColumnDialogProps> =
           onClose?.();
         },
         (error) => {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-expect-error
-          if (error.originalError?.hint?.expected === 'perms-pass?') {
+          if (isInstantDBPermissionError(error)) {
             onClose?.();
             toaster.create({
               title: `Maximum ${tariffLimits.free.max_tasks_per_team} tasks allowed`,

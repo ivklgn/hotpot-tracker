@@ -9,6 +9,7 @@ import { Reply } from '@/features/issue/Reply.tsx';
 import { useAccount } from '@/features/account/AccountContext.tsx';
 import { AppSchema } from '../../../instant.schema';
 import { toaster } from '@/utils/toaster';
+import { isInstantDBPermissionError } from '../../core/instantdb-errors';
 
 interface IProps {
   issueId: string;
@@ -46,9 +47,7 @@ export const IssueReplies = ({ issueId, fieldRef, replies }: IProps) => {
         setReplyContent('');
       },
       (error) => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        if (error.originalError?.hint?.expected === 'perms-pass?') {
+        if (isInstantDBPermissionError(error)) {
           toaster.create({
             title: `Maximum ${tariffLimits.free.max_replies_per_issue} replies allowed`,
             type: 'error',

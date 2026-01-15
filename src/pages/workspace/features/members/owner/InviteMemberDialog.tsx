@@ -19,9 +19,10 @@ import { id } from '@instantdb/react';
 import { runTransaction } from '../../../../../core/instantdb-transaction';
 import tariffLimits from '../../../../../../tariff-limits.json';
 import { toaster } from '@/utils/toaster';
+import { isInstantDBPermissionError } from '../../../../../core/instantdb-errors';
 
 interface CreateTeamDialogProps {
-  opener: React.ReactElement;
+  opener: React.ReactElement<{ ref?: React.Ref<HTMLInputElement>; onClick?: () => void }>;
 }
 
 export const InviteMemberDialog: React.FC<CreateTeamDialogProps> = ({ opener }) => {
@@ -66,9 +67,7 @@ export const InviteMemberDialog: React.FC<CreateTeamDialogProps> = ({ opener }) 
         });
       },
       (error) => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        if (error.originalError?.hint?.expected === 'perms-pass?') {
+        if (isInstantDBPermissionError(error)) {
           toaster.create({
             title: `Maximum ${tariffLimits.free.max_members_per_team} per team allowed`,
             type: 'error',

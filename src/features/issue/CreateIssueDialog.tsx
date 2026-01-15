@@ -21,10 +21,11 @@ import { useParams } from 'wouter';
 import tariffLimits from '../../../tariff-limits.json';
 import { useAccount } from '../account/AccountContext';
 import { toaster } from '@/utils/toaster';
+import { isInstantDBPermissionError } from '../../core/instantdb-errors';
 
 interface IProps {
   taskId: string;
-  opener?: ReactElement;
+  opener?: ReactElement<{ ref?: React.Ref<HTMLElement>; onClick?: () => void }>;
   visible?: boolean;
   onCreate?: () => void;
   onClose?: () => void;
@@ -92,9 +93,7 @@ export function CreateIssueDialog({ taskId, opener, visible = false, onCreate, o
         onClose?.();
       },
       (error) => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        if (error.originalError?.hint?.expected === 'perms-pass?') {
+        if (isInstantDBPermissionError(error)) {
           toaster.create({
             title: `Maximum ${tariffLimits.free.max_issues_per_tasks} issues allowed`,
             type: 'error',
@@ -128,7 +127,7 @@ export function CreateIssueDialog({ taskId, opener, visible = false, onCreate, o
       <DialogTrigger>
         {opener &&
           cloneElement(opener, {
-            openerRef,
+            ref: openerRef,
             onClick() {
               setIsOpen((prev) => !prev);
             },

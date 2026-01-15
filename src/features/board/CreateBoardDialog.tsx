@@ -20,9 +20,10 @@ import { useLocation } from 'wouter';
 import { runTransaction } from '../../core/instantdb-transaction';
 import tariffLimits from '../../../tariff-limits.json';
 import { toaster } from '@/utils/toaster';
+import { isInstantDBPermissionError } from '../../core/instantdb-errors';
 
 interface CreateTeamDialogProps {
-  opener: React.ReactElement;
+  opener: React.ReactElement<{ ref?: React.Ref<HTMLInputElement>; onClick?: () => void }>;
 }
 
 export const CreateBoardDialog: React.FC<CreateTeamDialogProps> = ({ opener }) => {
@@ -47,9 +48,7 @@ export const CreateBoardDialog: React.FC<CreateTeamDialogProps> = ({ opener }) =
         navigate(`/board/${result}`);
       },
       (error) => {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
-        if (error.originalError?.hint?.expected === 'perms-pass?') {
+        if (isInstantDBPermissionError(error)) {
           toaster.create({
             title: `Maximum ${tariffLimits.free.max_boards_per_team} boards allowed`,
             type: 'error',

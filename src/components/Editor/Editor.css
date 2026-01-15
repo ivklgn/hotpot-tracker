@@ -77,21 +77,21 @@
 /*}*/
 
 .tiptap {
-    outline: none;
+  outline: none;
 }
 
 .tiptap .issue {
-    text-decoration-line: underline;
-    text-decoration-style: dashed;
-    text-decoration-color: var(--chakra-colors-yellow-300);
-    text-decoration-thickness: 2px;
-    transition: all .2s cubic-bezier(.65,.05,.36,1);
+  text-decoration-line: underline;
+  text-decoration-style: dashed;
+  text-decoration-color: var(--chakra-colors-yellow-300);
+  text-decoration-thickness: 2px;
+  transition: all 0.2s cubic-bezier(0.65, 0.05, 0.36, 1);
 }
 
 .tiptap .issue:hover {
-    background-color: var(--chakra-colors-yellow-200);
+  background-color: var(--chakra-colors-yellow-200);
 }
 
 .tiptap-content-area {
-    height: 100%;
+  height: 100%;
 }

@@ -6,7 +6,15 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
-    react(),
+    react({
+      babel: {
+        plugins: [
+          ['babel-plugin-react-compiler', {
+            compilationMode: 'infer', // Start with safe 'infer' mode
+          }],
+        ],
+      },
+    }),
     tsconfigPaths(),
     sentryVitePlugin({
       org: 'hotpot-mp',

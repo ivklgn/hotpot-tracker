@@ -11,7 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { Field } from '@/components/ui/field';
 import { CreatableSelect, Select } from 'chakra-react-select';
-import { useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { LuX, LuPencil, LuPlus, LuShieldCheck, LuShieldQuestion } from 'react-icons/lu';
 import { db } from '../../instantdb';
 import { id, InstaQLEntity, InstaQLResult } from '@instantdb/react';
@@ -113,6 +113,8 @@ interface ColumnTasksProps {
 }
 
 function ColumnTasks({ column, onDragTask }: ColumnTasksProps) {
+  const ref = useRef<HTMLDivElement>(null);
+
   const [, taskDrop] = useDrop({
     accept: 'task',
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -122,12 +124,23 @@ function ColumnTasks({ column, onDragTask }: ColumnTasksProps) {
     },
   });
 
+  // Apply the drop ref using callback
+  const setRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      taskDrop(node);
+      if (ref.current !== node) {
+        (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+      }
+    },
+    [taskDrop]
+  );
+
   if (!column?.tasks) {
     return null;
   }
 
   return (
-    <Flex direction="column" p="2" gap="2" height="440px" overflowY="scroll" ref={taskDrop}>
+    <Flex direction="column" p="2" gap="2" height="440px" overflowY="scroll" ref={setRef}>
       {column?.tasks.map((task) => (
         <ColumnTask
           key={task.id}
@@ -155,8 +168,8 @@ function ColumnTask({ task, columnApproveRule, columnContributors }: ColumnTaskP
     }),
   });
 
-  // simplified version
-  const approved = useMemo(() => {
+  // simplified version - React Compiler will auto-memoize this
+  const getApproved = () => {
     if (!columnApproveRule || !task?.approves || columnContributors?.length === 0) return undefined;
 
     const approvedContributors = new Set(task.approves.map((a) => a.contributorId));
@@ -170,18 +183,21 @@ function ColumnTask({ task, columnApproveRule, columnContributors }: ColumnTaskP
     }
 
     return undefined;
-  }, [columnApproveRule, columnContributors, task?.approves]);
+  };
+  const approved = getApproved();
+
+  // Callback ref for drag
+  const setDragRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (approved === undefined || approved) {
+        drag(node);
+      }
+    },
+    [approved, drag]
+  );
 
   return (
-    <Box
-      bg="bg"
-      shadow="md"
-      borderRadius="md"
-      mb="2"
-      p="2"
-      key={task.id}
-      ref={approved === undefined || approved ? drag : undefined}
-    >
+    <Box bg="bg" shadow="md" borderRadius="md" mb="2" p="2" key={task.id} ref={setDragRef}>
       <Box>
         <ChakraLink
           asChild
@@ -326,7 +342,7 @@ function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
                   updateContributors({
                     userMemberships: changedContributors.map((v) => ({
                       userId: v.value as string,
-                      membershipId: memberships?.memberships.find((m) => m.userId === v.value)?.id as string,
+                      membershipId: memberships?.memberships?.find((m) => m.userId === v.value)?.id as string,
                     })),
                     columnId: column?.id as string,
                     teamId: currentTeamId as string,
@@ -340,7 +356,7 @@ function ColumnEdit({ column, onSubmit, onClose }: ColumnEditProps) {
                 }
               );
             }}
-            options={memberships?.memberships.map((member) => ({
+            options={memberships?.memberships?.map((member) => ({
               value: member.userId,
               label: member.userEmail,
             }))}
@@ -492,7 +508,16 @@ export function Column({ column, onDrag, onDragTask }: ColumnProps) {
     }),
   });
 
-  drag(columnDrop(ref));
+  // Callback ref to combine drag and drop
+  const setRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      drag(columnDrop(node));
+      if (ref.current !== node) {
+        (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+      }
+    },
+    [drag, columnDrop]
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -512,7 +537,7 @@ export function Column({ column, onDrag, onDragTask }: ColumnProps) {
       scrollBehavior="smooth"
       pb={4}
       key={column?.id}
-      ref={ref}
+      ref={setRef}
     >
       <ColumnHeader
         column={column}
@@ -607,6 +632,7 @@ async function updateContributors({
       db.tx.contributors[contributorId]
         .update({
           updatedAt: new Date().toJSON(),
+          createdAt: new Date().toJSON(),
           membershipId: mb.membershipId,
           columnId,
           teamId,

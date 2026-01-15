@@ -5,6 +5,7 @@ import { db } from '../../instantdb';
 import { useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Toaster } from '../../components/ui/toaster';
+import { ConnectionStatus } from '../../components/ConnectionStatus';
 
 import s from './AccountLayout.module.css';
 
@@ -29,6 +30,7 @@ export function AccountLayout({ children }: AccountLayoutProps) {
 
   return (
     <AccountContext.Provider value={{ currentTeamId, setCurrentTeamId }}>
+      <ConnectionStatus />
       <Flex direction="column" minH="100vh" className={s.accountLayout}>
         {children}
       </Flex>

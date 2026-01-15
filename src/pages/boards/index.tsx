@@ -50,8 +50,6 @@ export function BoardsPage() {
       smartParams: {},
       $: {
         where: {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-expect-error
           creatorId: boardFilter === 'my' ? (user?.id as string) : undefined,
           teamId: currentTeamId as string,
           deletedAt: {
@@ -86,9 +84,6 @@ export function BoardsPage() {
       </Stack>
       {boards?.boards &&
         boards?.boards?.length > 0 &&
-        // TODO: creatorId affect =\
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         boards?.boards?.map((board) => <Board board={board} key={board.id} mode="view" />)}
       {boards?.boards && boards?.boards?.length === 0 && (
         <EmptyState.Root>
@@ -98,7 +93,7 @@ export function BoardsPage() {
             </EmptyState.Indicator>
             <VStack textAlign="center">
               <EmptyState.Title>No boards</EmptyState.Title>
-              <EmptyState.Description>Click create button to get started 🚀</EmptyState.Description>
+              <EmptyState.Description>Click create button to get started</EmptyState.Description>
             </VStack>
             <ButtonGroup>
               <CreateBoardDialog opener={<Button size="xs">Create board</Button>} />

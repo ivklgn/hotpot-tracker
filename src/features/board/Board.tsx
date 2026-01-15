@@ -22,10 +22,10 @@ import { CreateBoardDialog } from './CreateBoardDialog';
 import { AppSchema } from '../../../instant.schema';
 import { SmartParams } from '../smart-params';
 import { runTransaction } from '../../core/instantdb-transaction';
-import { createEvent } from '../events';
 import tariffLimits from '../../../tariff-limits.json';
 import { AIReport } from '../ai/AIReport';
 import { toaster } from '@/utils/toaster';
+import { isInstantDBPermissionError } from '../../core/instantdb-errors';
 
 type BoardViewMode = 'view' | 'edit';
 
@@ -59,30 +59,39 @@ export function Board({ board, mode = 'view' }: BoardProps) {
     targetColumn: ColumnType,
     currentColumnId?: string
   ) => {
-    runTransaction(() => changeTaskColumn({ taskId: task.id, columnId: targetColumn.id }));
-    runTransaction(() => changeTaskBoard({ taskId: task.id, boardId: targetColumn.boardId }));
-
-    if (targetColumn.contributors && targetColumn.contributors.length > 0) {
-      targetColumn.contributors.forEach((contributor) => {
-        runTransaction(() =>
-          createEvent({
-            type: 'review-task',
-            payload: { taskId: task.id, taskTitle: task.title },
-            teamId: currentTeamId as string,
-            membershipId: contributor.membershipId,
-          })
-        );
-      });
-    }
-
     const taskApprovesFromCurrentColumn = board?.columns
       ?.find((c) => c.id === currentColumnId)
       ?.tasks.find((t) => t.id === task.id)
       ?.approves.map((a) => a.id);
 
-    if (taskApprovesFromCurrentColumn?.length) {
-      runTransaction(() => removeApproves({ approvesIds: taskApprovesFromCurrentColumn }));
-    }
+    runTransaction(async () => {
+      const transactions: ReturnType<typeof buildChangeTaskColumnTxs | typeof buildChangeTaskBoardTxs | typeof buildCreateEventTxs | typeof buildRemoveApprovesTxs>[number][] = [
+        // Change task column and board
+        ...buildChangeTaskColumnTxs({ taskId: task.id, columnId: targetColumn.id }),
+        ...buildChangeTaskBoardTxs({ taskId: task.id, boardId: targetColumn.boardId }),
+      ];
+
+      // Create events for contributors
+      if (targetColumn.contributors && targetColumn.contributors.length > 0) {
+        targetColumn.contributors.forEach((contributor) => {
+          transactions.push(
+            ...buildCreateEventTxs({
+              type: 'review-task',
+              payload: { taskId: task.id, taskTitle: task.title },
+              teamId: currentTeamId as string,
+              membershipId: contributor.membershipId,
+            })
+          );
+        });
+      }
+
+      // Remove approves from previous column
+      if (taskApprovesFromCurrentColumn?.length) {
+        transactions.push(...buildRemoveApprovesTxs({ approvesIds: taskApprovesFromCurrentColumn }));
+      }
+
+      return await db.transact(transactions);
+    });
   };
 
   const handleDragColumn = ({
@@ -294,9 +303,7 @@ function BoardHeader({ board, mode, columns }: BoardHeaderProps) {
                   });
                 },
                 (error) => {
-                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                  // @ts-expect-error
-                  if (error.originalError?.hint?.expected === 'perms-pass?') {
+                  if (isInstantDBPermissionError(error)) {
                     toaster.create({
                       title: `Maximum ${tariffLimits.free.max_columns_per_board} columns allowed`,
                       type: 'error',
@@ -384,10 +391,6 @@ function DeleteBoardActions({ board }: { board?: InstaQLEntity<AppSchema, 'board
   ];
 }
 
-async function removeApproves({ approvesIds }: { approvesIds: string[] }) {
-  return await db.transact(approvesIds.map((ai) => db.tx.approves[ai].delete()));
-}
-
 async function archiveBoard({ boardId }: { boardId: string }) {
   return await db.transact([
     db.tx.boards[boardId].update({ updatedAt: new Date().toJSON(), deletedAt: new Date().toJSON() }),
@@ -408,19 +411,6 @@ async function renameBoard({ newName, boardId }: { boardId: string; newName: str
   return await db.transact([db.tx.boards[boardId].merge({ updatedAt: new Date().toJSON(), name: newName })]);
 }
 
-async function changeTaskColumn({ taskId, columnId }: { taskId: string; columnId: string }) {
-  return await db.transact([
-    db.tx.tasks[taskId].merge({ updatedAt: new Date().toJSON(), columnId }),
-    db.tx.tasks[taskId].link({ columns: columnId }),
-  ]);
-}
-
-async function changeTaskBoard({ taskId, boardId }: { taskId: string; boardId: string }) {
-  return await db.transact(
-    db.tx.tasks[taskId].merge({ updatedAt: new Date().toJSON(), boardId }).link({ boards: boardId })
-  );
-}
-
 async function changeColumnPosition({
   from,
   to,
@@ -432,4 +422,49 @@ async function changeColumnPosition({
     db.tx.columns[from.columnId].merge({ updatedAt: new Date().toJSON(), position: from.position }),
     db.tx.columns[to.columnId].merge({ updatedAt: new Date().toJSON(), position: to.position }),
   ]);
+}
+
+// Transaction builder functions (return transaction arrays without executing)
+function buildChangeTaskColumnTxs({ taskId, columnId }: { taskId: string; columnId: string }) {
+  return [
+    db.tx.tasks[taskId].merge({ updatedAt: new Date().toJSON(), columnId }),
+    db.tx.tasks[taskId].link({ columns: columnId }),
+  ];
+}
+
+function buildChangeTaskBoardTxs({ taskId, boardId }: { taskId: string; boardId: string }) {
+  return [
+    db.tx.tasks[taskId].merge({ updatedAt: new Date().toJSON(), boardId }),
+    db.tx.tasks[taskId].link({ boards: boardId }),
+  ];
+}
+
+function buildCreateEventTxs({
+  type,
+  payload,
+  teamId,
+  membershipId,
+}: {
+  type: string;
+  payload?: Record<string, string>;
+  teamId: string;
+  membershipId: string;
+}) {
+  const eventId = id();
+  return [
+    db.tx.events[eventId].update({
+      updatedAt: new Date().toJSON(),
+      type,
+      payload,
+      teamId,
+      membershipId,
+      createdAt: new Date().toJSON(),
+    }),
+    db.tx.events[eventId].link({ teams: teamId }),
+    db.tx.memberships[membershipId].link({ events: eventId }),
+  ];
+}
+
+function buildRemoveApprovesTxs({ approvesIds }: { approvesIds: string[] }) {
+  return approvesIds.map((ai) => db.tx.approves[ai].delete());
 }
