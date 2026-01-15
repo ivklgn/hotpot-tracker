@@ -134,7 +134,7 @@ export function SearchPage() {
                             </Badge>
                           )}
                           {task.columns ? (
-                            [
+                            <>
                               <ChakraLink
                                 href={`/board/${task.columns.boardId}`}
                                 colorPalette="teal"
@@ -143,12 +143,12 @@ export function SearchPage() {
                                 target="_blank"
                               >
                                 Go to board
-                              </ChakraLink>,
-                              <Separator orientation="vertical" height="4" />,
+                              </ChakraLink>
+                              <Separator orientation="vertical" height="4" />
                               <Text textStyle="xs">
                                 Column: <strong>{task.columns.statuses?.name}</strong>
-                              </Text>,
-                            ]
+                              </Text>
+                            </>
                           ) : (
                             <Text textStyle="xs">No board & column</Text>
                           )}

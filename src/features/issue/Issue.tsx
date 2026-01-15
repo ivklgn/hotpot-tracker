@@ -1,7 +1,7 @@
 import { Box, Editable, Em, Flex, IconButton } from '@chakra-ui/react';
 import { Text } from '@chakra-ui/react';
 import { Button } from '@/components/ui/button.tsx';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { timeAgo } from '@/utils/dates.ts';
 import { LuBadgeCheck, LuCheck, LuX } from 'react-icons/lu';
 import { runTransaction } from '@/core/instantdb-transaction.ts';
@@ -27,17 +27,26 @@ interface IIssueProps {
 
 export const Issue = ({ id, creatorId, userEmail, date, content, replies, onApprove }: IIssueProps) => {
   const replyFieldRef = useRef<HTMLTextAreaElement>(null);
+  const rafIdRef = useRef<number | null>(null);
   const [issueContent, setIssueContent] = useState(content);
   const { user } = db.useAuth();
 
   const isCreator = creatorId === user?.id;
+
+  useEffect(() => {
+    return () => {
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current);
+      }
+    };
+  }, []);
 
   const handleClick = () => {
     document.querySelectorAll('.highlight')?.forEach((el) => {
       el.classList.remove('highlight');
     });
 
-    requestAnimationFrame(() => {
+    rafIdRef.current = requestAnimationFrame(() => {
       const elementToHighlight = document.querySelector(`span[data-comment-id="${id}"]`);
 
       if (elementToHighlight) {

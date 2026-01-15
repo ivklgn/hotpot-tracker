@@ -9,9 +9,9 @@ import {
 import { useState } from 'react';
 
 interface ConfirmActionProps {
-  opener: React.ReactElement;
-  text: string;
-  onOk: () => void;
+  readonly opener: React.ReactElement;
+  readonly text: string;
+  readonly onOk: () => void;
 }
 
 export const ConfirmAction: React.FC<ConfirmActionProps> = ({ opener, text, onOk }) => {

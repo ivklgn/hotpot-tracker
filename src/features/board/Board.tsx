@@ -26,12 +26,13 @@ import tariffLimits from '../../../tariff-limits.json';
 import { AIReport } from '../ai/AIReport';
 import { toaster } from '@/utils/toaster';
 import { isInstantDBPermissionError } from '../../core/instantdb-errors';
+import type { DBTransaction } from '@/@types/instantdb';
 
 type BoardViewMode = 'view' | 'edit';
 
 interface BoardProps {
-  mode: BoardViewMode;
-  board?: InstaQLEntity<
+  readonly mode: BoardViewMode;
+  readonly board?: InstaQLEntity<
     AppSchema,
     'boards',
     {
@@ -65,7 +66,7 @@ export function Board({ board, mode = 'view' }: BoardProps) {
       ?.approves.map((a) => a.id);
 
     runTransaction(async () => {
-      const transactions: ReturnType<typeof buildChangeTaskColumnTxs | typeof buildChangeTaskBoardTxs | typeof buildCreateEventTxs | typeof buildRemoveApprovesTxs>[number][] = [
+      const transactions: DBTransaction[] = [
         // Change task column and board
         ...buildChangeTaskColumnTxs({ taskId: task.id, columnId: targetColumn.id }),
         ...buildChangeTaskBoardTxs({ taskId: task.id, boardId: targetColumn.boardId }),
@@ -354,41 +355,43 @@ function DeleteBoardActions({ board }: { board?: InstaQLEntity<AppSchema, 'board
     );
   }
 
-  return [
-    <ConfirmAction
-      key={`${board.id}_${board.deletedAt}`}
-      opener={
-        <Button variant="outline" colorPalette="red">
-          Move from archive
-        </Button>
-      }
-      text="Board will return from archive"
-      onOk={() => {
-        runTransaction(() => undoArchiveBoard({ boardId: board.id }));
-      }}
-    />,
-    <ConfirmAction
-      key={`board.id_${board.deletedAt}`}
-      opener={
-        <Button colorPalette="red" variant="solid">
-          Delete
-        </Button>
-      }
-      text="Are you sure you want to delete this board? All columns will be deleted. This action cannot be undone."
-      onOk={() => {
-        runTransaction(
-          () => deleteBoard({ boardId: board.id }),
-          () => {
-            navigate('/boards');
-            toaster.create({
-              title: 'Board deleted',
-              type: 'success',
-            });
-          }
-        );
-      }}
-    />,
-  ];
+  return (
+    <>
+      <ConfirmAction
+        key={`${board.id}_${board.deletedAt}`}
+        opener={
+          <Button variant="outline" colorPalette="red">
+            Move from archive
+          </Button>
+        }
+        text="Board will return from archive"
+        onOk={() => {
+          runTransaction(() => undoArchiveBoard({ boardId: board.id }));
+        }}
+      />
+      <ConfirmAction
+        key={`board.id_${board.deletedAt}`}
+        opener={
+          <Button colorPalette="red" variant="solid">
+            Delete
+          </Button>
+        }
+        text="Are you sure you want to delete this board? All columns will be deleted. This action cannot be undone."
+        onOk={() => {
+          runTransaction(
+            () => deleteBoard({ boardId: board.id }),
+            () => {
+              navigate('/boards');
+              toaster.create({
+                title: 'Board deleted',
+                type: 'success',
+              });
+            }
+          );
+        }}
+      />
+    </>
+  );
 }
 
 async function archiveBoard({ boardId }: { boardId: string }) {

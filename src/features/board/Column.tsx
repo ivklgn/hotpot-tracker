@@ -42,11 +42,11 @@ export type ColumnType = InstaQLResult<
 >['columns'][0];
 
 interface ColumnHeaderProps {
-  column?: ColumnType;
-  isEdit: boolean;
-  onCreateTask: () => void;
-  onEditClick: () => void;
-  onCloseEdit: () => void;
+  readonly column?: ColumnType;
+  readonly isEdit: boolean;
+  readonly onCreateTask: () => void;
+  readonly onEditClick: () => void;
+  readonly onCloseEdit: () => void;
 }
 
 function ColumnHeader({ column, isEdit, onCreateTask, onEditClick, onCloseEdit }: ColumnHeaderProps) {

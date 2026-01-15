@@ -32,8 +32,8 @@ const Editor = lazy(() =>
 );
 
 interface TaskProps {
-  task?: InstaQLEntity<AppSchema, 'tasks', { smartParams: {}; columns: {} }>;
-  board?: InstaQLEntity<AppSchema, 'boards'>;
+  readonly task?: InstaQLEntity<AppSchema, 'tasks', { smartParams: {}; columns: {} }>;
+  readonly board?: InstaQLEntity<AppSchema, 'boards'>;
 }
 
 export function Task({ task, board }: TaskProps) {
@@ -53,7 +53,7 @@ export function Task({ task, board }: TaskProps) {
   );
   const [isCreateIssueVisible, setIsCreateIssueVisibility] = useState(false);
 
-  const handleRenameBoard = ({ value: newTitle }: { value: string }) => {
+  const handleRenameBoard = ({ value: newTitle }: { value: string }): void => {
     if (!newTitle || !task) return;
     runTransaction(
       () => renameTask({ taskId: task.id, newTitle }),
@@ -66,9 +66,9 @@ export function Task({ task, board }: TaskProps) {
     );
   };
 
-  const handleUpdateContent = (newContent: JSONContent) => {
+  const handleUpdateContent = (newContent: JSONContent): void => {
     if (!newContent || !task) return;
-    const jsonString = JSON.stringify(newContent);
+    const jsonString = JSON.stringify(newContent) as TaskContentJSON;
     const byteLength = new TextEncoder().encode(jsonString).length;
 
     if (byteLength > tariffLimits.free.max_size_task_content) {
@@ -96,14 +96,14 @@ export function Task({ task, board }: TaskProps) {
     );
   };
 
-  const handleCreateIssue = () => {
+  const handleCreateIssue = (): void => {
     const approveId = approvesData?.approves.find((a) => a.creatorId === user?.id)?.id;
     if (approveId) {
       removeApprove({ approveId });
     }
   };
 
-  const handleCreateCommentIssue = () => {
+  const handleCreateCommentIssue = (): void => {
     setIsCreateIssueVisibility(true);
   };
 
@@ -234,67 +234,73 @@ function DeleteTaskActions({ task }: { task?: InstaQLEntity<AppSchema, 'tasks'> 
     );
   }
 
-  return [
-    <ConfirmAction
-      key={`archive_${task.id}_${task.deletedAt}`}
-      opener={
-        <Button variant="outline" colorPalette="red">
-          Move from archive
-        </Button>
-      }
-      text="Task will return from archive"
-      onOk={() => {
-        runTransaction(() => undoArchiveTask({ taskId: task.id }));
-      }}
-    />,
-    <ConfirmAction
-      key={`delete_${task.id}_${task.deletedAt}`}
-      opener={
-        <Button colorPalette="red" variant="solid">
-          Delete
-        </Button>
-      }
-      text="Are you sure you want to delete this task? All content will be deleted. This action cannot be undone."
-      onOk={() => {
-        runTransaction(
-          () => deleteTask({ taskId: task.id }),
-          () => {
-            toaster.create({
-              title: 'Task deleted',
-              type: 'success',
-            });
-            navigate('/boards');
-          }
-        );
-      }}
-    />,
-  ];
+  return (
+    <>
+      <ConfirmAction
+        key={`archive_${task.id}_${task.deletedAt}`}
+        opener={
+          <Button variant="outline" colorPalette="red">
+            Move from archive
+          </Button>
+        }
+        text="Task will return from archive"
+        onOk={() => {
+          runTransaction(() => undoArchiveTask({ taskId: task.id }));
+        }}
+      />
+      <ConfirmAction
+        key={`delete_${task.id}_${task.deletedAt}`}
+        opener={
+          <Button colorPalette="red" variant="solid">
+            Delete
+          </Button>
+        }
+        text="Are you sure you want to delete this task? All content will be deleted. This action cannot be undone."
+        onOk={() => {
+          runTransaction(
+            () => deleteTask({ taskId: task.id }),
+            () => {
+              toaster.create({
+                title: 'Task deleted',
+                type: 'success',
+              });
+              navigate('/boards');
+            }
+          );
+        }}
+      />
+    </>
+  );
 }
 
-async function renameTask({ newTitle, taskId }: { taskId: string; newTitle: string }) {
-  return await db.transact([db.tx.tasks[taskId].merge({ updatedAt: new Date().toJSON(), title: newTitle })]);
+async function renameTask({ newTitle, taskId }: { taskId: string; newTitle: string }): Promise<void> {
+  await db.transact([db.tx.tasks[taskId].merge({ updatedAt: new Date().toJSON(), title: newTitle })]);
 }
 
-export async function updateTaskContent({ newContent, taskId }: { taskId: string; newContent: string }) {
-  return await db.transact([
-    db.tx.tasks[taskId].merge({ updatedAt: new Date().toJSON(), content: newContent }),
-  ]);
+export async function updateTaskContent({
+  newContent,
+  taskId,
+}: {
+  taskId: string;
+  newContent: TaskContentJSON;
+}): Promise<void> {
+  await db.transact([db.tx.tasks[taskId].merge({ updatedAt: new Date().toJSON(), content: newContent })]);
 }
 
-async function archiveTask({ taskId }: { taskId: string }) {
-  return await db.transact([
+async function archiveTask({ taskId }: { taskId: string }): Promise<void> {
+  await db.transact([
     db.tx.tasks[taskId].update({ updatedAt: new Date().toJSON(), deletedAt: new Date().toJSON() }),
   ]);
 }
 
-async function deleteTask({ taskId }: { taskId: string }) {
-  return await db.transact([db.tx.tasks[taskId].delete()]);
+async function deleteTask({ taskId }: { taskId: string }): Promise<void> {
+  await db.transact([db.tx.tasks[taskId].delete()]);
 }
 
-async function undoArchiveTask({ taskId }: { taskId: string }) {
-  return await db.transact([db.tx.tasks[taskId].update({ updatedAt: new Date().toJSON(), deletedAt: null })]);
+async function undoArchiveTask({ taskId }: { taskId: string }): Promise<void> {
+  await db.transact([db.tx.tasks[taskId].update({ updatedAt: new Date().toJSON(), deletedAt: null })]);
 }
 
-async function removeApprove({ approveId }: { approveId: string }) {
-  return await db.transact(db.tx.approves[approveId].delete());
+async function removeApprove({ approveId }: { approveId: string }): Promise<void> {
+  await db.transact(db.tx.approves[approveId].delete());
 }

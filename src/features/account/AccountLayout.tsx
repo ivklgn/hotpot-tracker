@@ -2,7 +2,7 @@ import { Flex } from '@chakra-ui/react';
 import { AccountContext } from './AccountContext';
 import { useLocalStorage } from '../web-storage';
 import { db } from '../../instantdb';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { Toaster } from '../../components/ui/toaster';
 import { ConnectionStatus } from '../../components/ConnectionStatus';
@@ -24,12 +24,17 @@ export function AccountLayout({ children }: AccountLayoutProps) {
     }
   }, [navigate, teams?.teams, isLoadingTeams]);
 
+  const contextValue = useMemo(
+    () => ({ currentTeamId, setCurrentTeamId }),
+    [currentTeamId, setCurrentTeamId]
+  );
+
   if (isLoadingTeams) {
     return null;
   }
 
   return (
-    <AccountContext.Provider value={{ currentTeamId, setCurrentTeamId }}>
+    <AccountContext.Provider value={contextValue}>
       <ConnectionStatus />
       <Flex direction="column" minH="100vh" className={s.accountLayout}>
         {children}

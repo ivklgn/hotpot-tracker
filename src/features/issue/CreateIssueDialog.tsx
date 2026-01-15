@@ -9,7 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog.tsx';
-import { cloneElement, ReactElement, useEffect, useRef, useState } from 'react';
+import { cloneElement, ReactElement, useRef, useState } from 'react';
 import { Field, HStack, Textarea } from '@chakra-ui/react';
 import { Button } from '@/components/ui/button.tsx';
 import { useCurrentEditor } from '@tiptap/react';
@@ -34,7 +34,8 @@ interface IProps {
 export function CreateIssueDialog({ taskId, opener, visible = false, onCreate, onClose }: IProps) {
   const openerRef = useRef(null);
 
-  const [isOpen, setIsOpen] = useState(visible);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isOpen = visible || internalOpen;
   const [content, setContent] = useState('');
 
   const { editor } = useCurrentEditor();
@@ -61,7 +62,7 @@ export function CreateIssueDialog({ taskId, opener, visible = false, onCreate, o
   };
 
   const handleClose = () => {
-    setIsOpen(false);
+    setInternalOpen(false);
     onClose?.();
   };
 
@@ -118,10 +119,6 @@ export function CreateIssueDialog({ taskId, opener, visible = false, onCreate, o
     );
   };
 
-  useEffect(() => {
-    setIsOpen(visible);
-  }, [visible]);
-
   return (
     <DialogRoot initialFocusEl={() => openerRef.current} open={isOpen} size="lg">
       <DialogTrigger>
@@ -129,7 +126,7 @@ export function CreateIssueDialog({ taskId, opener, visible = false, onCreate, o
           cloneElement(opener, {
             ref: openerRef,
             onClick() {
-              setIsOpen((prev) => !prev);
+              setInternalOpen((prev) => !prev);
             },
           })}
       </DialogTrigger>

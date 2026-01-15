@@ -1,5 +1,6 @@
 import { id } from '@instantdb/react';
 import { db } from '../../instantdb';
+import type { DBTransaction } from '@/@types/instantdb';
 
 // TODO: map types for events
 type EventType = 'review-task';
@@ -14,10 +15,10 @@ export async function createEvent({
   payload?: Record<string, string>;
   teamId: string;
   membershipId: string;
-}) {
+}): Promise<void> {
   const eventId = id();
 
-  return await db.transact([
+  const transactions: DBTransaction[] = [
     db.tx.events[eventId].update({
       updatedAt: new Date().toJSON(),
       type,
@@ -28,9 +29,11 @@ export async function createEvent({
     }),
     db.tx.events[eventId].link({ teams: teamId }),
     db.tx.memberships[membershipId].link({ events: eventId }),
-  ]);
+  ];
+
+  await db.transact(transactions);
 }
 
-export async function deleteEvent({ eventId }: { eventId: string }) {
-  return await db.transact([db.tx.events[eventId].delete()]);
+export async function deleteEvent({ eventId }: { eventId: string }): Promise<void> {
+  await db.transact([db.tx.events[eventId].delete()]);
 }

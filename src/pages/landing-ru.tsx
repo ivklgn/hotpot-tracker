@@ -39,8 +39,8 @@ import s from './landing.module.css';
 import { useColorMode } from '@/hooks/useColorMode';
 
 interface FeatureCardProps {
-  title: string;
-  text: string;
+  readonly title: string;
+  readonly text: string;
 }
 
 const FeatureCard = ({ title, text }: FeatureCardProps) => {

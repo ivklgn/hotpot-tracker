@@ -27,17 +27,17 @@ export default function App() {
         <AccountLayout>
           {!isMainPage && !isMainRuPage && <AccountNavbar />}
           <Switch>
-            <Route path="/workspace" component={() => <WorkspacePage />} />
-            <Route path="/boards" component={() => <BoardsPage />} />
-            <Route path="/board/:boardId" component={() => <BoardPage />} />
-            <Route path="/task/:taskId" component={() => <TaskPage />} />
-            <Route path="/search" component={() => <SearchPage />} />
-            <Route path="/settings" component={() => <SettingsPage />} />
-            <Route path="/" component={() => <Landing />} />
-            <Route path="/ru" component={() => <LandingRu />} />
-            <Route path="/404" component={() => <NotFoundPage />} />
-            <Route path="/auth" component={() => <Redirect to="/workspace" />} />
-            <Route path="*" component={() => <NotFoundPage />} />
+            <Route path="/workspace" component={WorkspacePage} />
+            <Route path="/boards" component={BoardsPage} />
+            <Route path="/board/:boardId" component={BoardPage} />
+            <Route path="/task/:taskId" component={TaskPage} />
+            <Route path="/search" component={SearchPage} />
+            <Route path="/settings" component={SettingsPage} />
+            <Route path="/" component={Landing} />
+            <Route path="/ru" component={LandingRu} />
+            <Route path="/404" component={NotFoundPage} />
+            <Route path="/auth">{() => <Redirect to="/workspace" />}</Route>
+            <Route path="*" component={NotFoundPage} />
           </Switch>
         </AccountLayout>
       </GlobalErrorBoundary>
@@ -47,12 +47,12 @@ export default function App() {
   return (
     <GlobalErrorBoundary>
       <Switch>
-        <Route path="/" component={() => <Landing />} />
-        <Route path="/ru" component={() => <LandingRu />} />
-        <Route path="/404" component={() => <NotFoundPage />} />
-        <Route path="/auth" component={() => <AuthPage />} />
-        <Route path="/workspace" component={() => <Redirect to="/auth" />} />
-        <Route path="*" component={() => <NotFoundPage />} />
+        <Route path="/" component={Landing} />
+        <Route path="/ru" component={LandingRu} />
+        <Route path="/404" component={NotFoundPage} />
+        <Route path="/auth" component={AuthPage} />
+        <Route path="/workspace">{() => <Redirect to="/auth" />}</Route>
+        <Route path="*" component={NotFoundPage} />
       </Switch>
     </GlobalErrorBoundary>
   );

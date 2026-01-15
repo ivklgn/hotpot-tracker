@@ -12,6 +12,7 @@ import { Link } from 'wouter';
 import { toaster } from '../../../../utils/toaster';
 
 interface ToWorkItem {
+  id: string;
   message: ReactNode;
   action: ReactNode;
 }
@@ -86,6 +87,7 @@ export function ToWork() {
 
     if (invites?.invites?.length) {
       const inviteItems = invites.invites.map((invite: Invite) => ({
+        id: `invite-${invite.id}`,
         message: (
           <>
             <Badge colorPalette="purple">invite</Badge> You have an invite to join{' '}
@@ -130,6 +132,7 @@ export function ToWork() {
 
     if (teams?.teams?.length === 0) {
       data.push({
+        id: 'no-teams',
         message: 'You dont have own teams. Create now and start working!',
         action: (
           <CreateTeamDialog
@@ -147,6 +150,7 @@ export function ToWork() {
       events.events.forEach((event: Event) => {
         if (event.type === 'review-task') {
           data.push({
+            id: `event-${event.id}`,
             message: (
               <>
                 <Badge colorPalette="blue">review</Badge> You have a task{' '}
@@ -196,8 +200,8 @@ export function ToWork() {
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {toWork.map((item, index) => (
-          <Table.Row key={index}>
+        {toWork.map((item) => (
+          <Table.Row key={item.id}>
             <Table.Cell>{item.message}</Table.Cell>
             <Table.Cell textAlign="end">{item.action}</Table.Cell>
           </Table.Row>

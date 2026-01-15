@@ -20,10 +20,10 @@ import { isJSON } from '@/utils/json.ts';
 import './Editor.css';
 
 export interface IEditorProps {
-  originalContent: JSONString;
-  onSaveClick(value: JSONContent): void;
-  onCreateInlineIssue?: () => void;
-  onCreateCommentIssue?: () => void;
+  readonly originalContent: TaskContentJSON;
+  readonly onSaveClick: (value: JSONContent) => void;
+  readonly onCreateInlineIssue?: () => void;
+  readonly onCreateCommentIssue?: () => void;
 }
 
 const extensions = [
