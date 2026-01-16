@@ -1,0 +1,31 @@
+{
+  "name": "@hotpot/shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./schema": {
+      "types": "./dist/instant.schema.d.ts",
+      "import": "./dist/instant.schema.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "instant:push": "instant-cli push perms --yes && instant-cli push schema --yes"
+  },
+  "peerDependencies": {
+    "@instantdb/core": ">=0.22.0"
+  },
+  "devDependencies": {
+    "@instantdb/core": "0.22.105",
+    "instant-cli": "^0.22.105",
+    "typescript": "~5.9.3"
+  }
+}

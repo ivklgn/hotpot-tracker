@@ -1,0 +1,27 @@
+{
+  "name": "server",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./dist/bin/www.js",
+    "dev": "tsx watch ./bin/www.ts",
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "3.0.12",
+    "@fastify/cors": "^11.2.0",
+    "@hotpot/shared": "workspace:*",
+    "@instantdb/admin": "0.22.105",
+    "@instantdb/core": "0.22.105",
+    "ai": "6.0.38",
+    "dotenv": "17.2.3",
+    "fastify": "5.7.1",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "25.0.9",
+    "tsx": "4.21.0",
+    "typescript": "5.9.3"
+  }
+}
