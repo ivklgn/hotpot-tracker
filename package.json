@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "dev": "pnpm -r dev",
-    "build": "pnpm -r build",
+    "build": "pnpm --filter @hotpot/shared build && pnpm --filter client build && pnpm --filter server build",
+    "build:client": "pnpm --filter @hotpot/shared build && pnpm --filter client build",
     "lint": "pnpm --filter client lint",
     "format": "prettier --write .",
     "prepare": "husky",
