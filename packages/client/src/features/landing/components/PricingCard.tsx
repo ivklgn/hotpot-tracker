@@ -124,7 +124,7 @@ export function PricingCard({ locale }: PricingCardProps) {
                   variant="outline"
                   asChild
                 >
-                  <a href="https://github.com/ivklgn/hotpot-tracker" target="_blank" rel="noopener noreferrer">
+                  <a href="https://github.com/ivklgn/hotpot-tracker?tab=readme-ov-file#self-hosted-deployment" target="_blank" rel="noopener noreferrer">
                     {locale.pricing.selfHosted.cta}
                     <Icon as={LuExternalLink} ml={2} boxSize={4} />
                   </a>
