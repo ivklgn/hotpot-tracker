@@ -1,0 +1,37 @@
+.heroPattern {
+  position: relative;
+  overflow: hidden;
+}
+
+.heroPattern::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% -10%, var(--blob-primary) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 40% at 80% 0%, var(--blob-secondary) 0%, transparent 45%),
+    radial-gradient(ellipse 50% 60% at 50% 80%, var(--blob-accent) 0%, transparent 40%);
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.heroPattern::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+}
+
+:root {
+  --blob-primary: rgba(59, 130, 246, 0.3);
+  --blob-secondary: rgba(147, 51, 234, 0.2);
+  --blob-accent: rgba(236, 72, 153, 0.15);
+}
+
+[data-theme='dark'] {
+  --blob-primary: rgba(59, 130, 246, 0.2);
+  --blob-secondary: rgba(147, 51, 234, 0.15);
+  --blob-accent: rgba(236, 72, 153, 0.1);
+}
