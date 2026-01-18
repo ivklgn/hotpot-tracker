@@ -20,7 +20,7 @@ import { LuPlus, LuSearch } from 'react-icons/lu';
 import { useAccount } from '../account/AccountContext';
 import { Select } from 'chakra-react-select';
 import { useDebounce } from '../../hooks/useDebounce';
-import tariffLimits from '@/tariff-limits.json';
+import { tariffLimits } from '@hotpot/shared';
 import { toaster } from '@/utils/toaster';
 import { useLocation } from 'wouter';
 import { isInstantDBPermissionError } from '../../core/instantdb-errors';

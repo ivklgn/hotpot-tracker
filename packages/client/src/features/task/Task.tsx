@@ -22,7 +22,7 @@ import { JSONContent } from '@tiptap/react';
 import { ConfirmAction } from '../../components/ConfirmAction';
 import { TaskApprove } from './TaskApprove';
 import { runTransaction } from '../../core/instantdb-transaction';
-import tariffLimits from '@/tariff-limits.json';
+import { tariffLimits } from '@hotpot/shared';
 import { Link as ChakraLink } from '@chakra-ui/react';
 import { toaster } from '@/utils/toaster';
 import { CreateIssueDialog } from '../issue/CreateIssueDialog';

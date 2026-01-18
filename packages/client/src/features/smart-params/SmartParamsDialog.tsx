@@ -21,7 +21,7 @@ import { useAccount } from '../account/AccountContext';
 import { AppSchema } from '@hotpot/shared';
 import { isJSON } from '../../utils/json';
 import { runTransaction } from '../../core/instantdb-transaction';
-import tariffLimits from '@/tariff-limits.json';
+import { tariffLimits } from '@hotpot/shared';
 import { toaster } from '@/utils/toaster';
 import { isInstantDBPermissionError } from '../../core/instantdb-errors';
 

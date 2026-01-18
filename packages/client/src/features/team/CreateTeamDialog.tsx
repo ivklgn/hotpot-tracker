@@ -16,7 +16,7 @@ import React from 'react';
 import { db } from '../../instantdb';
 import { id } from '@instantdb/react';
 import { runTransaction } from '../../core/instantdb-transaction';
-import tariffLimits from '@/tariff-limits.json';
+import { tariffLimits } from '@hotpot/shared';
 import { toaster } from '@/utils/toaster';
 import { isInstantDBPermissionError } from '../../core/instantdb-errors';
 

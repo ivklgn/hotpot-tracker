@@ -1,4 +1,4 @@
-import tariffLimits from './tariff-limits.json';
+import tariffLimits from './src/tariff-limits.json';
 
 export default {
   teams: {

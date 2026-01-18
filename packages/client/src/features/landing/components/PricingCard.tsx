@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react';
 import { Link } from 'wouter';
 import { LuCheck, LuExternalLink } from 'react-icons/lu';
-import tariffLimits from '@/tariff-limits.json';
+import { tariffLimits } from '@hotpot/shared';
 import type { LandingLocale } from '../locales/types';
 
 interface PricingCardProps {

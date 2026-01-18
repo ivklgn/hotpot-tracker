@@ -2,7 +2,7 @@ import { Box, ButtonGroup, Flex, IconButton, Stack, Textarea } from '@chakra-ui/
 import { LuCheck } from 'react-icons/lu';
 import { Ref, useState } from 'react';
 import { runTransaction } from '@/core/instantdb-transaction.ts';
-import tariffLimits from '@/tariff-limits.json';
+import { tariffLimits } from '@hotpot/shared';
 import { id, InstaQLResult } from '@instantdb/react';
 import { db } from '@/instantdb.ts';
 import { Reply } from '@/features/issue/Reply.tsx';

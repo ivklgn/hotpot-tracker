@@ -22,7 +22,7 @@ import { CreateBoardDialog } from './CreateBoardDialog';
 import { AppSchema } from '@hotpot/shared';
 import { SmartParams } from '../smart-params';
 import { runTransaction } from '../../core/instantdb-transaction';
-import tariffLimits from '@/tariff-limits.json';
+import { tariffLimits } from '@hotpot/shared';
 import { AIReport } from '../ai/AIReport';
 import { toaster } from '@/utils/toaster';
 import { isInstantDBPermissionError } from '../../core/instantdb-errors';

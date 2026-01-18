@@ -18,7 +18,7 @@ import { db } from '@/instantdb.ts';
 import { runTransaction } from '@/core/instantdb-transaction.ts';
 import { updateTaskContent } from '@/features/task/Task.tsx';
 import { useParams } from 'wouter';
-import tariffLimits from '@/tariff-limits.json';
+import { tariffLimits } from '@hotpot/shared';
 import { useAccount } from '../account/AccountContext';
 import { toaster } from '@/utils/toaster';
 import { isInstantDBPermissionError } from '../../core/instantdb-errors';
