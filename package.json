@@ -1,5 +1,5 @@
 {
-  "name": "hotpot-tracker-monorepo",
+  "name": "hotpot-tracker",
   "private": true,
   "type": "module",
   "scripts": {
