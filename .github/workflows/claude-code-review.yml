@@ -52,8 +52,8 @@ jobs:
               }
             }
 
-          # Allow archcore MCP tools
-          claude_args: '--allowedTools mcp__archcore__*'
+          # Allow archcore MCP tools and skip permission prompts (required for headless CI)
+          claude_args: '--allowedTools mcp__archcore__* --dangerously-skip-permissions'
 
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options
