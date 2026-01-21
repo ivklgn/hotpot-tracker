@@ -1,6 +1,6 @@
 {
   "permissions": {
-    "allow": []
+    "allow": ["WebSearch", "WebFetch(domain:opencode.ai)"]
   },
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": ["context7", "archcore"]

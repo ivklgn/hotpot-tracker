@@ -1,0 +1,10 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "archcore": {
+      "type": "remote",
+      "url": "https://archcore-demo-95p6u.ondigitalocean.app/mcp/message",
+      "enabled": true
+    }
+  }
+}

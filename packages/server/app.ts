@@ -83,7 +83,7 @@ app.register(cors, {
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
 });
 
-app.get('/health', async (request, reply) => {
+app.get('/health', async (_request, _reply) => {
   return { status: 'ok' };
 });
 
@@ -99,11 +99,9 @@ app.delete('/api/account', async function (request, reply) {
 
   const refreshToken = request.headers.refresh_token as string;
   const scopedDb = db.asUser({ token: refreshToken });
-  let user: AuthUser | undefined;
 
   try {
-    const result = await scopedDb.auth.getUser({ refresh_token: refreshToken });
-    user = result as AuthUser;
+    await scopedDb.auth.getUser({ refresh_token: refreshToken });
   } catch (e) {
     return reply.status(401).send({
       statusCode: 401,
@@ -146,17 +144,26 @@ app.post('/api/ai-report', async function (request, reply) {
       statusCode: 400,
       error: 'Bad Request',
       message: 'Invalid request parameters',
+      details: 'Please provide a valid boardId/preset in the request body',
+    });
+  }
+
+  if (!request.headers.refresh_token || typeof request.headers.refresh_token !== 'string') {
+    return reply.status(400).send({
+      statusCode: 400,
+      error: 'Bad Request',
+      message: 'Invalid request parameters',
       details: 'Please provide a valid refresh_token in the request headers',
     });
   }
 
   const refreshToken = request.headers.refresh_token as string;
   const scopedDb = db.asUser({ token: refreshToken });
-  let user: AuthUser | undefined;
+  let _user: AuthUser | undefined;
 
   try {
     const result = await scopedDb.auth.getUser({ refresh_token: refreshToken });
-    user = result as AuthUser;
+    _user = result as AuthUser;
   } catch (e) {
     return reply.status(401).send({
       statusCode: 401,
@@ -262,21 +269,21 @@ function mapBoardData(board: any) {
   return {
     boardName: board.name || 'Unnamed Board',
     boardSmartParams:
-      board.smartParams?.map((sp) => ({
+      board.smartParams?.map((sp: any) => ({
         name: sp?.name || '',
         type: sp?.type || '',
         value: sp?.value || '',
       })) || [],
     columnsWithTasks:
       board.columns
-        ?.map((col) => {
+        ?.map((col: any) => {
           if (!col) return null;
           return {
             columnName: col?.statuses?.name || 'Unnamed Column',
             approveRule: col.approveRule || null,
             tasks:
               col.tasks
-                ?.map((task) => {
+                ?.map((task: any) => {
                   if (!task) return null;
                   return {
                     title: task.title || 'Unnamed Task',
@@ -284,7 +291,7 @@ function mapBoardData(board: any) {
                     updatedAt: task.updatedAt || null,
                     smartParams:
                       task.smartParams
-                        ?.map((sp) => {
+                        ?.map((sp: any) => {
                           if (!sp) return null;
                           return {
                             name: sp.name || '',
@@ -295,7 +302,7 @@ function mapBoardData(board: any) {
                         .filter(Boolean) || [],
                     approves:
                       task.approves
-                        ?.map((approve) => {
+                        ?.map((approve: any) => {
                           if (!approve) return null;
                           return {
                             contributorId: approve.contributorId || 'Unknown',
@@ -342,7 +349,7 @@ function transformBoardToPrompt(data: ReturnType<typeof mapBoardData>) {
       lines.push(`Approval Rule: ${column.approveRule || 'none'}\n`);
 
       if (column.tasks && Array.isArray(column.tasks)) {
-        column.tasks.forEach((task, i) => {
+        column.tasks.forEach((task: any, i: number) => {
           if (!task) return;
 
           lines.push(`${i + 1}. Task: ${task.title || 'Unnamed'}`);
@@ -382,7 +389,7 @@ function transformBoardToPrompt(data: ReturnType<typeof mapBoardData>) {
           }
 
           if (task.approves && Array.isArray(task.approves) && task.approves.length > 0) {
-            task.approves.forEach((a) => {
+            task.approves.forEach((a: any) => {
               if (!a) return;
               lines.push(`- Approved by contributor: ${a.contributorId || 'Unknown'}`);
             });
