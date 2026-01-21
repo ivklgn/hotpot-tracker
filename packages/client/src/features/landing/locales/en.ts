@@ -19,12 +19,12 @@ export const enStrings: LandingLocale = {
     loginTitle: 'Log in or register with email',
   },
   intro: {
-    title: 'Another Trello clone?',
+    title: 'Lovingly built by engineers',
     description:
       'Almost... but not quite. Besides simple primitives like boards and tasks, Hotpot offers built-in tools for team engagement.',
   },
   about: {
-    title: 'Lovingly built by engineers',
+    title: 'Another Trello clone?',
     description:
       'In software development, there are approaches and tools that are useful for business too. Hotpot borrows ideas from Github/Gitlab to bring fresh thinking into team workflows.',
   },
