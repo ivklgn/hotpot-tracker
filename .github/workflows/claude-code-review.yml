@@ -43,8 +43,13 @@ jobs:
           # Enable MCP servers from .mcp.json
           mcp_config: '.mcp.json'
 
-          # Explicitly allow archcore MCP tools in headless environment
-          claude_args: '--allowedTools mcp__archcore__*'
+          # Configure permissions to allow archcore MCP tools
+          settings: |
+            {
+              "permissions": {
+                "allow": ["mcp__archcore__*"]
+              }
+            }
 
           # See https://github.com/anthropics/claude-code-action/blob/main/docs/usage.md
           # or https://code.claude.com/docs/en/cli-reference for available options

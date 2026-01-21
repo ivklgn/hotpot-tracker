@@ -43,8 +43,13 @@ jobs:
           # Enable MCP servers from .mcp.json
           mcp_config: '.mcp.json'
 
-          # Explicitly allow archcore MCP tools in headless environment
-          claude_args: '--allowedTools mcp__archcore__*'
+          # Configure permissions to allow archcore MCP tools
+          settings: |
+            {
+              "permissions": {
+                "allow": ["mcp__archcore__*"]
+              }
+            }
 
           # Optional: Give a custom prompt to Claude. If this is not specified, Claude will perform the instructions specified in the comment that tagged it.
           # prompt: 'Update the pull request description to include a summary of changes.'
