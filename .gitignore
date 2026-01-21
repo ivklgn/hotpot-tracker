@@ -28,5 +28,6 @@ dist-ssr
 # Sentry Config File
 .env.sentry-build-plugin
 
-.claude/
+.claude/*
+!.claude/settings.local.json
 doc
