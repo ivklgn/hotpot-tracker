@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "archcore": {
+      "type": "http",
+      "url": "https://archcore-demo-95p6u.ondigitalocean.app/mcp/message"
+    }
+  }
+}
